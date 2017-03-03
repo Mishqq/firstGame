@@ -28230,14 +28230,50 @@
 	
 	var _Bunny2 = _interopRequireDefault(_Bunny);
 	
+	var _background = __webpack_require__(140);
+	
+	var _background2 = _interopRequireDefault(_background);
+	
+	var _ChipView = __webpack_require__(142);
+	
+	var _ChipView2 = _interopRequireDefault(_ChipView);
+	
+	var _assetsLoader = __webpack_require__(143);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	var game = new _Game2.default(_config2.default);
 	
 	//Add the bunny
-	var bunny = new _Bunny2.default();
-	bunny.position.set(200, 150);
-	game.stage.addChild(bunny);
+	// let bunny = new Bunny();
+	// bunny.position.set(200,150);
+	// game.stage.addChild(bunny);
+	
+	
+	// background
+	var bg = new _background2.default();
+	game.stage.addChild(bg);
+	
+	PIXI.loader.add(["./assets/images/chips.json"]).load(function () {
+		var chip0Texture = PIXI.utils.TextureCache["chip0"];
+		var chip0_tblTexture = PIXI.utils.TextureCache["chip0_tbl"];
+	
+		var dungeon = new PIXI.Sprite(chip0Texture);
+		var dungeon1 = new PIXI.Sprite(chip0_tblTexture);
+	
+		game.stage.addChild(dungeon);
+		game.stage.addChild(dungeon1);
+	});
+	
+	// let chip = new ChipView();
+	// game.stage.addChild(chip);
+	
+	/**
+	 * Прогружаем все json-атласы
+	 */
+	// assetLoader(()=>{
+	// 	game.start();
+	// });
 	
 	game.start();
 
@@ -28283,8 +28319,8 @@
 	  value: true
 	});
 	exports.default = {
-	  width: 800,
-	  height: 600,
+	  width: 1980,
+	  height: 1024,
 	  webgl: true, //false for 2dContext, true for autoDetectRenderer
 	  rendererOptions: {
 	    //pixi rendererOptions
@@ -28299,7 +28335,7 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	  value: true
+		value: true
 	});
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -28313,47 +28349,47 @@
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var Game = function () {
-	  function Game(config) {
-	    _classCallCheck(this, Game);
+		function Game(config) {
+			_classCallCheck(this, Game);
 	
-	    var Renderer = config.webgl ? _pixi2.default.autoDetectRenderer : _pixi2.default.CanvasRenderer;
-	    this.renderer = new Renderer(config.width || 800, config.height || 600, config.rendererOptions);
-	    document.body.appendChild(this.renderer.view);
+			var Renderer = config.webgl ? _pixi2.default.autoDetectRenderer : _pixi2.default.CanvasRenderer;
+			this.renderer = new Renderer(config.width || 800, config.height || 600, config.rendererOptions);
+			document.body.appendChild(this.renderer.view);
 	
-	    this.animationLoop = new _pixi2.default.AnimationLoop(this.renderer);
-	    this.animationLoop.on('prerender', this.update.bind(this));
-	  }
+			this.animationLoop = new _pixi2.default.AnimationLoop(this.renderer);
+			this.animationLoop.on('prerender', this.update.bind(this));
+		}
 	
-	  _createClass(Game, [{
-	    key: 'update',
-	    value: function update() {
-	      for (var i = 0; i < this.stage.children.length; i++) {
-	        if (this.stage.children[i].update) {
-	          this.stage.children[i].update(this.animationLoop.delta);
-	        }
-	      }
-	    }
-	  }, {
-	    key: 'start',
-	    value: function start() {
-	      this.animationLoop.start();
-	    }
-	  }, {
-	    key: 'stop',
-	    value: function stop() {
-	      this.animationLoop.stop();
-	    }
-	  }, {
-	    key: 'stage',
-	    get: function get() {
-	      return this.animationLoop.stage;
-	    },
-	    set: function set(stage) {
-	      this.animationLoop.stage = stage;
-	    }
-	  }]);
+		_createClass(Game, [{
+			key: 'update',
+			value: function update() {
+				for (var i = 0; i < this.stage.children.length; i++) {
+					if (this.stage.children[i].update) {
+						this.stage.children[i].update(this.animationLoop.delta);
+					}
+				}
+			}
+		}, {
+			key: 'start',
+			value: function start() {
+				this.animationLoop.start();
+			}
+		}, {
+			key: 'stop',
+			value: function stop() {
+				this.animationLoop.stop();
+			}
+		}, {
+			key: 'stage',
+			get: function get() {
+				return this.animationLoop.stage;
+			},
+			set: function set(stage) {
+				this.animationLoop.stage = stage;
+			}
+		}]);
 	
-	  return Game;
+		return Game;
 	}();
 	
 	exports.default = Game;
@@ -28405,6 +28441,132 @@
 	}(_pixi2.default.Sprite);
 	
 	exports.default = Bunny;
+
+/***/ },
+/* 140 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _pixi = __webpack_require__(1);
+	
+	var _pixi2 = _interopRequireDefault(_pixi);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var Background = function (_PIXI$Sprite) {
+		_inherits(Background, _PIXI$Sprite);
+	
+		function Background() {
+			_classCallCheck(this, Background);
+	
+			var _this = _possibleConstructorReturn(this, (Background.__proto__ || Object.getPrototypeOf(Background)).call(this, _pixi2.default.Texture.fromImage('./assets/images/bg.jpg')));
+	
+			_this.position.set(0, 0);
+			_this.anchor.set(0);
+			// this.scale.x = 1;
+			_this.width = 1980;
+			_this.height = 1024;
+			// this.scale.y = 0.5;
+			return _this;
+		}
+	
+		return Background;
+	}(_pixi2.default.Sprite);
+	
+	exports.default = Background;
+
+/***/ },
+/* 141 */,
+/* 142 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _pixi = __webpack_require__(1);
+	
+	var _pixi2 = _interopRequireDefault(_pixi);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var ChipView = function (_PIXI$Sprite) {
+		_inherits(ChipView, _PIXI$Sprite);
+	
+		function ChipView() {
+			_classCallCheck(this, ChipView);
+	
+			return _possibleConstructorReturn(this, (ChipView.__proto__ || Object.getPrototypeOf(ChipView)).call(this));
+	
+			// super(PIXI.Texture.fromFrame('./assets/images/chips.json'));
+			// super(PIXI.resources["./assets/images/chips.json"].textures["chip0"]);
+	
+			// this.loadRes( this.createEnt );
+			// this.anchor.set(0.5);
+		}
+	
+		// loadRes(callback){
+		// 	PIXI.loader.add(['./assets/images/ships.json',]).load(callback);
+		// }
+		//
+		// createEnt(param, param2){
+		//
+		// }
+	
+	
+		return ChipView;
+	}(_pixi2.default.Sprite);
+	
+	exports.default = ChipView;
+
+/***/ },
+/* 143 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.assetLoader = undefined;
+	
+	var _pixi = __webpack_require__(1);
+	
+	var _pixi2 = _interopRequireDefault(_pixi);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var path = './assets/images/';
+	var assets = ['anums.json', 'bg_numbers.json', 'blights.json', 'buttons.json', 'chips.json', 'fields.json', 'timer.json'];
+	
+	assets = assets.map(function (item) {
+		return path + item;
+	});
+	
+	function assetLoader(callback) {
+		_pixi2.default.loader.add(assets).load(callback);
+	}
+	
+	exports.assetLoader = assetLoader;
 
 /***/ }
 /******/ ]);
