@@ -28214,74 +28214,14 @@
 
 	'use strict';
 	
-	var _plugins = __webpack_require__(135);
+	var _gameController = __webpack_require__(148);
 	
-	var _plugins2 = _interopRequireDefault(_plugins);
-	
-	var _config = __webpack_require__(137);
-	
-	var _config2 = _interopRequireDefault(_config);
-	
-	var _Game = __webpack_require__(138);
-	
-	var _Game2 = _interopRequireDefault(_Game);
-	
-	var _background = __webpack_require__(140);
-	
-	var _background2 = _interopRequireDefault(_background);
-	
-	var _ChipView = __webpack_require__(141);
-	
-	var _ChipView2 = _interopRequireDefault(_ChipView);
-	
-	var _ButtonView = __webpack_require__(147);
-	
-	var _ButtonView2 = _interopRequireDefault(_ButtonView);
-	
-	var _controller = __webpack_require__(148);
-	
-	var _controller2 = _interopRequireDefault(_controller);
-	
-	var _assetsLoader = __webpack_require__(142);
+	var _gameController2 = _interopRequireDefault(_gameController);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var game = new _Game2.default(_config2.default);
-	
-	var gameCtrl = new _controller2.default();
-	
-	/**
-	 * Вешаем на кнопки свои обработчики из контроллера
-	 */
-	var buttonsCallbackConfig = {
-		btnCancel: gameCtrl.cancelBtnClick,
-		btnClear: gameCtrl.clearBtnClick,
-		btnRepeat: gameCtrl.repeatBtnClick,
-		btnX2: gameCtrl.x2BtnClick
-	};
-	
-	/**
-	 * background
-	 */
-	var bg = new _background2.default();
-	game.stage.addChild(bg);
-	
-	/**
-	 * Прогружаем все json-атласы
-	 */
-	(0, _assetsLoader.assetLoader)(function () {
-		['chip0', 'chip1', 'chip2', 'chip3', 'chip4'].forEach(function (item) {
-			var chip = new _ChipView2.default(item, gameCtrl.chipClick, gameCtrl);
-			game.stage.addChild(chip);
-		});
-	
-		for (var key in buttonsCallbackConfig) {
-			var btn = new _ButtonView2.default(key, buttonsCallbackConfig[key], gameCtrl);
-			game.stage.addChild(btn);
-		}
-	
-		game.start();
-	});
+	var gameCtrl = new _gameController2.default();
+	gameCtrl.init();
 
 /***/ },
 /* 135 */
@@ -28401,8 +28341,7 @@
 	exports.default = Game;
 
 /***/ },
-/* 139 */,
-/* 140 */
+/* 139 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28446,7 +28385,7 @@
 	exports.default = Background;
 
 /***/ },
-/* 141 */
+/* 140 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28461,11 +28400,11 @@
 	
 	var _pixi2 = _interopRequireDefault(_pixi);
 	
-	var _spritesStore = __webpack_require__(143);
+	var _spritesStore = __webpack_require__(141);
 	
-	var _defaultPositions = __webpack_require__(146);
+	var _defaultPositions = __webpack_require__(142);
 	
-	var _chipValues = __webpack_require__(149);
+	var _chipValues = __webpack_require__(143);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -28543,7 +28482,167 @@
 	exports.default = ChipView;
 
 /***/ },
+/* 141 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	var spriteGroups = ['chips', 'anums', 'bgNumbers', 'blights', 'buttons', 'fields', 'timer'],
+	    spritesStore = {};
+	
+	spriteGroups.forEach(function (item) {
+		spritesStore[item] = {};
+	});
+	
+	exports.spritesStore = spritesStore;
+
+/***/ },
 /* 142 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	var defaultPositions = {
+		chips: {
+			chip0: { x: 659, y: 907 },
+			chip1: { x: 825, y: 907 },
+			chip2: { x: 991, y: 907 },
+			chip3: { x: 1157, y: 907 },
+			chip4: { x: 1323, y: 907 }
+		},
+		buttons: {
+			btnCancel: { x: 200, y: 884 },
+			btnClear: { x: 430, y: 884 },
+			btnRepeat: { x: 1500, y: 884 },
+			btnX2: { x: 1620, y: 884 }
+		},
+		fields: {
+			big: { x: 100, y: 200 },
+			small: { x: 1200, y: 300 }
+		}
+	};
+	
+	exports.defaultPositions = defaultPositions;
+
+/***/ },
+/* 143 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	var chipTextStyle = {
+		fontFamily: 'Arial',
+		fontSize: 32,
+		fill: 0xffffff,
+		align: 'center'
+	};
+	
+	var chipValues = {
+		chip0: 100,
+		chip1: 500,
+		chip2: 1000,
+		chip3: 2000,
+		chip4: 3000
+	};
+	
+	exports.chipValues = chipValues;
+	exports.chipTextStyle = chipTextStyle;
+
+/***/ },
+/* 144 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _pixi = __webpack_require__(1);
+	
+	var _pixi2 = _interopRequireDefault(_pixi);
+	
+	var _spritesStore = __webpack_require__(141);
+	
+	var _defaultPositions = __webpack_require__(142);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var ButtonView = function (_PIXI$Sprite) {
+		_inherits(ButtonView, _PIXI$Sprite);
+	
+		function ButtonView(btnType, callback, ctx) {
+			var _ret;
+	
+			_classCallCheck(this, ButtonView);
+	
+			var _this = _possibleConstructorReturn(this, (ButtonView.__proto__ || Object.getPrototypeOf(ButtonView)).call(this));
+	
+			_this.onClickCb = callback ? callback : undefined;
+			_this.cbCtx = ctx ? ctx : _this;
+	
+			// Контейнер для фишки с тенью и текстом
+			var spriteContainer = new _pixi2.default.Container();
+	
+			spriteContainer.x = _defaultPositions.defaultPositions.buttons[btnType].x;
+			spriteContainer.y = _defaultPositions.defaultPositions.buttons[btnType].y;
+	
+			if (btnType === 'btnCancel' || btnType === 'btnClear') btnType = 'btnAction';
+	
+			var sprite = new _pixi2.default.Sprite(_spritesStore.spritesStore.buttons[btnType]);
+	
+			// Opt-in to interactivity
+			sprite.interactive = true;
+	
+			// Shows hand cursor
+			sprite.buttonMode = true;
+	
+			sprite.anchor.set(0.5);
+	
+			sprite.on('tap', _this.onClick, _this);
+			sprite.on('click', _this.onClick, _this);
+	
+			spriteContainer.addChild(sprite);
+	
+			return _ret = spriteContainer, _possibleConstructorReturn(_this, _ret);
+		}
+	
+		_createClass(ButtonView, [{
+			key: 'onClick',
+			value: function onClick() {
+				if (this.onClickCb) {
+					this.onClickCb.call(this.cbCtx, 'lol');
+				} else {
+					console.log('this default click on button sprite');
+				}
+			}
+		}]);
+	
+		return ButtonView;
+	}(_pixi2.default.Sprite);
+	
+	exports.default = ButtonView;
+
+/***/ },
+/* 145 */,
+/* 146 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28557,9 +28656,9 @@
 	
 	var _pixi2 = _interopRequireDefault(_pixi);
 	
-	var _spritesStore = __webpack_require__(143);
+	var _spritesStore = __webpack_require__(141);
 	
-	var _constants = __webpack_require__(144);
+	var _constants = __webpack_require__(147);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -28599,25 +28698,7 @@
 	exports.assetLoader = assetLoader;
 
 /***/ },
-/* 143 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	var spriteGroups = ['chips', 'anums', 'bgNumbers', 'blights', 'buttons', 'fields', 'timer'],
-	    spritesStore = {};
-	
-	spriteGroups.forEach(function (item) {
-		spritesStore[item] = {};
-	});
-	
-	exports.spritesStore = spritesStore;
-
-/***/ },
-/* 144 */
+/* 147 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -28725,117 +28806,6 @@
 	exports.constants = constants;
 
 /***/ },
-/* 145 */,
-/* 146 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	var defaultPositions = {
-		chips: {
-			chip0: { x: 659, y: 907 },
-			chip1: { x: 825, y: 907 },
-			chip2: { x: 991, y: 907 },
-			chip3: { x: 1157, y: 907 },
-			chip4: { x: 1323, y: 907 }
-		},
-		buttons: {
-			btnCancel: { x: 200, y: 884 },
-			btnClear: { x: 430, y: 884 },
-			btnRepeat: { x: 1500, y: 884 },
-			btnX2: { x: 1620, y: 884 }
-		}
-	};
-	
-	exports.defaultPositions = defaultPositions;
-
-/***/ },
-/* 147 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _pixi = __webpack_require__(1);
-	
-	var _pixi2 = _interopRequireDefault(_pixi);
-	
-	var _spritesStore = __webpack_require__(143);
-	
-	var _defaultPositions = __webpack_require__(146);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var ButtonView = function (_PIXI$Sprite) {
-		_inherits(ButtonView, _PIXI$Sprite);
-	
-		function ButtonView(btnType, callback, ctx) {
-			var _ret;
-	
-			_classCallCheck(this, ButtonView);
-	
-			var _this = _possibleConstructorReturn(this, (ButtonView.__proto__ || Object.getPrototypeOf(ButtonView)).call(this));
-	
-			_this.onClickCb = callback ? callback : undefined;
-			_this.cbCtx = ctx ? ctx : _this;
-	
-			// Контейнер для фишки с тенью и текстом
-			var spriteContainer = new _pixi2.default.Container();
-	
-			spriteContainer.x = _defaultPositions.defaultPositions.buttons[btnType].x;
-			spriteContainer.y = _defaultPositions.defaultPositions.buttons[btnType].y;
-	
-			if (btnType === 'btnCancel' || btnType === 'btnClear') btnType = 'btnAction';
-	
-			var sprite = new _pixi2.default.Sprite(_spritesStore.spritesStore.buttons[btnType]);
-	
-			// Opt-in to interactivity
-			sprite.interactive = true;
-	
-			// Shows hand cursor
-			sprite.buttonMode = true;
-	
-			sprite.anchor.set(0.5);
-	
-			sprite.on('tap', _this.onClick, _this);
-			sprite.on('click', _this.onClick, _this);
-	
-			spriteContainer.addChild(sprite);
-	
-			return _ret = spriteContainer, _possibleConstructorReturn(_this, _ret);
-		}
-	
-		_createClass(ButtonView, [{
-			key: 'onClick',
-			value: function onClick() {
-				if (this.onClickCb) {
-					this.onClickCb.call(this.cbCtx, 'lol');
-				} else {
-					console.log('this default click on button sprite');
-				}
-			}
-		}]);
-	
-		return ButtonView;
-	}(_pixi2.default.Sprite);
-	
-	exports.default = ButtonView;
-
-/***/ },
 /* 148 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -28851,6 +28821,36 @@
 	
 	var _pixi2 = _interopRequireDefault(_pixi);
 	
+	var _plugins = __webpack_require__(135);
+	
+	var _plugins2 = _interopRequireDefault(_plugins);
+	
+	var _config = __webpack_require__(137);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
+	var _Game = __webpack_require__(138);
+	
+	var _Game2 = _interopRequireDefault(_Game);
+	
+	var _background = __webpack_require__(139);
+	
+	var _background2 = _interopRequireDefault(_background);
+	
+	var _ChipView = __webpack_require__(140);
+	
+	var _ChipView2 = _interopRequireDefault(_ChipView);
+	
+	var _ButtonView = __webpack_require__(144);
+	
+	var _ButtonView2 = _interopRequireDefault(_ButtonView);
+	
+	var _assetsLoader = __webpack_require__(146);
+	
+	var _gameFiledBigController = __webpack_require__(149);
+	
+	var _gameFiledBigController2 = _interopRequireDefault(_gameFiledBigController);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -28858,9 +28858,54 @@
 	var GameController = function () {
 		function GameController() {
 			_classCallCheck(this, GameController);
+	
+			this.game = new _Game2.default(_config2.default);
 		}
 	
 		_createClass(GameController, [{
+			key: 'init',
+			value: function init() {
+				var _this = this;
+	
+				console.log('init GameController');
+	
+				/**
+	    * Вешаем на кнопки свои обработчики из контроллера
+	    */
+				var buttonsCallbackConfig = {
+					btnCancel: this.cancelBtnClick,
+					btnClear: this.clearBtnClick,
+					btnRepeat: this.repeatBtnClick,
+					btnX2: this.x2BtnClick
+				};
+	
+				/**
+	    * background
+	    */
+				var bg = new _background2.default();
+				this.game.stage.addChild(bg);
+	
+				var fieldBig = new _gameFiledBigController2.default();
+				fieldBig.addToStage(this.game.stage);
+	
+				/**
+	    * Прогружаем все json-атласы
+	    */
+				(0, _assetsLoader.assetLoader)(function () {
+					['chip0', 'chip1', 'chip2', 'chip3', 'chip4'].forEach(function (item) {
+						var chip = new _ChipView2.default(item, _this.chipClick, _this);
+						_this.game.stage.addChild(chip);
+					});
+	
+					for (var key in buttonsCallbackConfig) {
+						var btn = new _ButtonView2.default(key, buttonsCallbackConfig[key], _this);
+						_this.game.stage.addChild(btn);
+					}
+	
+					_this.game.start();
+				});
+			}
+		}, {
 			key: 'chipClick',
 			value: function chipClick(data) {
 				console.log('This is chipClick from controller', data, this);
@@ -28894,6 +28939,199 @@
 
 /***/ },
 /* 149 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _pixi = __webpack_require__(1);
+	
+	var _pixi2 = _interopRequireDefault(_pixi);
+	
+	var _gameFiledBigView = __webpack_require__(150);
+	
+	var _gameFiledBigView2 = _interopRequireDefault(_gameFiledBigView);
+	
+	var _gameFieldBigCellMap = __webpack_require__(151);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var GameFiledBigController = function () {
+		function GameFiledBigController() {
+			_classCallCheck(this, GameFiledBigController);
+	
+			this.gameFieldBig = new _gameFiledBigView2.default(this.clickCb, this);
+		}
+	
+		/**
+	  * Вешаем коллбек на клик по большому игровому полю
+	  * @param event
+	  */
+	
+	
+		_createClass(GameFiledBigController, [{
+			key: 'clickCb',
+			value: function clickCb(event) {
+				console.log('click on gameField (big) from GameFiledBigController');
+				var localPos = event.data.getLocalPosition(this.gameFieldBig);
+				this.getCellFromPos(localPos);
+			}
+	
+			/**
+	   * Добавляем игровое поле на сцену
+	   * @param stage
+	   */
+	
+		}, {
+			key: 'addToStage',
+			value: function addToStage(stage) {
+				stage.addChild(this.gameFieldBig);
+			}
+		}, {
+			key: 'getCellFromPos',
+			value: function getCellFromPos(pos) {
+				console.log('pos ➠ ', pos);
+				for (var row in _gameFieldBigCellMap.cellMap) {
+					var rowRange = row.split('_');
+	
+					if (pos.x > rowRange[0] && pos.x < rowRange[1]) {
+						break;
+					}
+				}
+			}
+		}]);
+	
+		return GameFiledBigController;
+	}();
+	
+	exports.default = GameFiledBigController;
+
+/***/ },
+/* 150 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _pixi = __webpack_require__(1);
+	
+	var _pixi2 = _interopRequireDefault(_pixi);
+	
+	var _defaultPositions = __webpack_require__(142);
+	
+	var _gameFieldBigCellMap = __webpack_require__(151);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var GameFiledBigView = function (_PIXI$Sprite) {
+		_inherits(GameFiledBigView, _PIXI$Sprite);
+	
+		function GameFiledBigView(callback, ctx) {
+			var _ret;
+	
+			_classCallCheck(this, GameFiledBigView);
+	
+			var _this = _possibleConstructorReturn(this, (GameFiledBigView.__proto__ || Object.getPrototypeOf(GameFiledBigView)).call(this));
+	
+			_this.onClickCb = callback ? callback : undefined;
+			_this.cbCtx = ctx ? ctx : _this;
+	
+			// Контейнер для фишки с тенью и текстом
+			var spriteContainer = new _pixi2.default.Container();
+	
+			spriteContainer.x = _defaultPositions.defaultPositions.fields.big.x;
+			spriteContainer.y = _defaultPositions.defaultPositions.fields.big.y;
+	
+			var sprite = new _pixi2.default.Sprite.fromImage('./assets/images/table.png');
+	
+			// Opt-in to interactivity
+			sprite.interactive = true;
+			// Shows hand cursor
+			sprite.buttonMode = true;
+	
+			sprite.on('tap', _this.onClick, _this);
+			sprite.on('click', _this.onClick, _this);
+	
+			spriteContainer.addChild(sprite);
+	
+			_this.spriteContainer = spriteContainer;
+			_this.createClickAreas();
+	
+			return _ret = spriteContainer, _possibleConstructorReturn(_this, _ret);
+		}
+	
+		_createClass(GameFiledBigView, [{
+			key: 'onClick',
+			value: function onClick(event) {
+				if (this.onClickCb) {
+					this.onClickCb.call(this.cbCtx, event);
+				} else {
+					console.log('this default click on game field (big) sprite');
+				}
+			}
+		}, {
+			key: 'createClickAreas',
+			value: function createClickAreas() {
+				var _this2 = this;
+	
+				_gameFieldBigCellMap.clickAreas.forEach(function (item) {
+					_this2.drawRect(item);
+				});
+			}
+		}, {
+			key: 'drawRect',
+			value: function drawRect(area) {
+				var graphics = new _pixi2.default.Graphics();
+	
+				graphics.beginFill(0xFFFFFF);
+				graphics.alpha = 0.5;
+	
+				// set the line style to have a width of 5 and set the color to red
+				graphics.lineStyle(2, 0xFF0000);
+	
+				// draw a rectangle
+				graphics.drawRect(area.x + 2, area.y + 2, area.w - 2, area.h - 2);
+	
+				var str = '';
+				area.c.forEach(function (item) {
+					str += item + ' ';
+				});
+	
+				var text = new _pixi2.default.Text(str);
+				text.anchor.set(0.5);
+				text.x = area.x + area.w / 2;
+				text.y = area.y + area.h / 2;
+				graphics.addChild(text);
+	
+				this.spriteContainer.addChild(graphics);
+			}
+		}]);
+	
+		return GameFiledBigView;
+	}(_pixi2.default.Sprite);
+	
+	exports.default = GameFiledBigView;
+
+/***/ },
+/* 151 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -28901,23 +29139,75 @@
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	var chipTextStyle = {
-		fontFamily: 'Arial',
-		fontSize: 32,
-		fill: 0xffffff,
-		align: 'center'
+	var clickAreas = [{ x: 0, y: 0, w: 70, h: 322, c: ['zero'] }, { x: 1363, y: 0, w: 75, h: 106, c: ['2b1_row1'] }, { x: 1363, y: 107, w: 75, h: 106, c: ['2b1_row2'] }, { x: 1363, y: 214, w: 75, h: 106, c: ['2b1_row3'] }, { x: 87, y: 342, w: 425, h: 53, c: ['1st12'] }, { x: 513, y: 342, w: 423, h: 53, c: ['2st12'] }, { x: 937, y: 342, w: 425, h: 53, c: ['3st12'] }, { x: 88, y: 396, w: 213, h: 76, c: ['1to18'] }, { x: 301, y: 396, w: 211, h: 76, c: ['even'] }, { x: 512, y: 396, w: 212, h: 76, c: ['red'] }, { x: 725, y: 396, w: 211, h: 76, c: ['black'] }, { x: 937, y: 396, w: 211, h: 76, c: ['odd'] }, { x: 1149, y: 396, w: 213, h: 76, c: ['19to36'] }];
+	
+	var map = {
+		zero: {},
+		numbers: {
+			red: {},
+			black: {}
+		},
+		dozens: {
+			first: {},
+			second: {},
+			third: {}
+		},
+		ranges: {
+			f1to18: {},
+			f19to36: {}
+		},
+		odd: {},
+		even: {},
+		colors: {
+			red: {},
+			black: {}
+		}
 	};
 	
-	var chipValues = {
-		chip0: 100,
-		chip1: 500,
-		chip2: 1000,
-		chip3: 2000,
-		chip4: 3000
+	var cellMap = {
+		'3_88': {
+			'3_319': 'zero'
+		},
+		'91_188': {
+			'3_100': '3red'
+		},
+		'188_203': {
+			'3_100': '3red&6black'
+		},
+		'203_294': {
+			'3_100': '6black'
+		},
+		'294_309': {
+			'3_100': '6black&9red'
+		},
+		'309_400': {
+			'3_100': '9red'
+		},
+		'400_415': {
+			'3_100': '9red&12red'
+		},
+		'415_506': {
+			'3_100': '9red&12red'
+		},
+		'506_521': {},
+		'521_612': {},
+		'612_627': {},
+		'627_718': {},
+		'733_824': {},
+		'824_839': {},
+		'839_930': {},
+		'930_945': {},
+		'945_1036': {},
+		'1051_1142': {},
+		'1142_1157': {},
+		'1157_1248': {},
+		'1248_1263': {},
+		'1263_1360': {},
+		'1363_1435': {}
 	};
 	
-	exports.chipValues = chipValues;
-	exports.chipTextStyle = chipTextStyle;
+	exports.cellMap = cellMap;
+	exports.clickAreas = clickAreas;
 
 /***/ }
 /******/ ]);

@@ -11,6 +11,10 @@ const defaultPositions = {
 		btnClear:       {x: 430, y: 884},
 		btnRepeat:      {x: 1500, y: 884},
 		btnX2:          {x: 1620, y: 884}
+	},
+	fields: {
+		big: {x: 100, y: 200},
+		small: {x: 1200, y: 300}
 	}
 };
 
