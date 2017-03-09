@@ -1,6 +1,7 @@
 import PIXI from 'pixi.js';
 import GameFiledBigView from './gameFiledBigView';
-import {cellMap, clickAreas} from './gameFieldBigCellMap';
+import GameFiledBigModel from './GameFiledBigModel';
+import {clickAreas} from './gameFieldBigCellMap';
 
 export default class GameFiledBigController {
 	constructor() {
@@ -27,13 +28,10 @@ export default class GameFiledBigController {
 
 
 	getCellFromPos(pos){
-		console.log('pos ➠ ', pos);
-		for(let row in cellMap){
-			let rowRange = row.split('_');
+		let cell = clickAreas.find((item)=>{
+			return pos.x >= item.x && pos.x < item.x+item.w && pos.y > item.y && pos.y < item.y + item.h
+		});
 
-			if(pos.x > rowRange[0] && pos.x < rowRange[1]){
-				break;
-			}
-		}
+		console.log('cell.c ➠ ', cell.c);
 	}
 }

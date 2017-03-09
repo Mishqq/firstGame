@@ -1,6 +1,6 @@
 import PIXI from 'pixi.js';
 import {defaultPositions} from './../../constants/defaultPositions';
-import {cellMap, clickAreas} from './gameFieldBigCellMap';
+import {clickAreas} from './gameFieldBigCellMap';
 
 export default class GameFiledBigView extends PIXI.Sprite {
 	constructor(callback, ctx) {
@@ -28,7 +28,8 @@ export default class GameFiledBigView extends PIXI.Sprite {
 		spriteContainer.addChild(sprite);
 
 		this.spriteContainer = spriteContainer;
-		this.createClickAreas();
+
+		// this.devModeInteractiveAreas();
 
 		return spriteContainer;
 	}
@@ -41,7 +42,10 @@ export default class GameFiledBigView extends PIXI.Sprite {
 		}
 	}
 
-	createClickAreas(){
+	/**
+	 * Отрисовка областей на поле
+	 */
+	devModeInteractiveAreas(){
 		clickAreas.forEach((item)=>{
 			this.drawRect(item);
 		})
@@ -51,24 +55,34 @@ export default class GameFiledBigView extends PIXI.Sprite {
 		let graphics = new PIXI.Graphics();
 
 		graphics.beginFill(0xFFFFFF);
-		graphics.alpha = 0.5;
+		graphics.alpha = 0.80;
 
 		// set the line style to have a width of 5 and set the color to red
 		graphics.lineStyle(2, 0xFF0000);
 
 		// draw a rectangle
-		graphics.drawRect(area.x+2, area.y+2, area.w-2, area.h-2);
+		graphics.drawRect(area.x, area.y, area.w, area.h);
 
-		let str = '';
-		area.c.forEach((item)=>{
-			str += item + ' ';
-		});
+		if(area.c && area.c.length){
+			let str = '';
+			area.c.forEach((item)=>{
+				str += item;
+			});
 
-		let text = new PIXI.Text( str );
-		text.anchor.set(0.5);
-		text.x = area.x + area.w/2;
-		text.y = area.y + area.h/2;
-		graphics.addChild(text);
+			let text = new PIXI.Text(str);
+			text.style.font = "bold 18px Arial";
+			text.style.wordWrapWidth = 0;
+			text.style.fill = 'white';
+			text.style.stroke = 'black';
+			text.style.strokeThickness = 5;
+			text.rotation = -0.5;
+
+			text.anchor.set(0.55);
+			// text.pivot.x = 0.5;
+			text.x = area.x + area.w/2;
+			text.y = area.y + area.h/2;
+			graphics.addChild(text);
+		}
 
 		this.spriteContainer.addChild(graphics);
 	}

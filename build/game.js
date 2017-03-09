@@ -28214,7 +28214,7 @@
 
 	'use strict';
 	
-	var _gameController = __webpack_require__(148);
+	var _gameController = __webpack_require__(135);
 	
 	var _gameController2 = _interopRequireDefault(_gameController);
 	
@@ -28230,6 +28230,138 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _pixi = __webpack_require__(1);
+	
+	var _pixi2 = _interopRequireDefault(_pixi);
+	
+	var _plugins = __webpack_require__(136);
+	
+	var _plugins2 = _interopRequireDefault(_plugins);
+	
+	var _config = __webpack_require__(138);
+	
+	var _config2 = _interopRequireDefault(_config);
+	
+	var _Game = __webpack_require__(139);
+	
+	var _Game2 = _interopRequireDefault(_Game);
+	
+	var _background = __webpack_require__(140);
+	
+	var _background2 = _interopRequireDefault(_background);
+	
+	var _ChipView = __webpack_require__(141);
+	
+	var _ChipView2 = _interopRequireDefault(_ChipView);
+	
+	var _ButtonView = __webpack_require__(145);
+	
+	var _ButtonView2 = _interopRequireDefault(_ButtonView);
+	
+	var _assetsLoader = __webpack_require__(146);
+	
+	var _gameFiledBigController = __webpack_require__(148);
+	
+	var _gameFiledBigController2 = _interopRequireDefault(_gameFiledBigController);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var GameController = function () {
+		function GameController() {
+			_classCallCheck(this, GameController);
+	
+			this.game = new _Game2.default(_config2.default);
+		}
+	
+		_createClass(GameController, [{
+			key: 'init',
+			value: function init() {
+				var _this = this;
+	
+				console.log('init GameController');
+	
+				/**
+	    * Вешаем на кнопки свои обработчики из контроллера
+	    */
+				var buttonsCallbackConfig = {
+					btnCancel: this.cancelBtnClick,
+					btnClear: this.clearBtnClick,
+					btnRepeat: this.repeatBtnClick,
+					btnX2: this.x2BtnClick
+				};
+	
+				/**
+	    * background
+	    */
+				var bg = new _background2.default();
+				this.game.stage.addChild(bg);
+	
+				var fieldBig = new _gameFiledBigController2.default();
+				fieldBig.addToStage(this.game.stage);
+	
+				/**
+	    * Прогружаем все json-атласы
+	    */
+				(0, _assetsLoader.assetLoader)(function () {
+					['chip0', 'chip1', 'chip2', 'chip3', 'chip4'].forEach(function (item) {
+						var chip = new _ChipView2.default(item, _this.chipClick, _this);
+						_this.game.stage.addChild(chip);
+					});
+	
+					for (var key in buttonsCallbackConfig) {
+						var btn = new _ButtonView2.default(key, buttonsCallbackConfig[key], _this);
+						_this.game.stage.addChild(btn);
+					}
+	
+					_this.game.start();
+				});
+			}
+		}, {
+			key: 'chipClick',
+			value: function chipClick(data) {
+				console.log('This is chipClick from controller', data, this);
+			}
+		}, {
+			key: 'cancelBtnClick',
+			value: function cancelBtnClick() {
+				console.log('This is cancelBtnClick from controller', this);
+			}
+		}, {
+			key: 'clearBtnClick',
+			value: function clearBtnClick() {
+				console.log('This is clearBtnClick from controller', this);
+			}
+		}, {
+			key: 'x2BtnClick',
+			value: function x2BtnClick() {
+				console.log('This is x2BtnClick from controller', this);
+			}
+		}, {
+			key: 'repeatBtnClick',
+			value: function repeatBtnClick() {
+				console.log('This is repeatBtnClick from controller', this);
+			}
+		}]);
+	
+		return GameController;
+	}();
+	
+	exports.default = GameController;
+
+/***/ },
+/* 136 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
 	
@@ -28237,7 +28369,7 @@
 	
 	var _pixi2 = _interopRequireDefault(_pixi);
 	
-	var _pixiAnimationloop = __webpack_require__(136);
+	var _pixiAnimationloop = __webpack_require__(137);
 	
 	var _pixiAnimationloop2 = _interopRequireDefault(_pixiAnimationloop);
 	
@@ -28249,14 +28381,14 @@
 	exports.default = {};
 
 /***/ },
-/* 136 */
+/* 137 */
 /***/ function(module, exports) {
 
 	!function(e){function t(i){if(n[i])return n[i].exports;var o=n[i]={exports:{},id:i,loaded:!1};return e[i].call(o.exports,o,o.exports,t),o.loaded=!0,o.exports}var n={};return t.m=e,t.c=n,t.p="",t(0)}([function(e,t,n){e.exports=n(3)},function(e,t){e.exports=PIXI},function(e,t,n){"use strict";function i(e){return e&&e.__esModule?e:{"default":e}}function o(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}function r(e,t){if(!e)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return!t||"object"!=typeof t&&"function"!=typeof t?e:t}function a(e,t){if("function"!=typeof t&&null!==t)throw new TypeError("Super expression must either be null or a function, not "+typeof t);e.prototype=Object.create(t&&t.prototype,{constructor:{value:e,enumerable:!1,writable:!0,configurable:!0}}),t&&(Object.setPrototypeOf?Object.setPrototypeOf(e,t):e.__proto__=t)}function s(){return"undefined"!=typeof document.hidden?"visibilitychange":"undefined"!=typeof document.webkitHidden?"webkitvisibilitychange":"undefined"!=typeof document.mozHidden?"mozvisibilitychange":"undefined"!=typeof document.msHidden?"msvisibilitychange":void 0}var u=function(){function e(e,t){for(var n=0;n<t.length;n++){var i=t[n];i.enumerable=i.enumerable||!1,i.configurable=!0,"value"in i&&(i.writable=!0),Object.defineProperty(e,i.key,i)}}return function(t,n,i){return n&&e(t.prototype,n),i&&e(t,i),t}}();Object.defineProperty(t,"__esModule",{value:!0});var d=n(1),f=i(d),l=function(e){function t(e){var n=arguments.length<=1||void 0===arguments[1]?new f["default"].Container:arguments[1];o(this,t);var i=r(this,Object.getPrototypeOf(t).call(this));return i._animate=function(){if(i.raf=window.requestAnimationFrame(i._animate),i.stage){var e=Date.now();i.time+=Math.min((e-i._last)/1e3,i.maxFrame)*i.speed,i.delta=i.time-i._lastTime,i.deltaMS=1e3*i.delta,i._lastTime=i.time,i._last=e,i.emit("prerender"),i.renderer.render(i.stage),i.emit("postrender")}},i._onVisibilityChange=function(){var e=!!(document.hidden||document.webkitHidden||document.mozHidden||document.msHidden);e?i.stop():i.start(),i.emit("visibilitychange",e)},i.renderer=e,i.stage=n,i.isRunning=!1,i._stopOnVisibilityChange=!1,i._firstDate=0,i.speed=1,i._last=0,i.delta=0,i.deltaMS=0,i.time=0,i._lastTime=0,i.maxFrame=.035,i.raf=null,i}return a(t,e),u(t,[{key:"start",value:function(){if(!this.isRunning){this.isRunning=!0;var e=Date.now();this._last=e,0===this._firstDate&&(this._firstDate=e),this.emit("start"),this._animate()}}},{key:"stop",value:function(){this.isRunning&&(this.isRunning=!1,window.cancelAnimationFrame(this.raf),this.emit("stop"))}},{key:"realTime",get:function(){return this._firstDate>0?(Date.now()-this._firstDate)/1e3:0}},{key:"stopOnVisibilityChange",get:function(){return this._stopOnVisibilityChange},set:function(e){if(e!==this._stopOnVisibilityChange){this._stopOnVisibilityChange=e;var t=s();e?document.addEventListener(t,this._onVisibilityChange):document.removeEventListener(t,this._onVisibilityChange)}}}]),t}(f["default"].utils.EventEmitter);t["default"]=l},function(e,t,n){"use strict";function i(e){return e&&e.__esModule?e:{"default":e}}Object.defineProperty(t,"__esModule",{value:!0});var o=n(1),r=i(o),a=n(2),s=i(a);r["default"].AnimationLoop||(r["default"].AnimationLoop=s["default"]),t["default"]=r["default"].AnimationLoop}]);
 	//# sourceMappingURL=pixi-animationloop.js.map
 
 /***/ },
-/* 137 */
+/* 138 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -28275,7 +28407,7 @@
 	};
 
 /***/ },
-/* 138 */
+/* 139 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28341,7 +28473,7 @@
 	exports.default = Game;
 
 /***/ },
-/* 139 */
+/* 140 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28385,7 +28517,7 @@
 	exports.default = Background;
 
 /***/ },
-/* 140 */
+/* 141 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28400,11 +28532,11 @@
 	
 	var _pixi2 = _interopRequireDefault(_pixi);
 	
-	var _spritesStore = __webpack_require__(141);
+	var _spritesStore = __webpack_require__(142);
 	
-	var _defaultPositions = __webpack_require__(142);
+	var _defaultPositions = __webpack_require__(143);
 	
-	var _chipValues = __webpack_require__(143);
+	var _chipValues = __webpack_require__(144);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -28482,7 +28614,7 @@
 	exports.default = ChipView;
 
 /***/ },
-/* 141 */
+/* 142 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -28500,7 +28632,7 @@
 	exports.spritesStore = spritesStore;
 
 /***/ },
-/* 142 */
+/* 143 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -28531,7 +28663,7 @@
 	exports.defaultPositions = defaultPositions;
 
 /***/ },
-/* 143 */
+/* 144 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -28558,7 +28690,7 @@
 	exports.chipTextStyle = chipTextStyle;
 
 /***/ },
-/* 144 */
+/* 145 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28573,9 +28705,9 @@
 	
 	var _pixi2 = _interopRequireDefault(_pixi);
 	
-	var _spritesStore = __webpack_require__(141);
+	var _spritesStore = __webpack_require__(142);
 	
-	var _defaultPositions = __webpack_require__(142);
+	var _defaultPositions = __webpack_require__(143);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -28641,7 +28773,6 @@
 	exports.default = ButtonView;
 
 /***/ },
-/* 145 */,
 /* 146 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -28656,7 +28787,7 @@
 	
 	var _pixi2 = _interopRequireDefault(_pixi);
 	
-	var _spritesStore = __webpack_require__(141);
+	var _spritesStore = __webpack_require__(142);
 	
 	var _constants = __webpack_require__(147);
 	
@@ -28821,143 +28952,15 @@
 	
 	var _pixi2 = _interopRequireDefault(_pixi);
 	
-	var _plugins = __webpack_require__(135);
-	
-	var _plugins2 = _interopRequireDefault(_plugins);
-	
-	var _config = __webpack_require__(137);
-	
-	var _config2 = _interopRequireDefault(_config);
-	
-	var _Game = __webpack_require__(138);
-	
-	var _Game2 = _interopRequireDefault(_Game);
-	
-	var _background = __webpack_require__(139);
-	
-	var _background2 = _interopRequireDefault(_background);
-	
-	var _ChipView = __webpack_require__(140);
-	
-	var _ChipView2 = _interopRequireDefault(_ChipView);
-	
-	var _ButtonView = __webpack_require__(144);
-	
-	var _ButtonView2 = _interopRequireDefault(_ButtonView);
-	
-	var _assetsLoader = __webpack_require__(146);
-	
-	var _gameFiledBigController = __webpack_require__(149);
-	
-	var _gameFiledBigController2 = _interopRequireDefault(_gameFiledBigController);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var GameController = function () {
-		function GameController() {
-			_classCallCheck(this, GameController);
-	
-			this.game = new _Game2.default(_config2.default);
-		}
-	
-		_createClass(GameController, [{
-			key: 'init',
-			value: function init() {
-				var _this = this;
-	
-				console.log('init GameController');
-	
-				/**
-	    * Вешаем на кнопки свои обработчики из контроллера
-	    */
-				var buttonsCallbackConfig = {
-					btnCancel: this.cancelBtnClick,
-					btnClear: this.clearBtnClick,
-					btnRepeat: this.repeatBtnClick,
-					btnX2: this.x2BtnClick
-				};
-	
-				/**
-	    * background
-	    */
-				var bg = new _background2.default();
-				this.game.stage.addChild(bg);
-	
-				var fieldBig = new _gameFiledBigController2.default();
-				fieldBig.addToStage(this.game.stage);
-	
-				/**
-	    * Прогружаем все json-атласы
-	    */
-				(0, _assetsLoader.assetLoader)(function () {
-					['chip0', 'chip1', 'chip2', 'chip3', 'chip4'].forEach(function (item) {
-						var chip = new _ChipView2.default(item, _this.chipClick, _this);
-						_this.game.stage.addChild(chip);
-					});
-	
-					for (var key in buttonsCallbackConfig) {
-						var btn = new _ButtonView2.default(key, buttonsCallbackConfig[key], _this);
-						_this.game.stage.addChild(btn);
-					}
-	
-					_this.game.start();
-				});
-			}
-		}, {
-			key: 'chipClick',
-			value: function chipClick(data) {
-				console.log('This is chipClick from controller', data, this);
-			}
-		}, {
-			key: 'cancelBtnClick',
-			value: function cancelBtnClick() {
-				console.log('This is cancelBtnClick from controller', this);
-			}
-		}, {
-			key: 'clearBtnClick',
-			value: function clearBtnClick() {
-				console.log('This is clearBtnClick from controller', this);
-			}
-		}, {
-			key: 'x2BtnClick',
-			value: function x2BtnClick() {
-				console.log('This is x2BtnClick from controller', this);
-			}
-		}, {
-			key: 'repeatBtnClick',
-			value: function repeatBtnClick() {
-				console.log('This is repeatBtnClick from controller', this);
-			}
-		}]);
-	
-		return GameController;
-	}();
-	
-	exports.default = GameController;
-
-/***/ },
-/* 149 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _pixi = __webpack_require__(1);
-	
-	var _pixi2 = _interopRequireDefault(_pixi);
-	
-	var _gameFiledBigView = __webpack_require__(150);
+	var _gameFiledBigView = __webpack_require__(149);
 	
 	var _gameFiledBigView2 = _interopRequireDefault(_gameFiledBigView);
 	
-	var _gameFieldBigCellMap = __webpack_require__(151);
+	var _GameFiledBigModel = __webpack_require__(151);
+	
+	var _GameFiledBigModel2 = _interopRequireDefault(_GameFiledBigModel);
+	
+	var _gameFieldBigCellMap = __webpack_require__(150);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -28997,14 +29000,11 @@
 		}, {
 			key: 'getCellFromPos',
 			value: function getCellFromPos(pos) {
-				console.log('pos ➠ ', pos);
-				for (var row in _gameFieldBigCellMap.cellMap) {
-					var rowRange = row.split('_');
+				var cell = _gameFieldBigCellMap.clickAreas.find(function (item) {
+					return pos.x >= item.x && pos.x < item.x + item.w && pos.y > item.y && pos.y < item.y + item.h;
+				});
 	
-					if (pos.x > rowRange[0] && pos.x < rowRange[1]) {
-						break;
-					}
-				}
+				console.log('cell.c ➠ ', cell.c);
 			}
 		}]);
 	
@@ -29014,7 +29014,7 @@
 	exports.default = GameFiledBigController;
 
 /***/ },
-/* 150 */
+/* 149 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29029,9 +29029,9 @@
 	
 	var _pixi2 = _interopRequireDefault(_pixi);
 	
-	var _defaultPositions = __webpack_require__(142);
+	var _defaultPositions = __webpack_require__(143);
 	
-	var _gameFieldBigCellMap = __webpack_require__(151);
+	var _gameFieldBigCellMap = __webpack_require__(150);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -29073,7 +29073,8 @@
 			spriteContainer.addChild(sprite);
 	
 			_this.spriteContainer = spriteContainer;
-			_this.createClickAreas();
+	
+			// this.devModeInteractiveAreas();
 	
 			return _ret = spriteContainer, _possibleConstructorReturn(_this, _ret);
 		}
@@ -29087,9 +29088,14 @@
 					console.log('this default click on game field (big) sprite');
 				}
 			}
+	
+			/**
+	   * Отрисовка областей на поле
+	   */
+	
 		}, {
-			key: 'createClickAreas',
-			value: function createClickAreas() {
+			key: 'devModeInteractiveAreas',
+			value: function devModeInteractiveAreas() {
 				var _this2 = this;
 	
 				_gameFieldBigCellMap.clickAreas.forEach(function (item) {
@@ -29102,24 +29108,34 @@
 				var graphics = new _pixi2.default.Graphics();
 	
 				graphics.beginFill(0xFFFFFF);
-				graphics.alpha = 0.5;
+				graphics.alpha = 0.80;
 	
 				// set the line style to have a width of 5 and set the color to red
 				graphics.lineStyle(2, 0xFF0000);
 	
 				// draw a rectangle
-				graphics.drawRect(area.x + 2, area.y + 2, area.w - 2, area.h - 2);
+				graphics.drawRect(area.x, area.y, area.w, area.h);
 	
-				var str = '';
-				area.c.forEach(function (item) {
-					str += item + ' ';
-				});
+				if (area.c && area.c.length) {
+					var str = '';
+					area.c.forEach(function (item) {
+						str += item;
+					});
 	
-				var text = new _pixi2.default.Text(str);
-				text.anchor.set(0.5);
-				text.x = area.x + area.w / 2;
-				text.y = area.y + area.h / 2;
-				graphics.addChild(text);
+					var text = new _pixi2.default.Text(str);
+					text.style.font = "bold 18px Arial";
+					text.style.wordWrapWidth = 0;
+					text.style.fill = 'white';
+					text.style.stroke = 'black';
+					text.style.strokeThickness = 5;
+					text.rotation = -0.5;
+	
+					text.anchor.set(0.55);
+					// text.pivot.x = 0.5;
+					text.x = area.x + area.w / 2;
+					text.y = area.y + area.h / 2;
+					graphics.addChild(text);
+				}
 	
 				this.spriteContainer.addChild(graphics);
 			}
@@ -29131,83 +29147,96 @@
 	exports.default = GameFiledBigView;
 
 /***/ },
-/* 151 */
+/* 150 */
 /***/ function(module, exports) {
 
-	'use strict';
+	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	var clickAreas = [{ x: 0, y: 0, w: 70, h: 322, c: ['zero'] }, { x: 1363, y: 0, w: 75, h: 106, c: ['2b1_row1'] }, { x: 1363, y: 107, w: 75, h: 106, c: ['2b1_row2'] }, { x: 1363, y: 214, w: 75, h: 106, c: ['2b1_row3'] }, { x: 87, y: 342, w: 425, h: 53, c: ['1st12'] }, { x: 513, y: 342, w: 423, h: 53, c: ['2st12'] }, { x: 937, y: 342, w: 425, h: 53, c: ['3st12'] }, { x: 88, y: 396, w: 213, h: 76, c: ['1to18'] }, { x: 301, y: 396, w: 211, h: 76, c: ['even'] }, { x: 512, y: 396, w: 212, h: 76, c: ['red'] }, { x: 725, y: 396, w: 211, h: 76, c: ['black'] }, { x: 937, y: 396, w: 211, h: 76, c: ['odd'] }, { x: 1149, y: 396, w: 213, h: 76, c: ['19to36'] }];
+	var clickAreas = [{ x: 0, y: 0, w: 60, h: 322, c: [0] }, //zero
+	{ x: 1363, y: 0, w: 75, h: 106, c: [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36] }, //2b1_row1
+	{ x: 1363, y: 107, w: 75, h: 106, c: [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35] }, //2b1_row2
+	{ x: 1363, y: 214, w: 75, h: 106, c: [1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34] }, //2b1_row3
+	{ x: 87, y: 342, w: 425, h: 53, c: [1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12] }, //1st12
+	{ x: 513, y: 342, w: 423, h: 53, c: [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24] }, //2st12
+	{ x: 937, y: 342, w: 425, h: 53, c: [25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36] }, //3st12
+	{ x: 88, y: 396, w: 213, h: 76, c: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] }, //1to18
+	{ x: 1149, y: 396, w: 213, h: 76, c: [19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36] }, //19to36
+	{ x: 301, y: 396, w: 211, h: 76, c: [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36] }, //even
+	{ x: 937, y: 396, w: 211, h: 76, c: [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35] }, //odd
+	{ x: 512, y: 396, w: 212, h: 76, c: [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36] }, //red
+	{ x: 725, y: 396, w: 211, h: 76, c: [2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35] }, //black
 	
-	var map = {
-		zero: {},
-		numbers: {
-			red: {},
-			black: {}
-		},
-		dozens: {
-			first: {},
-			second: {},
-			third: {}
-		},
-		ranges: {
-			f1to18: {},
-			f19to36: {}
-		},
-		odd: {},
-		even: {},
-		colors: {
-			red: {},
-			black: {}
-		}
+	// zero + 1,2,3
+	{ x: 61, y: 290, w: 54, h: 52, c: [0, 1, 2, 3] }, { x: 61, y: 238, w: 54, h: 52, c: [0, 1] }, { x: 61, y: 186, w: 54, h: 52, c: [0, 1, 2] }, { x: 61, y: 134, w: 54, h: 52, c: [0, 2] }, { x: 61, y: 82, w: 54, h: 52, c: [0, 2, 3] }, { x: 61, y: 0, w: 54, h: 82, c: [0, 3] },
+	
+	// 34,35,36
+	{ x: 1279, y: 290, w: 57, h: 52, c: [34, 35, 36] }, { x: 1279, y: 238, w: 84, h: 52, c: [34] }, { x: 1279, y: 186, w: 84, h: 52, c: [34, 35] }, { x: 1279, y: 134, w: 84, h: 52, c: [35] }, { x: 1279, y: 82, w: 84, h: 52, c: [35, 36] }, { x: 1279, y: 0, w: 84, h: 82, c: [36] },
+	
+	// snake
+	{ x: 1336, y: 290, w: 54, h: 52, c: [1, 5, 9, 12, 14, 16, 19, 23, 27, 30, 32, 34] }];
+	
+	// templates for other filed cells
+	var rows = {
+		odd: [{ x: 115, y: 290, w: 54, h: 52, c: [1, 2, 3] }, { x: 115, y: 238, w: 54, h: 52, c: [1] }, { x: 115, y: 186, w: 54, h: 52, c: [1, 2] }, { x: 115, y: 134, w: 54, h: 52, c: [2] }, { x: 115, y: 82, w: 54, h: 52, c: [2, 3] }, { x: 115, y: 0, w: 54, h: 82, c: [3] }],
+		even: [{ x: 169, y: 290, w: 54, h: 52, c: [1, 2, 3, 4, 5, 6] }, { x: 169, y: 238, w: 54, h: 52, c: [1, 4] }, { x: 169, y: 186, w: 54, h: 52, c: [1, 2, 4, 5] }, { x: 169, y: 134, w: 54, h: 52, c: [2, 5] }, { x: 169, y: 82, w: 54, h: 52, c: [2, 3, 5, 6] }, { x: 169, y: 0, w: 54, h: 82, c: [3, 6] }]
 	};
 	
-	var cellMap = {
-		'3_88': {
-			'3_319': 'zero'
-		},
-		'91_188': {
-			'3_100': '3red'
-		},
-		'188_203': {
-			'3_100': '3red&6black'
-		},
-		'203_294': {
-			'3_100': '6black'
-		},
-		'294_309': {
-			'3_100': '6black&9red'
-		},
-		'309_400': {
-			'3_100': '9red'
-		},
-		'400_415': {
-			'3_100': '9red&12red'
-		},
-		'415_506': {
-			'3_100': '9red&12red'
-		},
-		'506_521': {},
-		'521_612': {},
-		'612_627': {},
-		'627_718': {},
-		'733_824': {},
-		'824_839': {},
-		'839_930': {},
-		'930_945': {},
-		'945_1036': {},
-		'1051_1142': {},
-		'1142_1157': {},
-		'1157_1248': {},
-		'1248_1263': {},
-		'1263_1360': {},
-		'1363_1435': {}
+	function addCellToField(originObj, dx, idx) {
+		var obj = Object.assign({}, originObj, { x: originObj.x + dx, c: originObj.c.map(function (originObj) {
+				return originObj + 3 * idx;
+			}) });
+		clickAreas.push(obj);
+	}
+	
+	// Добавляем все остальные ячейки для поля
+	
+	var _loop = function _loop(i) {
+		rows.odd.forEach(function (item) {
+			addCellToField(item, i * 106, i);
+		});
+	
+		rows.even.forEach(function (item) {
+			addCellToField(item, i * 106, i);
+		});
 	};
 	
-	exports.cellMap = cellMap;
+	for (var i = 0; i < 11; i += 1) {
+		_loop(i);
+	}
+	
+	/**
+	 * У каждой ячейки с цифрой на поле задаётся координата, куда будет отрисовываться кольцо
+	 */
+	var pointMap = {};
+	var starts = { x: 136, y: 54 };
+	
+	for (var i = 0; i < 3; i += 1) {
+		for (var y = 0; y < 12; y += 1) {}
+	}
+	
 	exports.clickAreas = clickAreas;
+	exports.pointMap = pointMap;
+
+/***/ },
+/* 151 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var GameFiledBigModel = function GameFiledBigModel() {
+		_classCallCheck(this, GameFiledBigModel);
+	};
+	
+	exports.default = GameFiledBigModel;
 
 /***/ }
 /******/ ]);
