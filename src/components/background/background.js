@@ -6,9 +6,7 @@ export default class Background extends PIXI.Sprite {
 
 		this.position.set(0, 0);
 		this.anchor.set(0);
-		// this.scale.x = 1;
-		this.width = 1980;
-		this.height = 1024;
-		// this.scale.y = 0.5;
+		this.width = 1920;
+		this.height = 1080;
 	}
 }

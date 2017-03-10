@@ -2,11 +2,18 @@ import PIXI from 'pixi.js';
 import plugins from './../plugins';
 import config  from './../config';
 import Game from './../Game';
-import Background from './../components/background/background';
-import ChipView from './../components/chip/ChipView';
-import ButtonView from './../components/button/ButtonView';
 import {assetLoader} from './../assetsLoader'
-import GameFiledBigController from './../components/gameFiledBig/gameFiledBigController';
+import {transferFactory} from './../servises/transferFactory'
+import {spritesStore} from './../spritesStore';
+
+// Components
+import Background           from './../components/background/background';
+import GameFieldController  from '../components/gameField/gameFieldController';
+import ButtonController     from './../components/button/buttonController';
+import ChipController       from './../components/chip/chipController';
+import FloatChipController  from './../components/floatChip/floatChipController';
+
+
 
 export default class GameController {
 	constructor(){
@@ -17,37 +24,38 @@ export default class GameController {
 		console.log('init GameController');
 
 		/**
-		 * Вешаем на кнопки свои обработчики из контроллера
-		 */
-		const buttonsCallbackConfig = {
-			btnCancel: this.cancelBtnClick,
-			btnClear: this.clearBtnClick,
-			btnRepeat: this.repeatBtnClick,
-			btnX2: this.x2BtnClick
-		};
-
-		/**
 		 * background
 		 */
 		let bg = new Background();
 		this.game.stage.addChild(bg);
 
-		let fieldBig = new GameFiledBigController();
-		fieldBig.addToStage(this.game.stage);
+		this.game.stage.interactive = true;
+
+		this.game.stage.on('mousemove', this.onTouchMove, this);
+		this.game.stage.on('touchmove', this.onTouchMove, this);
+
+		this.game.stage.on('mouseup', this.onTouchEnd, this);
+		this.game.stage.on('touchend', this.onTouchEnd, this);
 
 		/**
 		 * Прогружаем все json-атласы
 		 */
 		assetLoader(()=>{
-			['chip0', 'chip1', 'chip2', 'chip3', 'chip4'].forEach((item)=>{
-				let chip = new ChipView(item, this.chipClick, this);
+			let gameField = new GameFieldController();
+			this.game.stage.addChild(gameField.gameFieldSprite);
+
+			let chipsController = new ChipController();
+			chipsController.chips.forEach((chip)=>{
 				this.game.stage.addChild(chip);
 			});
 
-			for(let key in buttonsCallbackConfig){
-				let btn = new ButtonView(key, buttonsCallbackConfig[key], this);
-				this.game.stage.addChild(btn);
-			}
+			let buttonsController = new ButtonController();
+			buttonsController.buttons.forEach((button)=>{
+				this.game.stage.addChild(button);
+			});
+
+			this.floatChipContainer = new FloatChipController();
+			this.game.stage.addChild(this.floatChipContainer.getFloatChipsSprite);
 
 			this.game.start();
 		});
@@ -55,26 +63,14 @@ export default class GameController {
 
 
 
-
-
-
-	chipClick(data){
-		console.log('This is chipClick from controller', data, this);
+	onTouchMove(event){
+		if(transferFactory.chipActive){
+			this.floatChipContainer.viewFloatChip(transferFactory.chipValue);
+			this.floatChipContainer.setPosition( event.data.global );
+		}
 	}
 
-	cancelBtnClick(){
-		console.log('This is cancelBtnClick from controller', this);
-	}
+	onTouchEnd(){
 
-	clearBtnClick(){
-		console.log('This is clearBtnClick from controller', this);
-	}
-
-	x2BtnClick(){
-		console.log('This is x2BtnClick from controller', this);
-	}
-
-	repeatBtnClick(){
-		console.log('This is repeatBtnClick from controller', this);
 	}
 }

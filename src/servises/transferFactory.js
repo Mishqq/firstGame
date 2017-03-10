@@ -1,0 +1,3 @@
+let transferFactory = {};
+
+export {transferFactory};

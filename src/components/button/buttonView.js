@@ -3,11 +3,11 @@ import {spritesStore} from './../../spritesStore';
 import {defaultPositions} from './../../constants/defaultPositions';
 
 export default class ButtonView extends PIXI.Sprite {
-	constructor(btnType, callback, ctx) {
+	constructor(btnType, config) {
 		super();
 
-		this.onClickCb = (callback) ? callback : undefined;
-		this.cbCtx = (ctx) ? ctx : this;
+		this.onClickCb = (config.onClickCb) ? config.onClickCb : undefined;
+		this.cbCtx = (config.ctx) ? config.ctx : this;
 
 		// Контейнер для фишки с тенью и текстом
 		let spriteContainer = new PIXI.Container();

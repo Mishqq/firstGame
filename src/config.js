@@ -1,6 +1,6 @@
 export default {
-  width: 1980,
-  height: 1024,
+  width: 1920,
+  height: 1080,
   webgl: true, //false for 2dContext, true for autoDetectRenderer
   rendererOptions: {
     //pixi rendererOptions

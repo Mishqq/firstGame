@@ -1,19 +1,19 @@
 const defaultPositions = {
 	chips: {
-		chip0: {x: 659, y: 907},
-		chip1: {x: 825, y: 907},
-		chip2: {x: 991, y: 907},
-		chip3: {x: 1157, y: 907},
-		chip4: {x: 1323, y: 907}
+		chip0: {x: 640, y: 957},
+		chip1: {x: 800, y: 957},
+		chip2: {x: 960, y: 957},
+		chip3: {x: 1120, y: 957},
+		chip4: {x: 1280, y: 957}
 	},
 	buttons: {
-		btnCancel:     {x: 200, y: 884},
-		btnClear:       {x: 430, y: 884},
-		btnRepeat:      {x: 1500, y: 884},
-		btnX2:          {x: 1620, y: 884}
+		btnCancel:     {x: 180, y: 934},
+		btnClear:       {x: 410, y: 934},
+		btnRepeat:      {x: 1450, y: 934},
+		btnX2:          {x: 1570, y: 934}
 	},
 	fields: {
-		big: {x: 100, y: 200},
+		big: {x: 200, y: 300},
 		small: {x: 1200, y: 300}
 	}
 };

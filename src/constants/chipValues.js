@@ -1,9 +1,15 @@
 const chipTextStyle = {
-	fontFamily : 'Arial',
-	fontSize: 32,
-	fill : 0xffffff,
+	font: 'bold 32px Arial',
+	fill : 'white',
 	align : 'center'
 };
+
+const floatChipTextStyle = {
+	font: 'bold 20px Arial',
+	fill : 'white',
+	align : 'center'
+};
+
 
 const chipValues = {
 	chip0: 100,
@@ -13,4 +19,4 @@ const chipValues = {
 	chip4: 3000
 };
 
-export {chipValues, chipTextStyle};
+export {chipValues, chipTextStyle, floatChipTextStyle};

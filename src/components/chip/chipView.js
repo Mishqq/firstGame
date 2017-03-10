@@ -4,11 +4,12 @@ import {defaultPositions} from './../../constants/defaultPositions';
 import {chipValues, chipTextStyle} from './../../constants/chipValues';
 
 export default class ChipView extends PIXI.Sprite {
-	constructor(chipType, callback, ctx) {
+	constructor(chipType, config) {
 		super();
 
-		this.onClickCb = (callback) ? callback : undefined;
-		this.cbCtx = (ctx) ? ctx : this;
+		this.onClickCb = (config.onClickCb) ? config.onClickCb : undefined;
+		this.onTouchStartCb = (config.chipTouchStartCb) ? config.chipTouchStartCb : undefined;
+		this.cbCtx = (config.ctx) ? config.ctx : this;
 
 		// Контейнер для фишки с тенью и текстом
 		let spriteContainer = new PIXI.Container();
@@ -36,6 +37,9 @@ export default class ChipView extends PIXI.Sprite {
 		sprite.on('tap', this.onClick, this);
 		sprite.on('click', this.onClick, this);
 
+		sprite.on('mousedown', this.chipTouchStart, this);
+		sprite.on('touchstart', this.chipTouchStart, this);
+
 		spriteContainer.addChild(shadow).addChild(sprite).addChild(chipValueText);
 
 		return spriteContainer;
@@ -45,7 +49,15 @@ export default class ChipView extends PIXI.Sprite {
 		if(this.onClickCb) {
 			this.onClickCb.call(this.cbCtx, this.chipValue);
 		} else {
-			console.log('this default click on chip sprite');
+			console.log('chipClickEvent (ChipView)', this.chipValue);
+		}
+	}
+
+	chipTouchStart(){
+		if(this.onTouchStartCb) {
+			this.onTouchStartCb.call(this.cbCtx, this.formatChipValue(this.chipValue));
+		} else {
+			console.log('chipTouchStart (ChipView)', this.formatChipValue(this.chipValue));
 		}
 	}
 

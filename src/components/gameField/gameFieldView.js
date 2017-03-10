@@ -1,13 +1,13 @@
 import PIXI from 'pixi.js';
 import {defaultPositions} from './../../constants/defaultPositions';
-import {clickAreas} from './gameFieldBigCellMap';
+import {clickAreas} from './gameFieldCellMap';
 
-export default class GameFiledBigView extends PIXI.Sprite {
-	constructor(callback, ctx) {
+export default class GameFieldView extends PIXI.Sprite {
+	constructor(config) {
 		super();
 
-		this.onClickCb = (callback) ? callback : undefined;
-		this.cbCtx = (ctx) ? ctx : this;
+		this.onClickCb = (config.onClickCb) ? config.onClickCb : undefined;
+		this.cbCtx = (config.ctx) ? config.ctx : this;
 
 		// Контейнер для фишки с тенью и текстом
 		let spriteContainer = new PIXI.Container();
@@ -25,6 +25,9 @@ export default class GameFiledBigView extends PIXI.Sprite {
 		sprite.on('tap', this.onClick, this);
 		sprite.on('click', this.onClick, this);
 
+		sprite.on('mousedown', this.onTouchStart, this);
+		sprite.on('touchstart', this.onTouchStart, this);
+
 		spriteContainer.addChild(sprite);
 
 		this.spriteContainer = spriteContainer;
@@ -34,16 +37,32 @@ export default class GameFiledBigView extends PIXI.Sprite {
 		return spriteContainer;
 	}
 
+	/**
+	 * Функция отработки по клику
+	 * @param event
+	 */
 	onClick(event){
 		if(this.onClickCb) {
 			this.onClickCb.call(this.cbCtx, event);
 		} else {
-			console.log('this default click on game field (big) sprite');
+			console.log('gameFieldClickEvent (ChipView)');
 		}
 	}
 
 	/**
-	 * Отрисовка областей на поле
+	 * Функция отработки по нажатию
+	 * @param event
+	 */
+	onTouchStart(event){
+		if(this.onTouchStartCb) {
+			this.onTouchStartCb.call(this.cbCtx, this.chipValue);
+		} else {
+			console.log('gameFieldTouchStart (ChipView)');
+		}
+	}
+
+	/**
+	 * Отрисовка областей на поле для режима отладки
 	 */
 	devModeInteractiveAreas(){
 		clickAreas.forEach((item)=>{
@@ -51,6 +70,9 @@ export default class GameFiledBigView extends PIXI.Sprite {
 		})
 	}
 
+	/**
+	 * Добавление графики (прямоугольника) на сцену
+	 */
 	drawRect(area){
 		let graphics = new PIXI.Graphics();
 
@@ -78,7 +100,6 @@ export default class GameFiledBigView extends PIXI.Sprite {
 			text.rotation = -0.5;
 
 			text.anchor.set(0.55);
-			// text.pivot.x = 0.5;
 			text.x = area.x + area.w/2;
 			text.y = area.y + area.h/2;
 			graphics.addChild(text);
