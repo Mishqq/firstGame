@@ -1,7 +1,8 @@
 import PIXI from 'pixi.js';
 import {spritesStore} from './../../spritesStore';
 import {defaultPositions} from './../../constants/defaultPositions';
-import {chipValues, chipTextStyle} from './../../constants/chipValues';
+import {chipValues} from './../../constants/chipValues';
+import {styles} from './../../constants/styles';
 
 export default class ChipView extends PIXI.Sprite {
 	constructor(chipType, config) {
@@ -31,7 +32,7 @@ export default class ChipView extends PIXI.Sprite {
 
 		// Значение ставки на фишке
 		this.chipValue = chipValues[chipType];
-		let chipValueText = new PIXI.Text( this.formatChipValue(this.chipValue), chipTextStyle );
+		let chipValueText = new PIXI.Text( this.formatChipValue(this.chipValue), styles.chipTextStyle );
 		chipValueText.anchor.set(0.5);
 
 		sprite.on('tap', this.onClick, this);
@@ -46,21 +47,22 @@ export default class ChipView extends PIXI.Sprite {
 	}
 
 	onClick(){
-		if(this.onClickCb) {
-			this.onClickCb.call(this.cbCtx, this.chipValue);
-		} else {
+		this.onClickCb ?
+			this.onClickCb.call(this.cbCtx, this.chipValue) :
 			console.log('chipClickEvent (ChipView)', this.chipValue);
-		}
 	}
 
 	chipTouchStart(){
-		if(this.onTouchStartCb) {
-			this.onTouchStartCb.call(this.cbCtx, this.formatChipValue(this.chipValue));
-		} else {
-			console.log('chipTouchStart (ChipView)', this.formatChipValue(this.chipValue));
-		}
+		this.onTouchStartCb ?
+			this.onTouchStartCb.call(this.cbCtx, this.chipValue) :
+			console.log('chipTouchStart (ChipView)', this.chipValue);
 	}
 
+	/**
+	 * Форматирование значения ставки
+	 * @param value
+	 * @returns {string}
+	 */
 	formatChipValue(value){
 		let str = value;
 		str = str.toString();

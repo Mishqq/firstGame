@@ -1,10 +1,13 @@
 import GameFieldView from './gameFieldView';
 import {clickAreas} from './gameFieldCellMap';
+import {defaultPositions} from './../../constants/defaultPositions';
+import {transferFactory} from './../../servises/transferFactory'
 
 export default class GameFieldController {
 	constructor() {
 		let config = {
 			onClickCb: this.onClick,
+			onHoverCb: this.hoverAreas,
 			ctx: this
 		};
 
@@ -16,13 +19,20 @@ export default class GameFieldController {
 	 * @param event
 	 */
 	onClick(event){
-		console.log('click on gameField (big) from GameFiledBigController');
 		let localPos = event.data.getLocalPosition(this._gameFieldBig);
 		this.getCellFromPos(localPos);
 	}
 
 	get gameFieldSprite(){
-		return this._gameFieldBig;
+		return this._gameFieldBig.pixiContainer;
+	}
+
+	hideCircles(){
+		this._gameFieldBig.hideCircles();
+	}
+
+	showCircles(arr){
+		this._gameFieldBig.showCircles(arr);
 	}
 
 	/**
@@ -30,12 +40,28 @@ export default class GameFieldController {
 	 * @param pos
 	 */
 	getCellFromPos(pos){
-		let cell = clickAreas.find((item)=>{
+		return clickAreas.find((item)=>{
 			return pos.x >= item.x && pos.x < item.x+item.w && pos.y > item.y && pos.y < item.y + item.h
 		});
+	}
 
-		if(cell){
-			console.log('cell.c ➠ ', cell.c);
+	hoverAreas(event){
+		if(!transferFactory.chipActive) return false;
+
+		// т.к. событие mousemove и touchmove у нас отрабатывают по всей сцене
+		// (не важно на что вешаем), то вычисляем координаты нужного поля относительно
+		// сцены вручную
+		let pos = {
+			x: event.data.global.x - defaultPositions.fields.big.x,
+			y: event.data.global.y - defaultPositions.fields.big.y
+		};
+
+		let cell = this.getCellFromPos(pos);
+
+		this.hideCircles();
+
+		if(cell && cell.c.length){
+			this.showCircles(cell.c);
 		}
 	}
 }

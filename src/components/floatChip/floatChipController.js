@@ -1,11 +1,10 @@
 import FloatChipView from './floatChipView';
-import {transferFactory} from './../../servises/transferFactory'
+import {floatChipTypes} from './../../constants/chipValues';
 
 export default class FloatChipController {
 	constructor() {
 		let config = {
 			viewFloatChip: this.viewFloatChip,
-			setVisibility: this.setVisibility,
 			setPosition: this.setPosition,
 			ctx: this
 		};
@@ -18,33 +17,11 @@ export default class FloatChipController {
 	}
 
 	viewFloatChip(value){
-		// let type(value)
-		let type;
-		switch(value) {
-			case 100:
-				type = 0;
-				break;
-			case 500:
-				type = 1;
-				break;
-			case '1K':
-				type = 2;
-				break;
-			case '2K':
-				type = 3;
-				break;
-			case '3K':
-				type = 4;
-				break;
-			default:
-				break;
-		}
-
-		this._floatChipsSprite.viewFloatChip(type, value);
+		this._floatChipsSprite.viewFloatChip(floatChipTypes[value], value);
 	}
 
-	setVisibility(visibility){
-		console.log('setVisibility (FloatChipController)', visibility);
+	hideFloatChip(){
+		this._floatChipsSprite.hideFloatChips();
 	}
 
 	setPosition(pos){

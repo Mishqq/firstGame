@@ -28254,31 +28254,37 @@
 	
 	var _Game2 = _interopRequireDefault(_Game);
 	
-	var _assetsLoader = __webpack_require__(146);
+	var _assetsLoader = __webpack_require__(140);
 	
-	var _transferFactory = __webpack_require__(161);
+	var _transferFactory = __webpack_require__(143);
 	
-	var _spritesStore = __webpack_require__(142);
+	var _defaultPositions = __webpack_require__(147);
 	
-	var _background = __webpack_require__(140);
+	var _spritesStore = __webpack_require__(141);
+	
+	var _background = __webpack_require__(144);
 	
 	var _background2 = _interopRequireDefault(_background);
 	
-	var _gameFieldController = __webpack_require__(158);
+	var _gameFieldController = __webpack_require__(145);
 	
 	var _gameFieldController2 = _interopRequireDefault(_gameFieldController);
 	
-	var _buttonController = __webpack_require__(162);
+	var _buttonController = __webpack_require__(149);
 	
 	var _buttonController2 = _interopRequireDefault(_buttonController);
 	
-	var _chipController = __webpack_require__(152);
+	var _chipController = __webpack_require__(151);
 	
 	var _chipController2 = _interopRequireDefault(_chipController);
 	
-	var _floatChipController = __webpack_require__(163);
+	var _floatChipController = __webpack_require__(154);
 	
 	var _floatChipController2 = _interopRequireDefault(_floatChipController);
+	
+	var _betController = __webpack_require__(157);
+	
+	var _betController2 = _interopRequireDefault(_betController);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -28297,42 +28303,49 @@
 				var _this = this;
 	
 				console.log('init GameController');
+				var game = this.game,
+				    stage = game.stage;
+	
+				this.stage = stage;
 	
 				/**
 	    * background
 	    */
 				var bg = new _background2.default();
-				this.game.stage.addChild(bg);
+				stage.addChild(bg);
 	
-				this.game.stage.interactive = true;
+				stage.interactive = true;
 	
-				this.game.stage.on('mousemove', this.onTouchMove, this);
-				this.game.stage.on('touchmove', this.onTouchMove, this);
+				stage.on('mousemove', this.onTouchMove, this);
+				stage.on('touchmove', this.onTouchMove, this);
 	
-				this.game.stage.on('mouseup', this.onTouchEnd, this);
-				this.game.stage.on('touchend', this.onTouchEnd, this);
+				stage.on('mouseup', this.onTouchEnd, this);
+				stage.on('touchend', this.onTouchEnd, this);
+	
+				/**
+	    * Игровое поле
+	    */
+				this.gameField = new _gameFieldController2.default();
+				stage.addChild(this.gameField.gameFieldSprite);
 	
 				/**
 	    * Прогружаем все json-атласы
 	    */
 				(0, _assetsLoader.assetLoader)(function () {
-					var gameField = new _gameFieldController2.default();
-					_this.game.stage.addChild(gameField.gameFieldSprite);
-	
 					var chipsController = new _chipController2.default();
 					chipsController.chips.forEach(function (chip) {
-						_this.game.stage.addChild(chip);
+						stage.addChild(chip);
 					});
 	
 					var buttonsController = new _buttonController2.default();
 					buttonsController.buttons.forEach(function (button) {
-						_this.game.stage.addChild(button);
+						stage.addChild(button);
 					});
 	
 					_this.floatChipContainer = new _floatChipController2.default();
-					_this.game.stage.addChild(_this.floatChipContainer.getFloatChipsSprite);
+					stage.addChild(_this.floatChipContainer.getFloatChipsSprite);
 	
-					_this.game.start();
+					game.start();
 				});
 			}
 		}, {
@@ -28345,7 +28358,46 @@
 			}
 		}, {
 			key: 'onTouchEnd',
-			value: function onTouchEnd() {}
+			value: function onTouchEnd(event) {
+				var gameFieldPos = this.gameField.gameFieldSprite.getBounds(),
+				    pos = event.data.global;
+	
+				// Если отпустили ставку над столом - то проводим её
+				if (this.isPosInBounds(pos, gameFieldPos) && _transferFactory.transferFactory.chipValue) this.setBet();
+	
+				this.clearTableBet();
+			}
+	
+			/**
+	   * Проверка принадлежности по координатам
+	   * @param pos - {x, y}
+	   * @param bounds - {x, y, width, height}
+	   */
+	
+		}, {
+			key: 'isPosInBounds',
+			value: function isPosInBounds(pos, bounds) {
+				return pos.x >= bounds.x && pos.x <= bounds.x + bounds.width && pos.y >= bounds.y && pos.y <= bounds.y + bounds.height;
+			}
+		}, {
+			key: 'setBet',
+			value: function setBet() {
+				var gameFieldPos = _defaultPositions.defaultPositions.fields.big,
+				    testPos = { x: 150 + gameFieldPos.x, y: 200 + gameFieldPos.y };
+	
+				var betController = new _betController2.default(testPos);
+				this.stage.addChild(betController.betSprite);
+	
+				console.log('Делаем ставку ➠ ', _transferFactory.transferFactory.chipValue);
+			}
+		}, {
+			key: 'clearTableBet',
+			value: function clearTableBet() {
+				_transferFactory.transferFactory.chipActive = false;
+				_transferFactory.transferFactory.chipValue = undefined;
+				this.floatChipContainer.hideFloatChip();
+				this.gameField.hideCircles();
+			}
 		}]);
 	
 		return GameController;
@@ -28479,223 +28531,15 @@
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	
-	var _pixi = __webpack_require__(1);
-	
-	var _pixi2 = _interopRequireDefault(_pixi);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var Background = function (_PIXI$Sprite) {
-		_inherits(Background, _PIXI$Sprite);
-	
-		function Background() {
-			_classCallCheck(this, Background);
-	
-			var _this = _possibleConstructorReturn(this, (Background.__proto__ || Object.getPrototypeOf(Background)).call(this, _pixi2.default.Texture.fromImage('./assets/images/bg.jpg')));
-	
-			_this.position.set(0, 0);
-			_this.anchor.set(0);
-			_this.width = 1920;
-			_this.height = 1080;
-			return _this;
-		}
-	
-		return Background;
-	}(_pixi2.default.Sprite);
-	
-	exports.default = Background;
-
-/***/ },
-/* 141 */,
-/* 142 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	var spriteGroups = ['chips', 'anums', 'bgNumbers', 'blights', 'buttons', 'fields', 'timer'],
-	    spritesStore = {};
-	
-	spriteGroups.forEach(function (item) {
-		spritesStore[item] = {};
-	});
-	
-	exports.spritesStore = spritesStore;
-
-/***/ },
-/* 143 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	var defaultPositions = {
-		chips: {
-			chip0: { x: 640, y: 957 },
-			chip1: { x: 800, y: 957 },
-			chip2: { x: 960, y: 957 },
-			chip3: { x: 1120, y: 957 },
-			chip4: { x: 1280, y: 957 }
-		},
-		buttons: {
-			btnCancel: { x: 180, y: 934 },
-			btnClear: { x: 410, y: 934 },
-			btnRepeat: { x: 1450, y: 934 },
-			btnX2: { x: 1570, y: 934 }
-		},
-		fields: {
-			big: { x: 200, y: 300 },
-			small: { x: 1200, y: 300 }
-		}
-	};
-	
-	exports.defaultPositions = defaultPositions;
-
-/***/ },
-/* 144 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	var chipTextStyle = {
-		font: 'bold 32px Arial',
-		fill: 'white',
-		align: 'center'
-	};
-	
-	var floatChipTextStyle = {
-		font: 'bold 20px Arial',
-		fill: 'white',
-		align: 'center'
-	};
-	
-	var chipValues = {
-		chip0: 100,
-		chip1: 500,
-		chip2: 1000,
-		chip3: 2000,
-		chip4: 3000
-	};
-	
-	exports.chipValues = chipValues;
-	exports.chipTextStyle = chipTextStyle;
-	exports.floatChipTextStyle = floatChipTextStyle;
-
-/***/ },
-/* 145 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _pixi = __webpack_require__(1);
-	
-	var _pixi2 = _interopRequireDefault(_pixi);
-	
-	var _spritesStore = __webpack_require__(142);
-	
-	var _defaultPositions = __webpack_require__(143);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var ButtonView = function (_PIXI$Sprite) {
-		_inherits(ButtonView, _PIXI$Sprite);
-	
-		function ButtonView(btnType, config) {
-			var _ret;
-	
-			_classCallCheck(this, ButtonView);
-	
-			var _this = _possibleConstructorReturn(this, (ButtonView.__proto__ || Object.getPrototypeOf(ButtonView)).call(this));
-	
-			_this.onClickCb = config.onClickCb ? config.onClickCb : undefined;
-			_this.cbCtx = config.ctx ? config.ctx : _this;
-	
-			// Контейнер для фишки с тенью и текстом
-			var spriteContainer = new _pixi2.default.Container();
-	
-			spriteContainer.x = _defaultPositions.defaultPositions.buttons[btnType].x;
-			spriteContainer.y = _defaultPositions.defaultPositions.buttons[btnType].y;
-	
-			if (btnType === 'btnCancel' || btnType === 'btnClear') btnType = 'btnAction';
-	
-			var sprite = new _pixi2.default.Sprite(_spritesStore.spritesStore.buttons[btnType]);
-	
-			// Opt-in to interactivity
-			sprite.interactive = true;
-	
-			// Shows hand cursor
-			sprite.buttonMode = true;
-	
-			sprite.anchor.set(0.5);
-	
-			sprite.on('tap', _this.onClick, _this);
-			sprite.on('click', _this.onClick, _this);
-	
-			spriteContainer.addChild(sprite);
-	
-			return _ret = spriteContainer, _possibleConstructorReturn(_this, _ret);
-		}
-	
-		_createClass(ButtonView, [{
-			key: 'onClick',
-			value: function onClick() {
-				if (this.onClickCb) {
-					this.onClickCb.call(this.cbCtx, 'lol');
-				} else {
-					console.log('this default click on button sprite');
-				}
-			}
-		}]);
-	
-		return ButtonView;
-	}(_pixi2.default.Sprite);
-	
-	exports.default = ButtonView;
-
-/***/ },
-/* 146 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
 	exports.assetLoader = undefined;
 	
 	var _pixi = __webpack_require__(1);
 	
 	var _pixi2 = _interopRequireDefault(_pixi);
 	
-	var _spritesStore = __webpack_require__(142);
+	var _spritesStore = __webpack_require__(141);
 	
-	var _constants = __webpack_require__(147);
+	var _constants = __webpack_require__(142);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -28735,7 +28579,25 @@
 	exports.assetLoader = assetLoader;
 
 /***/ },
-/* 147 */
+/* 141 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	var spriteGroups = ['chips', 'anums', 'bgNumbers', 'blights', 'buttons', 'fields', 'timer'],
+	    spritesStore = {};
+	
+	spriteGroups.forEach(function (item) {
+		spritesStore[item] = {};
+	});
+	
+	exports.spritesStore = spritesStore;
+
+/***/ },
+/* 142 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -28843,77 +28705,20 @@
 	exports.constants = constants;
 
 /***/ },
-/* 148 */,
-/* 149 */,
-/* 150 */,
-/* 151 */,
-/* 152 */
-/***/ function(module, exports, __webpack_require__) {
+/* 143 */
+/***/ function(module, exports) {
 
-	'use strict';
+	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
-		value: true
+	  value: true
 	});
+	var transferFactory = {};
 	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _chipView = __webpack_require__(153);
-	
-	var _chipView2 = _interopRequireDefault(_chipView);
-	
-	var _transferFactory = __webpack_require__(161);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var ChipController = function () {
-		function ChipController() {
-			var _this = this;
-	
-			_classCallCheck(this, ChipController);
-	
-			var config = {
-				onClickCb: this.onClick,
-				chipTouchStartCb: this.chipTouchStart,
-				ctx: this
-			};
-	
-			this._chips = [];
-	
-			['chip0', 'chip1', 'chip2', 'chip3', 'chip4'].forEach(function (item) {
-				var chip = new _chipView2.default(item, config);
-				_this._chips.push(chip);
-			});
-		}
-	
-		_createClass(ChipController, [{
-			key: 'onClick',
-			value: function onClick(price) {
-				console.log('chipClickEvent (ChipController)', price);
-			}
-		}, {
-			key: 'chipTouchStart',
-			value: function chipTouchStart(price) {
-				_transferFactory.transferFactory.chipActive = true;
-				_transferFactory.transferFactory.chipValue = price;
-				console.log('chipTouchStart (ChipController)', price);
-			}
-		}, {
-			key: 'chips',
-			get: function get() {
-				return this._chips;
-			}
-		}]);
-	
-		return ChipController;
-	}();
-	
-	exports.default = ChipController;
+	exports.transferFactory = transferFactory;
 
 /***/ },
-/* 153 */
+/* 144 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28921,18 +28726,10 @@
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
 	var _pixi = __webpack_require__(1);
 	
 	var _pixi2 = _interopRequireDefault(_pixi);
-	
-	var _spritesStore = __webpack_require__(142);
-	
-	var _defaultPositions = __webpack_require__(143);
-	
-	var _chipValues = __webpack_require__(144);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -28942,92 +28739,28 @@
 	
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 	
-	var ChipView = function (_PIXI$Sprite) {
-		_inherits(ChipView, _PIXI$Sprite);
+	var Background = function (_PIXI$Sprite) {
+		_inherits(Background, _PIXI$Sprite);
 	
-		function ChipView(chipType, config) {
-			var _ret;
+		function Background() {
+			_classCallCheck(this, Background);
 	
-			_classCallCheck(this, ChipView);
+			var _this = _possibleConstructorReturn(this, (Background.__proto__ || Object.getPrototypeOf(Background)).call(this, _pixi2.default.Texture.fromImage('./assets/images/bg.jpg')));
 	
-			var _this = _possibleConstructorReturn(this, (ChipView.__proto__ || Object.getPrototypeOf(ChipView)).call(this));
-	
-			_this.onClickCb = config.onClickCb ? config.onClickCb : undefined;
-			_this.onTouchStartCb = config.chipTouchStartCb ? config.chipTouchStartCb : undefined;
-			_this.cbCtx = config.ctx ? config.ctx : _this;
-	
-			// Контейнер для фишки с тенью и текстом
-			var spriteContainer = new _pixi2.default.Container();
-	
-			spriteContainer.x = _defaultPositions.defaultPositions.chips[chipType].x;
-			spriteContainer.y = _defaultPositions.defaultPositions.chips[chipType].y;
-	
-			var sprite = new _pixi2.default.Sprite(_spritesStore.spritesStore.chips[chipType]);
-	
-			// Opt-in to interactivity
-			sprite.interactive = true;
-			// Shows hand cursor
-			sprite.buttonMode = true;
-			sprite.anchor.set(0.5);
-	
-			// Тень под фишкой
-			var shadow = new _pixi2.default.Sprite(_spritesStore.spritesStore.chips.chipShadow);
-			shadow.anchor.set(0.5);
-	
-			// Значение ставки на фишке
-			_this.chipValue = _chipValues.chipValues[chipType];
-			var chipValueText = new _pixi2.default.Text(_this.formatChipValue(_this.chipValue), _chipValues.chipTextStyle);
-			chipValueText.anchor.set(0.5);
-	
-			sprite.on('tap', _this.onClick, _this);
-			sprite.on('click', _this.onClick, _this);
-	
-			sprite.on('mousedown', _this.chipTouchStart, _this);
-			sprite.on('touchstart', _this.chipTouchStart, _this);
-	
-			spriteContainer.addChild(shadow).addChild(sprite).addChild(chipValueText);
-	
-			return _ret = spriteContainer, _possibleConstructorReturn(_this, _ret);
+			_this.position.set(0, 0);
+			_this.anchor.set(0);
+			_this.width = 1920;
+			_this.height = 1080;
+			return _this;
 		}
 	
-		_createClass(ChipView, [{
-			key: 'onClick',
-			value: function onClick() {
-				if (this.onClickCb) {
-					this.onClickCb.call(this.cbCtx, this.chipValue);
-				} else {
-					console.log('chipClickEvent (ChipView)', this.chipValue);
-				}
-			}
-		}, {
-			key: 'chipTouchStart',
-			value: function chipTouchStart() {
-				if (this.onTouchStartCb) {
-					this.onTouchStartCb.call(this.cbCtx, this.formatChipValue(this.chipValue));
-				} else {
-					console.log('chipTouchStart (ChipView)', this.formatChipValue(this.chipValue));
-				}
-			}
-		}, {
-			key: 'formatChipValue',
-			value: function formatChipValue(value) {
-				var str = value;
-				str = str.toString();
-				return str.length > 3 ? str.substring(0, 1) + 'K' : value;
-			}
-		}]);
-	
-		return ChipView;
+		return Background;
 	}(_pixi2.default.Sprite);
 	
-	exports.default = ChipView;
+	exports.default = Background;
 
 /***/ },
-/* 154 */,
-/* 155 */,
-/* 156 */,
-/* 157 */,
-/* 158 */
+/* 145 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29038,11 +28771,15 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _gameFieldView = __webpack_require__(159);
+	var _gameFieldView = __webpack_require__(146);
 	
 	var _gameFieldView2 = _interopRequireDefault(_gameFieldView);
 	
-	var _gameFieldCellMap = __webpack_require__(160);
+	var _gameFieldCellMap = __webpack_require__(148);
+	
+	var _defaultPositions = __webpack_require__(147);
+	
+	var _transferFactory = __webpack_require__(143);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -29054,6 +28791,7 @@
 	
 			var config = {
 				onClickCb: this.onClick,
+				onHoverCb: this.hoverAreas,
 				ctx: this
 			};
 	
@@ -29069,31 +28807,57 @@
 		_createClass(GameFieldController, [{
 			key: 'onClick',
 			value: function onClick(event) {
-				console.log('click on gameField (big) from GameFiledBigController');
 				var localPos = event.data.getLocalPosition(this._gameFieldBig);
 				this.getCellFromPos(localPos);
 			}
 		}, {
-			key: 'getCellFromPos',
-	
+			key: 'hideCircles',
+			value: function hideCircles() {
+				this._gameFieldBig.hideCircles();
+			}
+		}, {
+			key: 'showCircles',
+			value: function showCircles(arr) {
+				this._gameFieldBig.showCircles(arr);
+			}
 	
 			/**
 	   * Определение ячеек по клику на игровое поле
 	   * @param pos
 	   */
+	
+		}, {
+			key: 'getCellFromPos',
 			value: function getCellFromPos(pos) {
-				var cell = _gameFieldCellMap.clickAreas.find(function (item) {
+				return _gameFieldCellMap.clickAreas.find(function (item) {
 					return pos.x >= item.x && pos.x < item.x + item.w && pos.y > item.y && pos.y < item.y + item.h;
 				});
+			}
+		}, {
+			key: 'hoverAreas',
+			value: function hoverAreas(event) {
+				if (!_transferFactory.transferFactory.chipActive) return false;
 	
-				if (cell) {
-					console.log('cell.c ➠ ', cell.c);
+				// т.к. событие mousemove и touchmove у нас отрабатывают по всей сцене
+				// (не важно на что вешаем), то вычисляем координаты нужного поля относительно
+				// сцены вручную
+				var pos = {
+					x: event.data.global.x - _defaultPositions.defaultPositions.fields.big.x,
+					y: event.data.global.y - _defaultPositions.defaultPositions.fields.big.y
+				};
+	
+				var cell = this.getCellFromPos(pos);
+	
+				this.hideCircles();
+	
+				if (cell && cell.c.length) {
+					this.showCircles(cell.c);
 				}
 			}
 		}, {
 			key: 'gameFieldSprite',
 			get: function get() {
-				return this._gameFieldBig;
+				return this._gameFieldBig.pixiContainer;
 			}
 		}]);
 	
@@ -29103,7 +28867,7 @@
 	exports.default = GameFieldController;
 
 /***/ },
-/* 159 */
+/* 146 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29118,9 +28882,11 @@
 	
 	var _pixi2 = _interopRequireDefault(_pixi);
 	
-	var _defaultPositions = __webpack_require__(143);
+	var _defaultPositions = __webpack_require__(147);
 	
-	var _gameFieldCellMap = __webpack_require__(160);
+	var _gameFieldCellMap = __webpack_require__(148);
+	
+	var _styles = __webpack_require__(156);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -29134,17 +28900,17 @@
 		_inherits(GameFieldView, _PIXI$Sprite);
 	
 		function GameFieldView(config) {
-			var _ret;
-	
 			_classCallCheck(this, GameFieldView);
 	
 			var _this = _possibleConstructorReturn(this, (GameFieldView.__proto__ || Object.getPrototypeOf(GameFieldView)).call(this));
 	
 			_this.onClickCb = config.onClickCb ? config.onClickCb : undefined;
+			_this.onHoverCb = config.onHoverCb ? config.onHoverCb : undefined;
 			_this.cbCtx = config.ctx ? config.ctx : _this;
 	
 			// Контейнер для фишки с тенью и текстом
 			var spriteContainer = new _pixi2.default.Container();
+			_this.pixiContainer = spriteContainer;
 	
 			spriteContainer.x = _defaultPositions.defaultPositions.fields.big.x;
 			spriteContainer.y = _defaultPositions.defaultPositions.fields.big.y;
@@ -29156,35 +28922,32 @@
 			// Shows hand cursor
 			sprite.buttonMode = true;
 	
-			sprite.on('tap', _this.onClick, _this);
-			sprite.on('click', _this.onClick, _this);
+			['tap', 'click', 'pointertap'].forEach(function (event) {
+				sprite.on(event, _this.onClick, _this);
+			});
 	
-			sprite.on('mousedown', _this.onTouchStart, _this);
-			sprite.on('touchstart', _this.onTouchStart, _this);
+			['mousemove', 'touchmove', 'pointermove'].forEach(function (event) {
+				sprite.on(event, _this.hoverAreas, _this);
+			});
 	
 			spriteContainer.addChild(sprite);
 	
-			_this.spriteContainer = spriteContainer;
+			_this.drawCircle();
 	
 			// this.devModeInteractiveAreas();
-	
-			return _ret = spriteContainer, _possibleConstructorReturn(_this, _ret);
+			return _this;
 		}
-	
-		/**
-	  * Функция отработки по клику
-	  * @param event
-	  */
-	
 	
 		_createClass(GameFieldView, [{
 			key: 'onClick',
+	
+	
+			/**
+	   * Функция отработки по клику
+	   * @param event
+	   */
 			value: function onClick(event) {
-				if (this.onClickCb) {
-					this.onClickCb.call(this.cbCtx, event);
-				} else {
-					console.log('gameFieldClickEvent (ChipView)');
-				}
+				this.onClickCb ? this.onClickCb.call(this.cbCtx, event) : console.log('gameFieldClickEvent (ChipView)');
 			}
 	
 			/**
@@ -29217,6 +28980,64 @@
 			}
 	
 			/**
+	   * Отрисовка белых ховеров на поле.
+	   */
+	
+		}, {
+			key: 'drawCircle',
+			value: function drawCircle() {
+				this.ringSprites = {};
+				for (var key in _gameFieldCellMap.pointMap) {
+					var obj = _gameFieldCellMap.pointMap[key];
+					var ringSprite = new _pixi2.default.Sprite.fromImage('./assets/images/ring.png');
+					ringSprite.anchor.set(0.5);
+					ringSprite.x = obj.x;
+					ringSprite.y = obj.y;
+					ringSprite.visible = false;
+	
+					this.ringSprites[key] = ringSprite;
+	
+					this.pixiContainer.addChild(ringSprite);
+				}
+			}
+		}, {
+			key: 'hideCircles',
+	
+	
+			/**
+	   * Функция скрытия белых колец
+	   */
+			value: function hideCircles() {
+				for (var key in this.ringSprites) {
+					this.ringSprites[key].visible = false;
+				}
+			}
+	
+			/**
+	   * Функция показа белых колец
+	   */
+	
+		}, {
+			key: 'showCircles',
+			value: function showCircles(arr) {
+				for (var i = 0; i < arr.length; i += 1) {
+					if (this.ringSprites[arr[i]]) this.ringSprites[arr[i]].visible = true;
+				}
+			}
+	
+			/**
+	   * Наведение на интерактивные области игрового поля с
+	   * подсветкой номеров, на которые мы производим ставку
+	   * @param event
+	   */
+	
+		}, {
+			key: 'hoverAreas',
+			value: function hoverAreas(event) {
+				this.onHoverCb ? this.onHoverCb.call(this.cbCtx, event) : console.log('hoverAreas (ChipView)');
+			}
+	
+			/**
 	   * Добавление графики (прямоугольника) на сцену
 	   */
 	
@@ -29240,12 +29061,7 @@
 						str += item;
 					});
 	
-					var text = new _pixi2.default.Text(str);
-					text.style.font = "bold 18px Arial";
-					text.style.wordWrapWidth = 0;
-					text.style.fill = 'white';
-					text.style.stroke = 'black';
-					text.style.strokeThickness = 5;
+					var text = new _pixi2.default.Text(str, _styles.styles.filedClickAreaTextStyle);
 					text.rotation = -0.5;
 	
 					text.anchor.set(0.55);
@@ -29254,7 +29070,15 @@
 					graphics.addChild(text);
 				}
 	
-				this.spriteContainer.addChild(graphics);
+				this.pixiContainer.addChild(graphics);
+			}
+		}, {
+			key: 'pixiContainer',
+			set: function set(container) {
+				this._spriteContainer = container;
+			},
+			get: function get() {
+				return this._spriteContainer;
 			}
 		}]);
 	
@@ -29264,7 +29088,38 @@
 	exports.default = GameFieldView;
 
 /***/ },
-/* 160 */
+/* 147 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	var defaultPositions = {
+		chips: {
+			chip0: { x: 640, y: 957 },
+			chip1: { x: 800, y: 957 },
+			chip2: { x: 960, y: 957 },
+			chip3: { x: 1120, y: 957 },
+			chip4: { x: 1280, y: 957 }
+		},
+		buttons: {
+			btnCancel: { x: 180, y: 934 },
+			btnClear: { x: 410, y: 934 },
+			btnRepeat: { x: 1450, y: 934 },
+			btnX2: { x: 1570, y: 934 }
+		},
+		fields: {
+			big: { x: 200, y: 300 },
+			small: { x: 1200, y: 300 }
+		}
+	};
+	
+	exports.defaultPositions = defaultPositions;
+
+/***/ },
+/* 148 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -29276,7 +29131,7 @@
 	{ x: 1363, y: 0, w: 75, h: 106, c: [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36] }, //2b1_row1
 	{ x: 1363, y: 107, w: 75, h: 106, c: [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35] }, //2b1_row2
 	{ x: 1363, y: 214, w: 75, h: 106, c: [1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34] }, //2b1_row3
-	{ x: 87, y: 342, w: 425, h: 53, c: [1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12] }, //1st12
+	{ x: 87, y: 342, w: 425, h: 53, c: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] }, //1st12
 	{ x: 513, y: 342, w: 423, h: 53, c: [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24] }, //2st12
 	{ x: 937, y: 342, w: 425, h: 53, c: [25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36] }, //3st12
 	{ x: 88, y: 396, w: 213, h: 76, c: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] }, //1to18
@@ -29328,30 +29183,24 @@
 	 * У каждой ячейки с цифрой на поле задаётся координата, куда будет отрисовываться кольцо
 	 */
 	var pointMap = {};
-	var starts = { x: 136, y: 54 };
+	// let starts = {x:136, y:54};
+	// cell w:103 h:103 divider:3
+	var starts = { x: 143, y: 267 };
+	var count = 1;
 	
-	for (var i = 0; i < 3; i += 1) {
-		for (var y = 0; y < 12; y += 1) {}
+	for (var i = 0; i < 12; i += 1) {
+		var x = starts.x + 106 * i;
+		for (var j = 0; j < 3; j += 1) {
+			var y = starts.y - 106 * j;
+			pointMap[count++] = { x: x, y: y };
+		}
 	}
 	
 	exports.clickAreas = clickAreas;
 	exports.pointMap = pointMap;
 
 /***/ },
-/* 161 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	var transferFactory = {};
-	
-	exports.transferFactory = transferFactory;
-
-/***/ },
-/* 162 */
+/* 149 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29362,13 +29211,13 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _ButtonView = __webpack_require__(145);
+	var _ButtonView = __webpack_require__(150);
 	
 	var _ButtonView2 = _interopRequireDefault(_ButtonView);
 	
-	var _spritesStore = __webpack_require__(142);
+	var _spritesStore = __webpack_require__(141);
 	
-	var _defaultPositions = __webpack_require__(143);
+	var _defaultPositions = __webpack_require__(147);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -29438,7 +29287,7 @@
 	exports.default = ButtonController;
 
 /***/ },
-/* 163 */
+/* 150 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29449,11 +29298,297 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _floatChipView = __webpack_require__(164);
+	var _pixi = __webpack_require__(1);
+	
+	var _pixi2 = _interopRequireDefault(_pixi);
+	
+	var _spritesStore = __webpack_require__(141);
+	
+	var _defaultPositions = __webpack_require__(147);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var ButtonView = function (_PIXI$Sprite) {
+		_inherits(ButtonView, _PIXI$Sprite);
+	
+		function ButtonView(btnType, config) {
+			var _ret;
+	
+			_classCallCheck(this, ButtonView);
+	
+			var _this = _possibleConstructorReturn(this, (ButtonView.__proto__ || Object.getPrototypeOf(ButtonView)).call(this));
+	
+			_this.onClickCb = config.onClickCb ? config.onClickCb : undefined;
+			_this.cbCtx = config.ctx ? config.ctx : _this;
+	
+			// Контейнер для фишки с тенью и текстом
+			var spriteContainer = new _pixi2.default.Container();
+	
+			spriteContainer.x = _defaultPositions.defaultPositions.buttons[btnType].x;
+			spriteContainer.y = _defaultPositions.defaultPositions.buttons[btnType].y;
+	
+			if (btnType === 'btnCancel' || btnType === 'btnClear') btnType = 'btnAction';
+	
+			var sprite = new _pixi2.default.Sprite(_spritesStore.spritesStore.buttons[btnType]);
+	
+			// Opt-in to interactivity
+			sprite.interactive = true;
+	
+			// Shows hand cursor
+			sprite.buttonMode = true;
+	
+			sprite.anchor.set(0.5);
+	
+			sprite.on('tap', _this.onClick, _this);
+			sprite.on('click', _this.onClick, _this);
+	
+			spriteContainer.addChild(sprite);
+	
+			return _ret = spriteContainer, _possibleConstructorReturn(_this, _ret);
+		}
+	
+		_createClass(ButtonView, [{
+			key: 'onClick',
+			value: function onClick() {
+				if (this.onClickCb) {
+					this.onClickCb.call(this.cbCtx, 'lol');
+				} else {
+					console.log('this default click on button sprite');
+				}
+			}
+		}]);
+	
+		return ButtonView;
+	}(_pixi2.default.Sprite);
+	
+	exports.default = ButtonView;
+
+/***/ },
+/* 151 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _chipView = __webpack_require__(152);
+	
+	var _chipView2 = _interopRequireDefault(_chipView);
+	
+	var _transferFactory = __webpack_require__(143);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var ChipController = function () {
+		function ChipController() {
+			var _this = this;
+	
+			_classCallCheck(this, ChipController);
+	
+			var config = {
+				onClickCb: this.onClick,
+				chipTouchStartCb: this.chipTouchStart,
+				ctx: this
+			};
+	
+			this._chips = [];
+	
+			['chip0', 'chip1', 'chip2', 'chip3', 'chip4'].forEach(function (item) {
+				var chip = new _chipView2.default(item, config);
+				_this._chips.push(chip);
+			});
+		}
+	
+		_createClass(ChipController, [{
+			key: 'onClick',
+			value: function onClick(price) {
+				console.log('chipClickEvent (ChipController)', price);
+			}
+		}, {
+			key: 'chipTouchStart',
+			value: function chipTouchStart(price) {
+				_transferFactory.transferFactory.chipActive = true;
+				_transferFactory.transferFactory.chipValue = price;
+				console.log('chipTouchStart (ChipController)', price);
+			}
+		}, {
+			key: 'chips',
+			get: function get() {
+				return this._chips;
+			}
+		}]);
+	
+		return ChipController;
+	}();
+	
+	exports.default = ChipController;
+
+/***/ },
+/* 152 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _pixi = __webpack_require__(1);
+	
+	var _pixi2 = _interopRequireDefault(_pixi);
+	
+	var _spritesStore = __webpack_require__(141);
+	
+	var _defaultPositions = __webpack_require__(147);
+	
+	var _chipValues = __webpack_require__(153);
+	
+	var _styles = __webpack_require__(156);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var ChipView = function (_PIXI$Sprite) {
+		_inherits(ChipView, _PIXI$Sprite);
+	
+		function ChipView(chipType, config) {
+			var _ret;
+	
+			_classCallCheck(this, ChipView);
+	
+			var _this = _possibleConstructorReturn(this, (ChipView.__proto__ || Object.getPrototypeOf(ChipView)).call(this));
+	
+			_this.onClickCb = config.onClickCb ? config.onClickCb : undefined;
+			_this.onTouchStartCb = config.chipTouchStartCb ? config.chipTouchStartCb : undefined;
+			_this.cbCtx = config.ctx ? config.ctx : _this;
+	
+			// Контейнер для фишки с тенью и текстом
+			var spriteContainer = new _pixi2.default.Container();
+	
+			spriteContainer.x = _defaultPositions.defaultPositions.chips[chipType].x;
+			spriteContainer.y = _defaultPositions.defaultPositions.chips[chipType].y;
+	
+			var sprite = new _pixi2.default.Sprite(_spritesStore.spritesStore.chips[chipType]);
+	
+			// Opt-in to interactivity
+			sprite.interactive = true;
+			// Shows hand cursor
+			sprite.buttonMode = true;
+			sprite.anchor.set(0.5);
+	
+			// Тень под фишкой
+			var shadow = new _pixi2.default.Sprite(_spritesStore.spritesStore.chips.chipShadow);
+			shadow.anchor.set(0.5);
+	
+			// Значение ставки на фишке
+			_this.chipValue = _chipValues.chipValues[chipType];
+			var chipValueText = new _pixi2.default.Text(_this.formatChipValue(_this.chipValue), _styles.styles.chipTextStyle);
+			chipValueText.anchor.set(0.5);
+	
+			sprite.on('tap', _this.onClick, _this);
+			sprite.on('click', _this.onClick, _this);
+	
+			sprite.on('mousedown', _this.chipTouchStart, _this);
+			sprite.on('touchstart', _this.chipTouchStart, _this);
+	
+			spriteContainer.addChild(shadow).addChild(sprite).addChild(chipValueText);
+	
+			return _ret = spriteContainer, _possibleConstructorReturn(_this, _ret);
+		}
+	
+		_createClass(ChipView, [{
+			key: 'onClick',
+			value: function onClick() {
+				this.onClickCb ? this.onClickCb.call(this.cbCtx, this.chipValue) : console.log('chipClickEvent (ChipView)', this.chipValue);
+			}
+		}, {
+			key: 'chipTouchStart',
+			value: function chipTouchStart() {
+				this.onTouchStartCb ? this.onTouchStartCb.call(this.cbCtx, this.chipValue) : console.log('chipTouchStart (ChipView)', this.chipValue);
+			}
+	
+			/**
+	   * Форматирование значения ставки
+	   * @param value
+	   * @returns {string}
+	   */
+	
+		}, {
+			key: 'formatChipValue',
+			value: function formatChipValue(value) {
+				var str = value;
+				str = str.toString();
+				return str.length > 3 ? str.substring(0, 1) + 'K' : value;
+			}
+		}]);
+	
+		return ChipView;
+	}(_pixi2.default.Sprite);
+	
+	exports.default = ChipView;
+
+/***/ },
+/* 153 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	var chipValues = {
+		chip0: 100,
+		chip1: 500,
+		chip2: 1000,
+		chip3: 2000,
+		chip4: 3000
+	};
+	
+	var floatChipTypes = {},
+	    count = 0;
+	for (var key in chipValues) {
+		floatChipTypes[chipValues[key]] = 'fChip' + count++;
+	}
+	
+	exports.chipValues = chipValues;
+	exports.floatChipTypes = floatChipTypes;
+
+/***/ },
+/* 154 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _floatChipView = __webpack_require__(155);
 	
 	var _floatChipView2 = _interopRequireDefault(_floatChipView);
 	
-	var _transferFactory = __webpack_require__(161);
+	var _chipValues = __webpack_require__(153);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -29465,7 +29600,6 @@
 	
 			var config = {
 				viewFloatChip: this.viewFloatChip,
-				setVisibility: this.setVisibility,
 				setPosition: this.setPosition,
 				ctx: this
 			};
@@ -29476,34 +29610,12 @@
 		_createClass(FloatChipController, [{
 			key: 'viewFloatChip',
 			value: function viewFloatChip(value) {
-				// let type(value)
-				var type = void 0;
-				switch (value) {
-					case 100:
-						type = 0;
-						break;
-					case 500:
-						type = 1;
-						break;
-					case '1K':
-						type = 2;
-						break;
-					case '2K':
-						type = 3;
-						break;
-					case '3K':
-						type = 4;
-						break;
-					default:
-						break;
-				}
-	
-				this._floatChipsSprite.viewFloatChip(type, value);
+				this._floatChipsSprite.viewFloatChip(_chipValues.floatChipTypes[value], value);
 			}
 		}, {
-			key: 'setVisibility',
-			value: function setVisibility(visibility) {
-				console.log('setVisibility (FloatChipController)', visibility);
+			key: 'hideFloatChip',
+			value: function hideFloatChip() {
+				this._floatChipsSprite.hideFloatChips();
 			}
 		}, {
 			key: 'setPosition',
@@ -29523,7 +29635,7 @@
 	exports.default = FloatChipController;
 
 /***/ },
-/* 164 */
+/* 155 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29538,11 +29650,9 @@
 	
 	var _pixi2 = _interopRequireDefault(_pixi);
 	
-	var _spritesStore = __webpack_require__(142);
+	var _spritesStore = __webpack_require__(141);
 	
-	var _defaultPositions = __webpack_require__(143);
-	
-	var _chipValues = __webpack_require__(144);
+	var _styles = __webpack_require__(156);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -29555,17 +29665,12 @@
 	var FloatChipView = function (_PIXI$Sprite) {
 		_inherits(FloatChipView, _PIXI$Sprite);
 	
-		function FloatChipView(config) {
+		function FloatChipView() {
 			_classCallCheck(this, FloatChipView);
 	
+			// Контейнер для плавающей фишки
 			var _this = _possibleConstructorReturn(this, (FloatChipView.__proto__ || Object.getPrototypeOf(FloatChipView)).call(this));
 	
-			_this.viewFloatChipCb = config.viewFloatChip ? config.viewFloatChip : undefined;
-			_this.setVisibilityCb = config.setVisibility ? config.setVisibility : undefined;
-			_this.setPositionCb = config.setPosition ? config.setPosition : undefined;
-			_this.cbCtx = config.ctx ? config.ctx : _this;
-	
-			// Контейнер для фишки с тенью и текстом
 			_this._floatChipsContainer = new _pixi2.default.Container();
 			_this._floatChipsContainer.x = 50;
 			_this._floatChipsContainer.y = 50;
@@ -29579,7 +29684,7 @@
 			});
 	
 			// Значение на фишке
-			var chipValueText = new _pixi2.default.Text(';)', _chipValues.floatChipTextStyle);
+			var chipValueText = new _pixi2.default.Text(';)', _styles.styles.floatChipTextStyle);
 			chipValueText.visible = false;
 			_this._floatChipsContainer.addChild(chipValueText);
 			chipValueText.anchor.x = 0.5;
@@ -29587,28 +29692,75 @@
 			return _this;
 		}
 	
+		/**
+	  * Возвращает контейнер со спрайтами фишек, тенью и текстом
+	  * @returns {PIXI.Container|*}
+	  */
+	
+	
 		_createClass(FloatChipView, [{
 			key: 'setText',
-			value: function setText(text) {
-				// let chipValueText = new PIXI.Text( text, floatChipTextStyle );
-			}
+			value: function setText(text) {}
+			// let chipValueText = new PIXI.Text( text, floatChipTextStyle );
+	
+	
+			/**
+	   * Функция показывает плавающую фишку
+	   * @param type - тип показываемой фишки
+	   * @param text - устанавливаемый текст
+	   */
+	
 		}, {
 			key: 'viewFloatChip',
-			value: function viewFloatChip(type, text) {
-				this._floatChipsContainer.visible = true;
-				this._floatChipsContainer.children[type].visible = true;
+			value: function viewFloatChip(type, value) {
+				var arr = ['fChip0', 'fChip1', 'fChip2', 'fChip3', 'fChip4'],
+				    idx = arr.indexOf(type);
 	
-				this._floatChipsContainer.children[5].text = text;
+				this.hideFloatChips();
+	
+				this._floatChipsContainer.visible = true;
+				this._floatChipsContainer.children[idx].visible = true;
+	
+				this._floatChipsContainer.children[5].text = this.formatChipValue(value);
 				this._floatChipsContainer.children[5].visible = true;
 			}
+	
+			/**
+	   * Скрывает все фишки и текст с тенью
+	   */
+	
 		}, {
-			key: 'setVisibility',
-			value: function setVisibility() {}
+			key: 'hideFloatChips',
+			value: function hideFloatChips() {
+				this._floatChipsContainer.children.forEach(function (fChip) {
+					fChip.visible = false;
+				});
+			}
+	
+			/**
+	   * Установка позиции контейнера со спрайтом фишки
+	   * @param pos - {x: Number, y: Number}
+	   */
+	
 		}, {
 			key: 'setPosition',
 			value: function setPosition(pos) {
 				this._floatChipsContainer.x = pos.x;
 				this._floatChipsContainer.y = pos.y;
+			}
+	
+			/**
+	   * Форматирование значения ставки
+	   * @param value
+	   * @returns {string}
+	   */
+	
+		}, {
+			key: 'formatChipValue',
+			value: function formatChipValue(value) {
+				var str = value;
+				str = str.toString();
+				return str.length > 3 ? str.substring(0, 1) + 'K' : value;
 			}
 		}, {
 			key: 'floatChipContainer',
@@ -29621,6 +29773,161 @@
 	}(_pixi2.default.Sprite);
 	
 	exports.default = FloatChipView;
+
+/***/ },
+/* 156 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	var styles = {
+		chipTextStyle: {
+			font: 'bold 32px Arial',
+			fill: 'white',
+			align: 'center'
+		},
+		floatChipTextStyle: {
+			font: 'bold 20px Arial',
+			fill: 'white',
+			align: 'center'
+		},
+		filedClickAreaTextStyle: {
+			font: "bold 18px Arial",
+			wordWrapWidth: 0,
+			fill: 'white',
+			stroke: 'black',
+			strokeThickness: 5
+		}
+	};
+	
+	exports.styles = styles;
+
+/***/ },
+/* 157 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _betView = __webpack_require__(158);
+	
+	var _betView2 = _interopRequireDefault(_betView);
+	
+	var _chipValues = __webpack_require__(153);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var BetController = function () {
+		function BetController(pos) {
+			_classCallCheck(this, BetController);
+	
+			var config = {
+				pos: pos,
+				onClick: this.onClick,
+				ctx: this
+			};
+	
+			this._betView = new _betView2.default(config);
+		}
+	
+		_createClass(BetController, [{
+			key: 'onClick',
+			value: function onClick(event) {}
+		}, {
+			key: 'betSprite',
+			get: function get() {
+				return this._betView.betViewContainer;
+			}
+		}]);
+	
+		return BetController;
+	}();
+	
+	exports.default = BetController;
+
+/***/ },
+/* 158 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _pixi = __webpack_require__(1);
+	
+	var _pixi2 = _interopRequireDefault(_pixi);
+	
+	var _spritesStore = __webpack_require__(141);
+	
+	var _styles = __webpack_require__(156);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var BetView = function (_PIXI$Sprite) {
+		_inherits(BetView, _PIXI$Sprite);
+	
+		function BetView(config) {
+			_classCallCheck(this, BetView);
+	
+			var _this = _possibleConstructorReturn(this, (BetView.__proto__ || Object.getPrototypeOf(BetView)).call(this));
+	
+			_this.onClickCb = config.onClickCb ? config.onClickCb : undefined;
+			_this.cbCtx = config.ctx ? config.ctx : _this;
+	
+			_this._betContainer = new _pixi2.default.Container();
+			_this._betContainer.x = config.pos.x;
+			_this._betContainer.y = config.pos.y;
+	
+			var betSprite = new _pixi2.default.Sprite(_spritesStore.spritesStore.chips['chipSm0']);
+	
+			_this._betContainer.addChild(betSprite);
+			return _this;
+		}
+	
+		_createClass(BetView, [{
+			key: 'onClick',
+			value: function onClick() {
+				this.onClickCb ? this.onClickCb.call(this.cbCtx) : console.log('betClickEvent (betView)');
+			}
+		}, {
+			key: 'setText',
+			value: function setText(text) {
+				// let chipValueText = new PIXI.Text( text, floatChipTextStyle );
+			}
+		}, {
+			key: 'updateBet',
+			value: function updateBet() {}
+		}, {
+			key: 'betViewContainer',
+			get: function get() {
+				return this._betContainer;
+			}
+		}]);
+	
+		return BetView;
+	}(_pixi2.default.Sprite);
+	
+	exports.default = BetView;
 
 /***/ }
 /******/ ]);

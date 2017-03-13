@@ -1,16 +1,3 @@
-const chipTextStyle = {
-	font: 'bold 32px Arial',
-	fill : 'white',
-	align : 'center'
-};
-
-const floatChipTextStyle = {
-	font: 'bold 20px Arial',
-	fill : 'white',
-	align : 'center'
-};
-
-
 const chipValues = {
 	chip0: 100,
 	chip1: 500,
@@ -19,4 +6,10 @@ const chipValues = {
 	chip4: 3000
 };
 
-export {chipValues, chipTextStyle, floatChipTextStyle};
+let floatChipTypes = {},
+	count = 0;
+for(let key in chipValues){
+	floatChipTypes[ chipValues[key] ] = 'fChip' + count++;
+}
+
+export {chipValues, floatChipTypes};

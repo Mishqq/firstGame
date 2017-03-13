@@ -1,16 +1,19 @@
 import PIXI from 'pixi.js';
 import {defaultPositions} from './../../constants/defaultPositions';
-import {clickAreas} from './gameFieldCellMap';
+import {clickAreas, pointMap} from './gameFieldCellMap';
+import {styles} from './../../constants/styles';
 
 export default class GameFieldView extends PIXI.Sprite {
 	constructor(config) {
 		super();
 
 		this.onClickCb = (config.onClickCb) ? config.onClickCb : undefined;
+		this.onHoverCb = (config.onHoverCb) ? config.onHoverCb : undefined;
 		this.cbCtx = (config.ctx) ? config.ctx : this;
 
 		// Контейнер для фишки с тенью и текстом
 		let spriteContainer = new PIXI.Container();
+		this.pixiContainer = spriteContainer;
 
 		spriteContainer.x = defaultPositions.fields.big.x;
 		spriteContainer.y = defaultPositions.fields.big.y;
@@ -22,19 +25,27 @@ export default class GameFieldView extends PIXI.Sprite {
 		// Shows hand cursor
 		sprite.buttonMode = true;
 
-		sprite.on('tap', this.onClick, this);
-		sprite.on('click', this.onClick, this);
+		['tap', 'click', 'pointertap'].forEach((event)=>{
+			sprite.on(event, this.onClick, this);
+		});
 
-		sprite.on('mousedown', this.onTouchStart, this);
-		sprite.on('touchstart', this.onTouchStart, this);
+		['mousemove', 'touchmove', 'pointermove'].forEach((event)=>{
+			sprite.on(event, this.hoverAreas, this);
+		});
 
 		spriteContainer.addChild(sprite);
 
-		this.spriteContainer = spriteContainer;
+		this.drawCircle();
 
 		// this.devModeInteractiveAreas();
+	}
 
-		return spriteContainer;
+	set pixiContainer(container){
+		this._spriteContainer = container;
+	}
+
+	get pixiContainer(){
+		return this._spriteContainer;
 	}
 
 	/**
@@ -42,11 +53,9 @@ export default class GameFieldView extends PIXI.Sprite {
 	 * @param event
 	 */
 	onClick(event){
-		if(this.onClickCb) {
-			this.onClickCb.call(this.cbCtx, event);
-		} else {
+		this.onClickCb ?
+			this.onClickCb.call(this.cbCtx, event) :
 			console.log('gameFieldClickEvent (ChipView)');
-		}
 	}
 
 	/**
@@ -71,6 +80,55 @@ export default class GameFieldView extends PIXI.Sprite {
 	}
 
 	/**
+	 * Отрисовка белых ховеров на поле.
+	 */
+	drawCircle(){
+		this.ringSprites = {};
+		for(let key in pointMap){
+			let obj = pointMap[key];
+			let ringSprite = new PIXI.Sprite.fromImage( './assets/images/ring.png' );
+			ringSprite.anchor.set(0.5);
+			ringSprite.x = obj.x;
+			ringSprite.y = obj.y;
+			ringSprite.visible = false;
+
+			this.ringSprites[key] = ringSprite;
+
+			this.pixiContainer.addChild(ringSprite)
+		}
+	};
+
+	/**
+	 * Функция скрытия белых колец
+	 */
+	hideCircles(){
+		for(let key in this.ringSprites){
+			this.ringSprites[key].visible = false;
+		}
+	}
+
+	/**
+	 * Функция показа белых колец
+	 */
+	showCircles(arr){
+		for(let i=0; i<arr.length; i+=1){
+			if(this.ringSprites[ arr[i] ])
+				this.ringSprites[ arr[i] ].visible = true;
+		}
+	}
+
+	/**
+	 * Наведение на интерактивные области игрового поля с
+	 * подсветкой номеров, на которые мы производим ставку
+	 * @param event
+	 */
+	hoverAreas(event){
+		this.onHoverCb ?
+			this.onHoverCb.call(this.cbCtx, event) :
+			console.log('hoverAreas (ChipView)');
+	}
+
+	/**
 	 * Добавление графики (прямоугольника) на сцену
 	 */
 	drawRect(area){
@@ -87,16 +145,9 @@ export default class GameFieldView extends PIXI.Sprite {
 
 		if(area.c && area.c.length){
 			let str = '';
-			area.c.forEach((item)=>{
-				str += item;
-			});
+			area.c.forEach((item)=>{ str += item });
 
-			let text = new PIXI.Text(str);
-			text.style.font = "bold 18px Arial";
-			text.style.wordWrapWidth = 0;
-			text.style.fill = 'white';
-			text.style.stroke = 'black';
-			text.style.strokeThickness = 5;
+			let text = new PIXI.Text(str, styles.filedClickAreaTextStyle);
 			text.rotation = -0.5;
 
 			text.anchor.set(0.55);
@@ -105,6 +156,6 @@ export default class GameFieldView extends PIXI.Sprite {
 			graphics.addChild(text);
 		}
 
-		this.spriteContainer.addChild(graphics);
+		this.pixiContainer.addChild(graphics);
 	}
 }
