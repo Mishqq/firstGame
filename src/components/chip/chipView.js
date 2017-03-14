@@ -3,6 +3,7 @@ import {spritesStore} from './../../spritesStore';
 import {defaultPositions} from './../../constants/defaultPositions';
 import {chipValues} from './../../constants/chipValues';
 import {styles} from './../../constants/styles';
+import {_hf} from './../../servises/helpFunctions'
 
 export default class ChipView extends PIXI.Sprite {
 	constructor(chipType, config) {
@@ -14,6 +15,7 @@ export default class ChipView extends PIXI.Sprite {
 
 		// Контейнер для фишки с тенью и текстом
 		let spriteContainer = new PIXI.Container();
+		this._spriteContainer = spriteContainer;
 
 		spriteContainer.x = defaultPositions.chips[chipType].x;
 		spriteContainer.y = defaultPositions.chips[chipType].y;
@@ -32,7 +34,7 @@ export default class ChipView extends PIXI.Sprite {
 
 		// Значение ставки на фишке
 		this.chipValue = chipValues[chipType];
-		let chipValueText = new PIXI.Text( this.formatChipValue(this.chipValue), styles.chipTextStyle );
+		let chipValueText = new PIXI.Text( _hf.formatChipValue(this.chipValue), styles.chipTextStyle );
 		chipValueText.anchor.set(0.5);
 
 		sprite.on('tap', this.onClick, this);
@@ -43,7 +45,19 @@ export default class ChipView extends PIXI.Sprite {
 
 		spriteContainer.addChild(shadow).addChild(sprite).addChild(chipValueText);
 
-		return spriteContainer;
+		this.active = false;
+	}
+
+	get sprite(){
+		return this._spriteContainer;
+	}
+
+	set active(active){
+		this._active = active
+	}
+
+	get active(){
+		return this._active;
 	}
 
 	onClick(){
@@ -58,14 +72,22 @@ export default class ChipView extends PIXI.Sprite {
 			console.log('chipTouchStart (ChipView)', this.chipValue);
 	}
 
-	/**
-	 * Форматирование значения ставки
-	 * @param value
-	 * @returns {string}
-	 */
-	formatChipValue(value){
-		let str = value;
-		str = str.toString();
-		return (str.length > 3) ? str.substring(0, 1) + 'K' : value;
+	setActive(){
+		this.active = true;
+
+		this.sprite.children.forEach((childSprite)=>{
+			childSprite.scale.x += 0.15;
+			childSprite.scale.y += 0.15;
+		});
+	}
+
+	setDefault(){
+		console.log('111 ➠ ', 111);
+		this.active = false;
+
+		this.sprite.children.forEach((childSprite)=>{
+			childSprite.scale.x -= 0.15;
+			childSprite.scale.y -= 0.15;
+		});
 	}
 }

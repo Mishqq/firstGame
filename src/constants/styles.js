@@ -10,7 +10,7 @@ const styles = {
 		align : 'center'
 	},
 	filedClickAreaTextStyle: {
-		font: "bold 18px Arial",
+		font: "normal 18px Arial",
 		wordWrapWidth: 0,
 		fill: 'white',
 		stroke: 'black',

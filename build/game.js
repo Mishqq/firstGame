@@ -28258,27 +28258,29 @@
 	
 	var _transferFactory = __webpack_require__(143);
 	
-	var _defaultPositions = __webpack_require__(147);
+	var _defaultPositions = __webpack_require__(144);
 	
 	var _spritesStore = __webpack_require__(141);
 	
-	var _background = __webpack_require__(144);
+	var _helpFunctions = __webpack_require__(159);
+	
+	var _background = __webpack_require__(145);
 	
 	var _background2 = _interopRequireDefault(_background);
 	
-	var _gameFieldController = __webpack_require__(145);
+	var _gameFieldController = __webpack_require__(146);
 	
 	var _gameFieldController2 = _interopRequireDefault(_gameFieldController);
 	
-	var _buttonController = __webpack_require__(149);
+	var _buttonController = __webpack_require__(150);
 	
 	var _buttonController2 = _interopRequireDefault(_buttonController);
 	
-	var _chipController = __webpack_require__(151);
+	var _chipController = __webpack_require__(152);
 	
 	var _chipController2 = _interopRequireDefault(_chipController);
 	
-	var _floatChipController = __webpack_require__(154);
+	var _floatChipController = __webpack_require__(155);
 	
 	var _floatChipController2 = _interopRequireDefault(_floatChipController);
 	
@@ -28333,9 +28335,9 @@
 	    */
 				(0, _assetsLoader.assetLoader)(function () {
 					var chipsController = new _chipController2.default();
-					chipsController.chips.forEach(function (chip) {
-						stage.addChild(chip);
-					});
+					for (var key in chipsController.chips) {
+						stage.addChild(chipsController.chips[key].sprite);
+					}
 	
 					var buttonsController = new _buttonController2.default();
 					buttonsController.buttons.forEach(function (button) {
@@ -28351,8 +28353,8 @@
 		}, {
 			key: 'onTouchMove',
 			value: function onTouchMove(event) {
-				if (_transferFactory.transferFactory.chipActive) {
-					this.floatChipContainer.viewFloatChip(_transferFactory.transferFactory.chipValue);
+				if (_transferFactory.transferFactory.activeChip) {
+					this.floatChipContainer.viewFloatChip(_transferFactory.transferFactory.activeChip.value);
 					this.floatChipContainer.setPosition(event.data.global);
 				}
 			}
@@ -28363,40 +28365,52 @@
 				    pos = event.data.global;
 	
 				// Если отпустили ставку над столом - то проводим её
-				if (this.isPosInBounds(pos, gameFieldPos) && _transferFactory.transferFactory.chipValue) this.setBet();
+				if (_helpFunctions._hf.isPosInBounds(pos, gameFieldPos) && _transferFactory.transferFactory.activeChip) this.setBet({
+					x: pos.x - gameFieldPos.x,
+					y: pos.y - gameFieldPos.y
+				});
 	
 				this.clearTableBet();
 			}
 	
 			/**
-	   * Проверка принадлежности по координатам
-	   * @param pos - {x, y}
-	   * @param bounds - {x, y, width, height}
+	   * Функция ставки.
+	   * @param pos - {x, y} - позиция события
 	   */
 	
 		}, {
-			key: 'isPosInBounds',
-			value: function isPosInBounds(pos, bounds) {
-				return pos.x >= bounds.x && pos.x <= bounds.x + bounds.width && pos.y >= bounds.y && pos.y <= bounds.y + bounds.height;
-			}
-		}, {
 			key: 'setBet',
-			value: function setBet() {
-				var gameFieldPos = _defaultPositions.defaultPositions.fields.big,
-				    testPos = { x: 150 + gameFieldPos.x, y: 200 + gameFieldPos.y };
+			value: function setBet(pos) {
+				var gameFieldPos = this.gameField.gameFieldSprite.getBounds();
 	
-				var betController = new _betController2.default(testPos);
-				this.stage.addChild(betController.betSprite);
+				pos = this.getCoordsForBet(pos);
 	
-				console.log('Делаем ставку ➠ ', _transferFactory.transferFactory.chipValue);
+				if (pos) {
+					pos.x = pos.x + gameFieldPos.x;
+					pos.y = pos.y + gameFieldPos.y;
+	
+					var betController = new _betController2.default(pos);
+					this.stage.addChild(betController.betSprite);
+	
+					console.log('Делаем ставку ➠ ', _transferFactory.transferFactory.activeChip.value);
+				}
 			}
 		}, {
 			key: 'clearTableBet',
+	
+	
+			/**
+	   * Очищаем стол: скидываем размер ставки, скрываем белые кольца
+	   */
 			value: function clearTableBet() {
-				_transferFactory.transferFactory.chipActive = false;
-				_transferFactory.transferFactory.chipValue = undefined;
+				_transferFactory.transferFactory.activeChip = undefined;
 				this.floatChipContainer.hideFloatChip();
-				this.gameField.hideCircles();
+				this.gameField.hideHints();
+			}
+		}, {
+			key: 'getCoordsForBet',
+			value: function getCoordsForBet(pos) {
+				return this.gameField.getCoordsForBet(pos);
 			}
 		}]);
 	
@@ -28719,6 +28733,37 @@
 
 /***/ },
 /* 144 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	var defaultPositions = {
+		chips: {
+			chip0: { x: 640, y: 957 },
+			chip1: { x: 800, y: 957 },
+			chip2: { x: 960, y: 957 },
+			chip3: { x: 1120, y: 957 },
+			chip4: { x: 1280, y: 957 }
+		},
+		buttons: {
+			btnCancel: { x: 180, y: 934 },
+			btnClear: { x: 410, y: 934 },
+			btnRepeat: { x: 1450, y: 934 },
+			btnX2: { x: 1570, y: 934 }
+		},
+		fields: {
+			big: { x: 200, y: 300 },
+			small: { x: 1200, y: 300 }
+		}
+	};
+	
+	exports.defaultPositions = defaultPositions;
+
+/***/ },
+/* 145 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28760,7 +28805,7 @@
 	exports.default = Background;
 
 /***/ },
-/* 145 */
+/* 146 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28771,13 +28816,13 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _gameFieldView = __webpack_require__(146);
+	var _gameFieldView = __webpack_require__(147);
 	
 	var _gameFieldView2 = _interopRequireDefault(_gameFieldView);
 	
 	var _gameFieldCellMap = __webpack_require__(148);
 	
-	var _defaultPositions = __webpack_require__(147);
+	var _defaultPositions = __webpack_require__(144);
 	
 	var _transferFactory = __webpack_require__(143);
 	
@@ -28811,14 +28856,14 @@
 				this.getCellFromPos(localPos);
 			}
 		}, {
-			key: 'hideCircles',
-			value: function hideCircles() {
-				this._gameFieldBig.hideCircles();
+			key: 'showHints',
+			value: function showHints(arr) {
+				this._gameFieldBig.showHints(arr);
 			}
 		}, {
-			key: 'showCircles',
-			value: function showCircles(arr) {
-				this._gameFieldBig.showCircles(arr);
+			key: 'hideHints',
+			value: function hideHints() {
+				this._gameFieldBig.hideHints();
 			}
 	
 			/**
@@ -28833,10 +28878,17 @@
 					return pos.x >= item.x && pos.x < item.x + item.w && pos.y > item.y && pos.y < item.y + item.h;
 				});
 			}
+	
+			/**
+	   * Наведение на активные области
+	   * @param event
+	   * @returns {boolean}
+	   */
+	
 		}, {
 			key: 'hoverAreas',
 			value: function hoverAreas(event) {
-				if (!_transferFactory.transferFactory.chipActive) return false;
+				if (!_transferFactory.transferFactory.activeChip) return false;
 	
 				// т.к. событие mousemove и touchmove у нас отрабатывают по всей сцене
 				// (не важно на что вешаем), то вычисляем координаты нужного поля относительно
@@ -28848,11 +28900,29 @@
 	
 				var cell = this.getCellFromPos(pos);
 	
-				this.hideCircles();
+				this.hideHints();
 	
 				if (cell && cell.c.length) {
-					this.showCircles(cell.c);
+					this.showHints(cell.c);
 				}
+			}
+	
+			/**
+	   * /**
+	   * Функция по переданным координатам возвращает координаты центра ячейки на игровом поле
+	   * (используется для координат ставки)
+	   * @param pos - {x, y}
+	   * @param global - boolean, используем ли глобальные координаты, или координаты игрового поля
+	   * @returns {x, y}
+	   */
+	
+		}, {
+			key: 'getCoordsForBet',
+			value: function getCoordsForBet(pos, global) {
+				//TODO сделать поддержку глобальных координат
+				var cell = this.getCellFromPos(pos);
+	
+				return cell ? cell.center : false;
 			}
 		}, {
 			key: 'gameFieldSprite',
@@ -28867,7 +28937,7 @@
 	exports.default = GameFieldController;
 
 /***/ },
-/* 146 */
+/* 147 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28882,11 +28952,11 @@
 	
 	var _pixi2 = _interopRequireDefault(_pixi);
 	
-	var _defaultPositions = __webpack_require__(147);
+	var _defaultPositions = __webpack_require__(144);
 	
 	var _gameFieldCellMap = __webpack_require__(148);
 	
-	var _styles = __webpack_require__(156);
+	var _styles = __webpack_require__(149);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -28932,7 +29002,7 @@
 	
 			spriteContainer.addChild(sprite);
 	
-			_this.drawCircle();
+			_this.drawHints();
 	
 			// this.devModeInteractiveAreas();
 			return _this;
@@ -28984,21 +29054,57 @@
 	   */
 	
 		}, {
-			key: 'drawCircle',
-			value: function drawCircle() {
+			key: 'drawHints',
+			value: function drawHints() {
 				this.ringSprites = {};
+				this.greenSquare = {};
 				for (var key in _gameFieldCellMap.pointMap) {
-					var obj = _gameFieldCellMap.pointMap[key];
-					var ringSprite = new _pixi2.default.Sprite.fromImage('./assets/images/ring.png');
-					ringSprite.anchor.set(0.5);
-					ringSprite.x = obj.x;
-					ringSprite.y = obj.y;
-					ringSprite.visible = false;
-	
-					this.ringSprites[key] = ringSprite;
-	
-					this.pixiContainer.addChild(ringSprite);
+					if (key === 'zero' || key === 'doubleZero') {
+						this.drawGreenSquare(_gameFieldCellMap.pointMap[key], key);
+					} else {
+						this.drawCircle(_gameFieldCellMap.pointMap[key], key);
+					}
 				}
+	
+				for (var _key in this.ringSprites) {
+					this.pixiContainer.addChild(this.ringSprites[_key]);
+				}for (var _key2 in this.greenSquare) {
+					this.pixiContainer.addChild(this.greenSquare[_key2]);
+				}
+			}
+		}, {
+			key: 'showHints',
+			value: function showHints(arr) {
+				var _this3 = this;
+	
+				arr.forEach(function (cellType) {
+					cellType === 'zero' || cellType === 'doubleZero' ? _this3.showZeroSquare(cellType) : _this3.showCircles(cellType);
+				});
+			}
+		}, {
+			key: 'hideHints',
+			value: function hideHints() {
+				for (var key in this.ringSprites) {
+					this.ringSprites[key].visible = false;
+				}for (var _key3 in this.greenSquare) {
+					this.greenSquare[_key3].visible = false;
+				}
+			}
+	
+			/**
+	   * ================================= Подсветка нумерованых ячеек кольцами =============================
+	   */
+	
+		}, {
+			key: 'drawCircle',
+			value: function drawCircle(obj, key) {
+				var ringSprite = new _pixi2.default.Sprite.fromImage('./assets/images/ring.png');
+				ringSprite.anchor.set(0.5);
+				ringSprite.x = obj.x;
+				ringSprite.y = obj.y;
+				ringSprite.visible = false;
+	
+				this.ringSprites[key] = ringSprite;
 			}
 		}, {
 			key: 'hideCircles',
@@ -29019,10 +29125,55 @@
 	
 		}, {
 			key: 'showCircles',
-			value: function showCircles(arr) {
-				for (var i = 0; i < arr.length; i += 1) {
-					if (this.ringSprites[arr[i]]) this.ringSprites[arr[i]].visible = true;
-				}
+			value: function showCircles(cellType) {
+				this.ringSprites[cellType].visible = true;
+			}
+	
+			/**
+	   * ==================================== Подсветка полей 0 и 00 ================================
+	   */
+	
+			/**
+	   * Отрисовка подсвечивающихся прямоугольников над 'zero' и 'doubleZero'
+	   * @param obj
+	   * @param key
+	   */
+	
+		}, {
+			key: 'drawGreenSquare',
+			value: function drawGreenSquare(obj, key) {
+				var graphics = new _pixi2.default.Graphics();
+				graphics.beginFill(0xABEE23);
+				graphics.lineStyle(0);
+				graphics.drawRect(obj.x, obj.y, obj.w, obj.h);
+				graphics.alpha = 0.35;
+				graphics.visible = false;
+				this.pixiContainer.addChild(graphics);
+	
+				this.greenSquare[key] = graphics;
+			}
+	
+			/**
+	   * Подсвечиваем над 'zero' и 'doubleZero'
+	   * @param arr
+	   */
+	
+		}, {
+			key: 'showZeroSquare',
+			value: function showZeroSquare(cellType) {
+				this.greenSquare[cellType].visible = true;
+			}
+	
+			/**
+	   * Убираем подсветку над 'zero' и 'doubleZero'
+	   */
+	
+		}, {
+			key: 'hideZeroSquare',
+			value: function hideZeroSquare() {
+				this.greenSquare.forEach(function (item) {
+					item.visible = true;
+				});
 			}
 	
 			/**
@@ -29047,7 +29198,7 @@
 				var graphics = new _pixi2.default.Graphics();
 	
 				graphics.beginFill(0xFFFFFF);
-				graphics.alpha = 0.80;
+				graphics.alpha = 0.60;
 	
 				// set the line style to have a width of 5 and set the color to red
 				graphics.lineStyle(2, 0xFF0000);
@@ -29057,14 +29208,18 @@
 	
 				if (area.c && area.c.length) {
 					var str = '';
-					area.c.forEach(function (item) {
-						str += item;
-					});
+					if (area.c.length > 2) {
+						str = area.c[0] + '...' + area.c[area.c.length - 1];
+					} else {
+						area.c.forEach(function (item) {
+							str += item;
+						});
+					}
 	
 					var text = new _pixi2.default.Text(str, _styles.styles.filedClickAreaTextStyle);
 					text.rotation = -0.5;
 	
-					text.anchor.set(0.55);
+					text.anchor.set(0.50);
 					text.x = area.x + area.w / 2;
 					text.y = area.y + area.h / 2;
 					graphics.addChild(text);
@@ -29088,90 +29243,70 @@
 	exports.default = GameFieldView;
 
 /***/ },
-/* 147 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	var defaultPositions = {
-		chips: {
-			chip0: { x: 640, y: 957 },
-			chip1: { x: 800, y: 957 },
-			chip2: { x: 960, y: 957 },
-			chip3: { x: 1120, y: 957 },
-			chip4: { x: 1280, y: 957 }
-		},
-		buttons: {
-			btnCancel: { x: 180, y: 934 },
-			btnClear: { x: 410, y: 934 },
-			btnRepeat: { x: 1450, y: 934 },
-			btnX2: { x: 1570, y: 934 }
-		},
-		fields: {
-			big: { x: 200, y: 300 },
-			small: { x: 1200, y: 300 }
-		}
-	};
-	
-	exports.defaultPositions = defaultPositions;
-
-/***/ },
 /* 148 */
 /***/ function(module, exports) {
 
-	"use strict";
+	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	var clickAreas = [{ x: 0, y: 0, w: 60, h: 322, c: [0] }, //zero
-	{ x: 1363, y: 0, w: 75, h: 106, c: [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36] }, //2b1_row1
-	{ x: 1363, y: 107, w: 75, h: 106, c: [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35] }, //2b1_row2
-	{ x: 1363, y: 214, w: 75, h: 106, c: [1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34] }, //2b1_row3
-	{ x: 87, y: 342, w: 425, h: 53, c: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] }, //1st12
-	{ x: 513, y: 342, w: 423, h: 53, c: [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24] }, //2st12
-	{ x: 937, y: 342, w: 425, h: 53, c: [25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36] }, //3st12
-	{ x: 88, y: 396, w: 213, h: 76, c: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] }, //1to18
-	{ x: 1149, y: 396, w: 213, h: 76, c: [19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36] }, //19to36
-	{ x: 301, y: 396, w: 211, h: 76, c: [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36] }, //even
-	{ x: 937, y: 396, w: 211, h: 76, c: [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35] }, //odd
-	{ x: 512, y: 396, w: 212, h: 76, c: [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36] }, //red
-	{ x: 725, y: 396, w: 211, h: 76, c: [2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35] }, //black
+	// Размер ячейки
+	var cs = { w: 53, h: 52, evs: 184, odds: 132 };
 	
-	// zero + 1,2,3
-	{ x: 61, y: 290, w: 54, h: 52, c: [0, 1, 2, 3] }, { x: 61, y: 238, w: 54, h: 52, c: [0, 1] }, { x: 61, y: 186, w: 54, h: 52, c: [0, 1, 2] }, { x: 61, y: 134, w: 54, h: 52, c: [0, 2] }, { x: 61, y: 82, w: 54, h: 52, c: [0, 2, 3] }, { x: 61, y: 0, w: 54, h: 82, c: [0, 3] },
+	var clickAreas = [{ x: 0, y: 0, w: 80, h: 158, c: ['doubleZero'] }, //zero
+	{ x: 0, y: 158, w: 80, h: 158, c: ['zero'] }, //zeroZero
+	{ x: 1363, y: 0, w: 78, h: 105, c: [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36] }, //2b1_row1
+	{ x: 1363, y: 105, w: 78, h: 105, c: [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35] }, //2b1_row2
+	{ x: 1363, y: 210, w: 78, h: 105, c: [1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34] }, //2b1_row3
+	{ x: 105, y: 341, w: 420, h: 52, c: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] }, //1st12
+	{ x: 525, y: 341, w: 420, h: 52, c: [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24] }, //2st12
+	{ x: 945, y: 341, w: 420, h: 52, c: [25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36] }, //3st12
+	{ x: 105, y: 393, w: 210, h: 76, c: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] }, //1to18
+	{ x: 1155, y: 393, w: 210, h: 76, c: [19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36] }, //19to36
+	{ x: 315, y: 393, w: 210, h: 76, c: [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36] }, //even
+	{ x: 945, y: 393, w: 210, h: 76, c: [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35] }, //odd
+	{ x: 525, y: 393, w: 210, h: 76, c: [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36] }, //red
+	{ x: 735, y: 393, w: 210, h: 76, c: [2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35] }, //black
+	
+	// zero, doubleZero + 1,2,3 ~ "Корзина"
+	{ x: 80, y: 290, w: cs.w, h: cs.h, c: ['zero', 'doubleZero', 1, 2, 3] }, { x: 80, y: 238, w: cs.w, h: cs.h, c: ['zero', 1] }, { x: 80, y: 186, w: cs.w, h: cs.h, c: ['zero', 1, 2] }, { x: 80, y: 134, w: cs.w, h: cs.h, c: ['zero', 'doubleZero', 2] }, { x: 80, y: 82, w: cs.w, h: cs.h, c: ['doubleZero', 2, 3] }, { x: 80, y: 0, w: cs.w, h: cs.h + 30, c: ['doubleZero', 3] },
 	
 	// 34,35,36
-	{ x: 1279, y: 290, w: 57, h: 52, c: [34, 35, 36] }, { x: 1279, y: 238, w: 84, h: 52, c: [34] }, { x: 1279, y: 186, w: 84, h: 52, c: [34, 35] }, { x: 1279, y: 134, w: 84, h: 52, c: [35] }, { x: 1279, y: 82, w: 84, h: 52, c: [35, 36] }, { x: 1279, y: 0, w: 84, h: 82, c: [36] },
+	{ x: 1287, y: 290, w: 53, h: cs.h, c: [34, 35, 36] }, { x: 1287, y: 238, w: 78, h: cs.h, c: [34] }, { x: 1287, y: 186, w: 78, h: cs.h, c: [34, 35] }, { x: 1287, y: 134, w: 78, h: cs.h, c: [35] }, { x: 1287, y: 82, w: 78, h: cs.h, c: [35, 36] }, { x: 1287, y: 0, w: 78, h: cs.h + 30, c: [36] },
 	
 	// snake
-	{ x: 1336, y: 290, w: 54, h: 52, c: [1, 5, 9, 12, 14, 16, 19, 23, 27, 30, 32, 34] }];
+	{ x: 1340, y: 290, w: 54, h: 52, c: [1, 5, 9, 12, 14, 16, 19, 23, 27, 30, 32, 34] }];
 	
 	// templates for other filed cells
 	var rows = {
-		odd: [{ x: 115, y: 290, w: 54, h: 52, c: [1, 2, 3] }, { x: 115, y: 238, w: 54, h: 52, c: [1] }, { x: 115, y: 186, w: 54, h: 52, c: [1, 2] }, { x: 115, y: 134, w: 54, h: 52, c: [2] }, { x: 115, y: 82, w: 54, h: 52, c: [2, 3] }, { x: 115, y: 0, w: 54, h: 82, c: [3] }],
-		even: [{ x: 169, y: 290, w: 54, h: 52, c: [1, 2, 3, 4, 5, 6] }, { x: 169, y: 238, w: 54, h: 52, c: [1, 4] }, { x: 169, y: 186, w: 54, h: 52, c: [1, 2, 4, 5] }, { x: 169, y: 134, w: 54, h: 52, c: [2, 5] }, { x: 169, y: 82, w: 54, h: 52, c: [2, 3, 5, 6] }, { x: 169, y: 0, w: 54, h: 82, c: [3, 6] }]
+		odd: [{ x: cs.odds, y: 290, w: cs.w - 1, h: cs.h, c: [1, 2, 3] }, { x: cs.odds, y: 238, w: cs.w - 1, h: cs.h, c: [1] }, { x: cs.odds, y: 186, w: cs.w - 1, h: cs.h, c: [1, 2] }, { x: cs.odds, y: 134, w: cs.w - 1, h: cs.h, c: [2] }, { x: cs.odds, y: 82, w: cs.w - 1, h: cs.h, c: [2, 3] }, { x: cs.odds, y: 0, w: cs.w - 1, h: 82, c: [3] }],
+		even: [{ x: cs.evs, y: 290, w: cs.w, h: cs.h, c: [1, 2, 3, 4, 5, 6] }, { x: cs.evs, y: 238, w: cs.w, h: cs.h, c: [1, 4] }, { x: cs.evs, y: 186, w: cs.w, h: cs.h, c: [1, 2, 4, 5] }, { x: cs.evs, y: 134, w: cs.w, h: cs.h, c: [2, 5] }, { x: cs.evs, y: 82, w: cs.w, h: cs.h, c: [2, 3, 5, 6] }, { x: cs.evs, y: 0, w: cs.w, h: cs.h + 30, c: [3, 6] }]
 	};
 	
-	function addCellToField(originObj, dx, idx) {
-		var obj = Object.assign({}, originObj, { x: originObj.x + dx, c: originObj.c.map(function (originObj) {
+	function addCellToField(originObj, dx, idx, idxInRow) {
+		var originObjEx = { x: originObj.x + dx, c: originObj.c.map(function (originObj) {
 				return originObj + 3 * idx;
-			}) });
+			}) };
+		if (idxInRow === 5) {
+			originObjEx.center = {
+				y: originObj.y + 2 * originObj.h / 3,
+				x: originObjEx.x + originObj.w / 2
+			};
+		}
+		var obj = Object.assign({}, originObj, originObjEx);
 		clickAreas.push(obj);
 	}
 	
 	// Добавляем все остальные ячейки для поля
 	
 	var _loop = function _loop(i) {
-		rows.odd.forEach(function (item) {
-			addCellToField(item, i * 106, i);
+		rows.odd.forEach(function (item, idxInRow) {
+			addCellToField(item, i * cs.w * 2 - i, i, idxInRow);
 		});
 	
-		rows.even.forEach(function (item) {
-			addCellToField(item, i * 106, i);
+		rows.even.forEach(function (item, idxInRow) {
+			addCellToField(item, i * cs.w * 2 - i, i, idxInRow);
 		});
 	};
 	
@@ -29179,28 +29314,63 @@
 		_loop(i);
 	}
 	
+	clickAreas.forEach(function (cell) {
+		if (!cell.center) cell.center = { x: cell.x + cell.w / 2, y: cell.y + cell.h / 2 };
+	});
+	
 	/**
 	 * У каждой ячейки с цифрой на поле задаётся координата, куда будет отрисовываться кольцо
 	 */
 	var pointMap = {};
-	// let starts = {x:136, y:54};
-	// cell w:103 h:103 divider:3
-	var starts = { x: 143, y: 267 };
+	var starts = { x: 158, y: 263 };
 	var count = 1;
 	
 	for (var i = 0; i < 12; i += 1) {
-		var x = starts.x + 106 * i;
+		var x = starts.x + cs.w * 2 * i - i;
 		for (var j = 0; j < 3; j += 1) {
-			var y = starts.y - 106 * j;
+			var y = starts.y - cs.w * 2 * j;
 			pointMap[count++] = { x: x, y: y };
 		}
 	}
+	pointMap.doubleZero = { x: 0, y: 0, w: 105, h: 158 };
+	pointMap.zero = { x: 0, y: 158, w: 105, h: 158 };
 	
 	exports.clickAreas = clickAreas;
 	exports.pointMap = pointMap;
 
 /***/ },
 /* 149 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	var styles = {
+		chipTextStyle: {
+			font: 'bold 32px Arial',
+			fill: 'white',
+			align: 'center'
+		},
+		floatChipTextStyle: {
+			font: 'bold 20px Arial',
+			fill: 'white',
+			align: 'center'
+		},
+		filedClickAreaTextStyle: {
+			font: "normal 18px Arial",
+			wordWrapWidth: 0,
+			fill: 'white',
+			stroke: 'black',
+			strokeThickness: 5
+		}
+	};
+	
+	exports.styles = styles;
+
+/***/ },
+/* 150 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29211,13 +29381,13 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _ButtonView = __webpack_require__(150);
+	var _ButtonView = __webpack_require__(151);
 	
 	var _ButtonView2 = _interopRequireDefault(_ButtonView);
 	
 	var _spritesStore = __webpack_require__(141);
 	
-	var _defaultPositions = __webpack_require__(147);
+	var _defaultPositions = __webpack_require__(144);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -29287,7 +29457,7 @@
 	exports.default = ButtonController;
 
 /***/ },
-/* 150 */
+/* 151 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29304,7 +29474,7 @@
 	
 	var _spritesStore = __webpack_require__(141);
 	
-	var _defaultPositions = __webpack_require__(147);
+	var _defaultPositions = __webpack_require__(144);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -29370,7 +29540,7 @@
 	exports.default = ButtonView;
 
 /***/ },
-/* 151 */
+/* 152 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29381,9 +29551,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _chipView = __webpack_require__(152);
+	var _chipView = __webpack_require__(153);
 	
 	var _chipView2 = _interopRequireDefault(_chipView);
+	
+	var _chipValues = __webpack_require__(154);
 	
 	var _transferFactory = __webpack_require__(143);
 	
@@ -29403,11 +29575,11 @@
 				ctx: this
 			};
 	
-			this._chips = [];
+			this._chips = {};
 	
 			['chip0', 'chip1', 'chip2', 'chip3', 'chip4'].forEach(function (item) {
 				var chip = new _chipView2.default(item, config);
-				_this._chips.push(chip);
+				_this._chips[item] = chip;
 			});
 		}
 	
@@ -29419,8 +29591,22 @@
 		}, {
 			key: 'chipTouchStart',
 			value: function chipTouchStart(price) {
-				_transferFactory.transferFactory.chipActive = true;
-				_transferFactory.transferFactory.chipValue = price;
+				var chipType = void 0;
+				for (var key in _chipValues.chipValues) {
+					if (_chipValues.chipValues[key] === price) chipType = key;
+				}_transferFactory.transferFactory.activeChip = {
+					value: price,
+					type: chipType
+				};
+	
+				for (var _key in this.chips) {
+					if (this.chips[_key].active) {
+						this.chips[_key].setDefault();
+					}
+				}
+	
+				this.chips[chipType].setActive();
+	
 				console.log('chipTouchStart (ChipController)', price);
 			}
 		}, {
@@ -29436,7 +29622,7 @@
 	exports.default = ChipController;
 
 /***/ },
-/* 152 */
+/* 153 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29453,11 +29639,13 @@
 	
 	var _spritesStore = __webpack_require__(141);
 	
-	var _defaultPositions = __webpack_require__(147);
+	var _defaultPositions = __webpack_require__(144);
 	
-	var _chipValues = __webpack_require__(153);
+	var _chipValues = __webpack_require__(154);
 	
-	var _styles = __webpack_require__(156);
+	var _styles = __webpack_require__(149);
+	
+	var _helpFunctions = __webpack_require__(159);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -29471,8 +29659,6 @@
 		_inherits(ChipView, _PIXI$Sprite);
 	
 		function ChipView(chipType, config) {
-			var _ret;
-	
 			_classCallCheck(this, ChipView);
 	
 			var _this = _possibleConstructorReturn(this, (ChipView.__proto__ || Object.getPrototypeOf(ChipView)).call(this));
@@ -29483,6 +29669,7 @@
 	
 			// Контейнер для фишки с тенью и текстом
 			var spriteContainer = new _pixi2.default.Container();
+			_this._spriteContainer = spriteContainer;
 	
 			spriteContainer.x = _defaultPositions.defaultPositions.chips[chipType].x;
 			spriteContainer.y = _defaultPositions.defaultPositions.chips[chipType].y;
@@ -29501,7 +29688,7 @@
 	
 			// Значение ставки на фишке
 			_this.chipValue = _chipValues.chipValues[chipType];
-			var chipValueText = new _pixi2.default.Text(_this.formatChipValue(_this.chipValue), _styles.styles.chipTextStyle);
+			var chipValueText = new _pixi2.default.Text(_helpFunctions._hf.formatChipValue(_this.chipValue), _styles.styles.chipTextStyle);
 			chipValueText.anchor.set(0.5);
 	
 			sprite.on('tap', _this.onClick, _this);
@@ -29512,7 +29699,8 @@
 	
 			spriteContainer.addChild(shadow).addChild(sprite).addChild(chipValueText);
 	
-			return _ret = spriteContainer, _possibleConstructorReturn(_this, _ret);
+			_this.active = false;
+			return _this;
 		}
 	
 		_createClass(ChipView, [{
@@ -29525,19 +29713,39 @@
 			value: function chipTouchStart() {
 				this.onTouchStartCb ? this.onTouchStartCb.call(this.cbCtx, this.chipValue) : console.log('chipTouchStart (ChipView)', this.chipValue);
 			}
-	
-			/**
-	   * Форматирование значения ставки
-	   * @param value
-	   * @returns {string}
-	   */
-	
 		}, {
-			key: 'formatChipValue',
-			value: function formatChipValue(value) {
-				var str = value;
-				str = str.toString();
-				return str.length > 3 ? str.substring(0, 1) + 'K' : value;
+			key: 'setActive',
+			value: function setActive() {
+				this.active = true;
+	
+				this.sprite.children.forEach(function (childSprite) {
+					childSprite.scale.x += 0.15;
+					childSprite.scale.y += 0.15;
+				});
+			}
+		}, {
+			key: 'setDefault',
+			value: function setDefault() {
+				console.log('111 ➠ ', 111);
+				this.active = false;
+	
+				this.sprite.children.forEach(function (childSprite) {
+					childSprite.scale.x -= 0.15;
+					childSprite.scale.y -= 0.15;
+				});
+			}
+		}, {
+			key: 'sprite',
+			get: function get() {
+				return this._spriteContainer;
+			}
+		}, {
+			key: 'active',
+			set: function set(active) {
+				this._active = active;
+			},
+			get: function get() {
+				return this._active;
 			}
 		}]);
 	
@@ -29547,7 +29755,7 @@
 	exports.default = ChipView;
 
 /***/ },
-/* 153 */
+/* 154 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -29573,7 +29781,7 @@
 	exports.floatChipTypes = floatChipTypes;
 
 /***/ },
-/* 154 */
+/* 155 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29584,11 +29792,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _floatChipView = __webpack_require__(155);
+	var _floatChipView = __webpack_require__(156);
 	
 	var _floatChipView2 = _interopRequireDefault(_floatChipView);
 	
-	var _chipValues = __webpack_require__(153);
+	var _chipValues = __webpack_require__(154);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -29635,7 +29843,7 @@
 	exports.default = FloatChipController;
 
 /***/ },
-/* 155 */
+/* 156 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29652,7 +29860,7 @@
 	
 	var _spritesStore = __webpack_require__(141);
 	
-	var _styles = __webpack_require__(156);
+	var _styles = __webpack_require__(149);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -29775,37 +29983,6 @@
 	exports.default = FloatChipView;
 
 /***/ },
-/* 156 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	var styles = {
-		chipTextStyle: {
-			font: 'bold 32px Arial',
-			fill: 'white',
-			align: 'center'
-		},
-		floatChipTextStyle: {
-			font: 'bold 20px Arial',
-			fill: 'white',
-			align: 'center'
-		},
-		filedClickAreaTextStyle: {
-			font: "bold 18px Arial",
-			wordWrapWidth: 0,
-			fill: 'white',
-			stroke: 'black',
-			strokeThickness: 5
-		}
-	};
-	
-	exports.styles = styles;
-
-/***/ },
 /* 157 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -29821,7 +29998,7 @@
 	
 	var _betView2 = _interopRequireDefault(_betView);
 	
-	var _chipValues = __webpack_require__(153);
+	var _chipValues = __webpack_require__(154);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -29873,7 +30050,7 @@
 	
 	var _spritesStore = __webpack_require__(141);
 	
-	var _styles = __webpack_require__(156);
+	var _styles = __webpack_require__(149);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -29899,6 +30076,7 @@
 			_this._betContainer.y = config.pos.y;
 	
 			var betSprite = new _pixi2.default.Sprite(_spritesStore.spritesStore.chips['chipSm0']);
+			betSprite.anchor.set(0.5);
 	
 			_this._betContainer.addChild(betSprite);
 			return _this;
@@ -29928,6 +30106,42 @@
 	}(_pixi2.default.Sprite);
 	
 	exports.default = BetView;
+
+/***/ },
+/* 159 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	/**
+	 * Проверка принадлежности по координатам
+	 * @param pos - {x, y}
+	 * @param bounds - {x, y, width, height}
+	 */
+	function isPosInBounds(pos, bounds) {
+	  return pos.x >= bounds.x && pos.x <= bounds.x + bounds.width && pos.y >= bounds.y && pos.y <= bounds.y + bounds.height;
+	}
+	
+	/**
+	 * Форматирование значения ставки
+	 * @param value
+	 * @returns {string}
+	 */
+	function formatChipValue(value) {
+	  var str = value;
+	  str = str.toString();
+	  return str.length > 3 ? str.substring(0, 1) + 'K' : value;
+	}
+	
+	var _hf = {
+	  isPosInBounds: isPosInBounds,
+	  formatChipValue: formatChipValue
+	};
+	
+	exports._hf = _hf;
 
 /***/ }
 /******/ ]);

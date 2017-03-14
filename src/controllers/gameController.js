@@ -7,6 +7,8 @@ import {transferFactory} from './../servises/transferFactory'
 import {defaultPositions} from './../constants/defaultPositions';
 import {spritesStore} from './../spritesStore';
 
+import {_hf} from './../servises/helpFunctions';
+
 // Components
 import Background           from './../components/background/background';
 import GameFieldController  from './../components/gameField/gameFieldController';
@@ -53,9 +55,9 @@ export default class GameController {
 		 */
 		assetLoader(()=>{
 			let chipsController = new ChipController();
-			chipsController.chips.forEach((chip)=>{
-				stage.addChild(chip);
-			});
+			for(let key in chipsController.chips){
+				stage.addChild(chipsController.chips[key].sprite);
+			}
 
 			let buttonsController = new ButtonController();
 			buttonsController.buttons.forEach((button)=>{
@@ -72,8 +74,8 @@ export default class GameController {
 
 
 	onTouchMove(event){
-		if(transferFactory.chipActive){
-			this.floatChipContainer.viewFloatChip(transferFactory.chipValue);
+		if(transferFactory.activeChip){
+			this.floatChipContainer.viewFloatChip(transferFactory.activeChip.value);
 			this.floatChipContainer.setPosition( event.data.global );
 		}
 	}
@@ -83,36 +85,45 @@ export default class GameController {
 			pos = event.data.global;
 
 		// Если отпустили ставку над столом - то проводим её
-		if(this.isPosInBounds(pos, gameFieldPos) && transferFactory.chipValue)
-			this.setBet();
+		if(_hf.isPosInBounds(pos, gameFieldPos) && transferFactory.activeChip)
+			this.setBet({
+				x: pos.x - gameFieldPos.x,
+				y: pos.y - gameFieldPos.y
+			});
 
 		this.clearTableBet();
 	}
 
 	/**
-	 * Проверка принадлежности по координатам
-	 * @param pos - {x, y}
-	 * @param bounds - {x, y, width, height}
+	 * Функция ставки.
+	 * @param pos - {x, y} - позиция события
 	 */
-	isPosInBounds(pos, bounds){
-		return pos.x >= bounds.x && pos.x <= (bounds.x + bounds.width) &&
-		pos.y >= bounds.y && pos.y <= (bounds.y + bounds.height);
-	}
+	setBet(pos){
+		let gameFieldPos = this.gameField.gameFieldSprite.getBounds();
 
-	setBet(){
-		let gameFieldPos = defaultPositions.fields.big,
-			testPos = {x: 150+gameFieldPos.x, y: 200+gameFieldPos.y};
+		pos = this.getCoordsForBet(pos);
 
-		let betController = new BetController(testPos);
-		this.stage.addChild(betController.betSprite);
+		if(pos){
+			pos.x = pos.x + gameFieldPos.x;
+			pos.y = pos.y + gameFieldPos.y;
 
-		console.log('Делаем ставку ➠ ', transferFactory.chipValue);
+			let betController = new BetController(pos);
+			this.stage.addChild(betController.betSprite);
+
+			console.log('Делаем ставку ➠ ', transferFactory.activeChip.value);
+		}
 	};
 
+	/**
+	 * Очищаем стол: скидываем размер ставки, скрываем белые кольца
+	 */
 	clearTableBet(){
-		transferFactory.chipActive = false;
-		transferFactory.chipValue = undefined;
+		transferFactory.activeChip = undefined;
 		this.floatChipContainer.hideFloatChip();
-		this.gameField.hideCircles();
+		this.gameField.hideHints();
 	};
+
+	getCoordsForBet(pos){
+		return this.gameField.getCoordsForBet(pos);
+	}
 }

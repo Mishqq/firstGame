@@ -35,7 +35,7 @@ export default class GameFieldView extends PIXI.Sprite {
 
 		spriteContainer.addChild(sprite);
 
-		this.drawCircle();
+		this.drawHints();
 
 		// this.devModeInteractiveAreas();
 	}
@@ -82,21 +82,55 @@ export default class GameFieldView extends PIXI.Sprite {
 	/**
 	 * Отрисовка белых ховеров на поле.
 	 */
-	drawCircle(){
+	drawHints(){
 		this.ringSprites = {};
+		this.greenSquare = {};
 		for(let key in pointMap){
-			let obj = pointMap[key];
-			let ringSprite = new PIXI.Sprite.fromImage( './assets/images/ring.png' );
-			ringSprite.anchor.set(0.5);
-			ringSprite.x = obj.x;
-			ringSprite.y = obj.y;
-			ringSprite.visible = false;
-
-			this.ringSprites[key] = ringSprite;
-
-			this.pixiContainer.addChild(ringSprite)
+			if(key === 'zero' || key === 'doubleZero') {
+				this.drawGreenSquare(pointMap[key], key);
+			} else {
+				this.drawCircle(pointMap[key], key);
+			}
 		}
+
+		for(let key in this.ringSprites)
+			this.pixiContainer.addChild(this.ringSprites[key]);
+
+		for(let key in this.greenSquare)
+			this.pixiContainer.addChild(this.greenSquare[key]);
+
 	};
+
+	showHints(arr){
+		arr.forEach((cellType)=>{
+			cellType === 'zero' || cellType === 'doubleZero' ?
+				this.showZeroSquare(cellType) :
+				this.showCircles(cellType);
+		})
+	}
+
+	hideHints(){
+		for(let key in this.ringSprites)
+			this.ringSprites[key].visible = false;
+
+		for(let key in this.greenSquare)
+			this.greenSquare[key].visible = false;
+	}
+
+
+	/**
+	 * ================================= Подсветка нумерованых ячеек кольцами =============================
+	 */
+	drawCircle(obj, key){
+		let ringSprite = new PIXI.Sprite.fromImage( './assets/images/ring.png' );
+		ringSprite.anchor.set(0.5);
+		ringSprite.x = obj.x;
+		ringSprite.y = obj.y;
+		ringSprite.visible = false;
+
+		this.ringSprites[key] = ringSprite;
+	};
+
 
 	/**
 	 * Функция скрытия белых колец
@@ -110,12 +144,51 @@ export default class GameFieldView extends PIXI.Sprite {
 	/**
 	 * Функция показа белых колец
 	 */
-	showCircles(arr){
-		for(let i=0; i<arr.length; i+=1){
-			if(this.ringSprites[ arr[i] ])
-				this.ringSprites[ arr[i] ].visible = true;
-		}
+	showCircles(cellType){
+		this.ringSprites[cellType].visible = true;
 	}
+
+
+	/**
+	 * ==================================== Подсветка полей 0 и 00 ================================
+	 */
+
+	/**
+	 * Отрисовка подсвечивающихся прямоугольников над 'zero' и 'doubleZero'
+	 * @param obj
+	 * @param key
+	 */
+	drawGreenSquare(obj, key){
+		let graphics = new PIXI.Graphics();
+		graphics.beginFill(0xABEE23);
+		graphics.lineStyle(0);
+		graphics.drawRect(obj.x, obj.y, obj.w, obj.h);
+		graphics.alpha = 0.35;
+		graphics.visible = false;
+		this.pixiContainer.addChild(graphics);
+
+		this.greenSquare[key] = graphics;
+	}
+
+	/**
+	 * Подсвечиваем над 'zero' и 'doubleZero'
+	 * @param arr
+	 */
+	showZeroSquare(cellType){
+		this.greenSquare[cellType].visible = true;
+	}
+
+	/**
+	 * Убираем подсветку над 'zero' и 'doubleZero'
+	 */
+	hideZeroSquare(){
+		this.greenSquare.forEach((item)=>{
+			item.visible = true;
+		});
+	}
+
+
+
 
 	/**
 	 * Наведение на интерактивные области игрового поля с
@@ -128,6 +201,9 @@ export default class GameFieldView extends PIXI.Sprite {
 			console.log('hoverAreas (ChipView)');
 	}
 
+
+
+
 	/**
 	 * Добавление графики (прямоугольника) на сцену
 	 */
@@ -135,7 +211,7 @@ export default class GameFieldView extends PIXI.Sprite {
 		let graphics = new PIXI.Graphics();
 
 		graphics.beginFill(0xFFFFFF);
-		graphics.alpha = 0.80;
+		graphics.alpha = 0.60;
 
 		// set the line style to have a width of 5 and set the color to red
 		graphics.lineStyle(2, 0xFF0000);
@@ -145,12 +221,17 @@ export default class GameFieldView extends PIXI.Sprite {
 
 		if(area.c && area.c.length){
 			let str = '';
-			area.c.forEach((item)=>{ str += item });
+			if(area.c.length > 2){
+				str = area.c[0] + '...' + area.c[ area.c.length-1 ]
+			} else {
+				area.c.forEach((item)=>{ str += item });
+			}
+
 
 			let text = new PIXI.Text(str, styles.filedClickAreaTextStyle);
 			text.rotation = -0.5;
 
-			text.anchor.set(0.55);
+			text.anchor.set(0.50);
 			text.x = area.x + area.w/2;
 			text.y = area.y + area.h/2;
 			graphics.addChild(text);

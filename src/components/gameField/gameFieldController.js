@@ -27,12 +27,12 @@ export default class GameFieldController {
 		return this._gameFieldBig.pixiContainer;
 	}
 
-	hideCircles(){
-		this._gameFieldBig.hideCircles();
+	showHints(arr){
+		this._gameFieldBig.showHints(arr);
 	}
 
-	showCircles(arr){
-		this._gameFieldBig.showCircles(arr);
+	hideHints(){
+		this._gameFieldBig.hideHints();
 	}
 
 	/**
@@ -45,8 +45,13 @@ export default class GameFieldController {
 		});
 	}
 
+	/**
+	 * Наведение на активные области
+	 * @param event
+	 * @returns {boolean}
+	 */
 	hoverAreas(event){
-		if(!transferFactory.chipActive) return false;
+		if(!transferFactory.activeChip) return false;
 
 		// т.к. событие mousemove и touchmove у нас отрабатывают по всей сцене
 		// (не важно на что вешаем), то вычисляем координаты нужного поля относительно
@@ -58,10 +63,25 @@ export default class GameFieldController {
 
 		let cell = this.getCellFromPos(pos);
 
-		this.hideCircles();
+		this.hideHints();
 
 		if(cell && cell.c.length){
-			this.showCircles(cell.c);
+			this.showHints(cell.c);
 		}
+	}
+
+	/**
+	 * /**
+	 * Функция по переданным координатам возвращает координаты центра ячейки на игровом поле
+	 * (используется для координат ставки)
+	 * @param pos - {x, y}
+	 * @param global - boolean, используем ли глобальные координаты, или координаты игрового поля
+	 * @returns {x, y}
+	 */
+	getCoordsForBet(pos, global){
+		//TODO сделать поддержку глобальных координат
+		let cell = this.getCellFromPos(pos);
+
+		return cell ? cell.center : false;
 	}
 }

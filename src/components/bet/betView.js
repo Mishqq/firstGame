@@ -14,6 +14,7 @@ export default class BetView extends PIXI.Sprite {
 		this._betContainer.y = config.pos.y;
 
 		let betSprite = new PIXI.Sprite( spritesStore.chips['chipSm0'] );
+		betSprite.anchor.set(0.5);
 
 		this._betContainer.addChild(betSprite);
 	}
