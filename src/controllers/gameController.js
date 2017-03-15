@@ -8,6 +8,7 @@ import {defaultPositions} from './../constants/defaultPositions';
 import {spritesStore} from './../spritesStore';
 
 import {_hf} from './../servises/helpFunctions';
+import {betStore} from './../servises/betStore';
 
 // Components
 import Background           from './../components/background/background';
@@ -38,11 +39,13 @@ export default class GameController {
 
 		stage.interactive = true;
 
-		stage.on('mousemove', this.onTouchMove, this);
-		stage.on('touchmove', this.onTouchMove, this);
+		['mousemove', 'touchmove', 'pointermove'].forEach((event)=>{
+			stage.on(event, this.onTouchMove, this);
+		});
 
-		stage.on('mouseup', this.onTouchEnd, this);
-		stage.on('touchend', this.onTouchEnd, this);
+		['mouseup', 'touchend', 'pointerup'].forEach((event)=>{
+			stage.on(event, this.onTouchEnd, this);
+		});
 
 		/**
 		 * Игровое поле
@@ -71,8 +74,6 @@ export default class GameController {
 		});
 	};
 
-
-
 	onTouchMove(event){
 		if(transferFactory.activeChip){
 			this.floatChipContainer.viewFloatChip(transferFactory.activeChip.value);
@@ -85,11 +86,19 @@ export default class GameController {
 			pos = event.data.global;
 
 		// Если отпустили ставку над столом - то проводим её
-		if(_hf.isPosInBounds(pos, gameFieldPos) && transferFactory.activeChip)
-			this.setBet({
+		if(_hf.isPosInBounds(pos, gameFieldPos) && transferFactory.activeChip){
+			let pos4Bet = this.getCoordsForBet({
 				x: pos.x - gameFieldPos.x,
 				y: pos.y - gameFieldPos.y
 			});
+
+			if(pos4Bet){
+				this.setBet({
+					x: pos4Bet.x + gameFieldPos.x,
+					y: pos4Bet.y + gameFieldPos.y
+				}, transferFactory.activeChip.value);
+			}
+		}
 
 		this.clearTableBet();
 	}
@@ -97,20 +106,18 @@ export default class GameController {
 	/**
 	 * Функция ставки.
 	 * @param pos - {x, y} - позиция события
+	 * @param value - Num Величина ставки
 	 */
-	setBet(pos){
-		let gameFieldPos = this.gameField.gameFieldSprite.getBounds();
+	setBet(pos, value){
+		let betStoreId = pos.x + '_' +pos.y;
 
-		pos = this.getCoordsForBet(pos);
-
-		if(pos){
-			pos.x = pos.x + gameFieldPos.x;
-			pos.y = pos.y + gameFieldPos.y;
-
-			let betController = new BetController(pos);
+		if(betStore[betStoreId]){
+			betStore[betStoreId].updateBetView(value);
+		} else {
+			console.log('Создаём новую ставку');
+			let betController = new BetController(pos, value);
 			this.stage.addChild(betController.betSprite);
-
-			console.log('Делаем ставку ➠ ', transferFactory.activeChip.value);
+			betStore[betStoreId] = betController;
 		}
 	};
 

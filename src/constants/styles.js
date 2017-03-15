@@ -4,6 +4,11 @@ const styles = {
 		fill : 'white',
 		align : 'center'
 	},
+	chipSmTextStyle: {
+		font: 'normal 20px Arial',
+		fill : 'white',
+		align : 'center'
+	},
 	floatChipTextStyle: {
 		font: 'bold 20px Arial',
 		fill : 'white',

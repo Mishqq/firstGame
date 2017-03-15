@@ -2,14 +2,15 @@ import BetView from './betView';
 import {floatChipTypes} from './../../constants/chipValues';
 
 export default class BetController {
-	constructor(pos) {
+	constructor(pos, value) {
 		let config = {
 			pos: pos,
 			onClick: this.onClick,
+			updateBetModel: this.updateBetModel,
 			ctx: this
 		};
 
-		this._betView = new BetView(config);
+		this._betView = new BetView(config, value);
 	}
 
 	get betSprite(){
@@ -18,5 +19,14 @@ export default class BetController {
 
 	onClick(event){
 
+	}
+
+	updateBetView(value){
+		console.log('вызываем апдейт вьюхи');
+		this._betView.updateBet(value);
+	}
+
+	updateBetModel(){
+		console.log('апдейтим модель ставки');
 	}
 }

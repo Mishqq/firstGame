@@ -82,7 +82,6 @@ export default class ChipView extends PIXI.Sprite {
 	}
 
 	setDefault(){
-		console.log('111 ➠ ', 111);
 		this.active = false;
 
 		this.sprite.children.forEach((childSprite)=>{

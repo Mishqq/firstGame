@@ -44,6 +44,6 @@ export default class ChipController {
 
 		this.chips[chipType].setActive();
 
-		console.log('chipTouchStart (ChipController)', price);
+		// console.log('chipTouchStart (ChipController)', price);
 	}
 }
