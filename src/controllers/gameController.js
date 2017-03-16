@@ -43,9 +43,9 @@ export default class GameController {
 			stage.on(event, this.onTouchMove, this);
 		});
 
-		['mouseup', 'touchend', 'pointerup'].forEach((event)=>{
-			stage.on(event, this.onTouchEnd, this);
-		});
+		// ['mouseup', 'touchend', 'pointerup'].forEach((event)=>{
+		// 	stage.on(event, this.onTouchEnd, this);
+		// });
 
 		/**
 		 * Игровое поле
@@ -67,7 +67,10 @@ export default class GameController {
 				stage.addChild(button);
 			});
 
-			this.floatChipContainer = new FloatChipController();
+			this.floatChipContainer = new FloatChipController({
+				onTouchEndCb: this.onTouchEnd,
+				ctx: this
+			});
 			stage.addChild(this.floatChipContainer.getFloatChipsSprite);
 
 			game.start();
@@ -85,7 +88,11 @@ export default class GameController {
 		let gameFieldPos = this.gameField.gameFieldSprite.getBounds(),
 			pos = event.data.global;
 
-		// Если отпустили ставку над столом - то проводим её
+
+		/////////////////////////////////////
+
+		// TODO: сделать описание как это работает
+
 		if(_hf.isPosInBounds(pos, gameFieldPos) && transferFactory.activeChip){
 			let pos4Bet = this.getCoordsForBet({
 				x: pos.x - gameFieldPos.x,
@@ -93,12 +100,44 @@ export default class GameController {
 			});
 
 			if(pos4Bet){
-				this.setBet({
-					x: pos4Bet.x + gameFieldPos.x,
-					y: pos4Bet.y + gameFieldPos.y
-				}, transferFactory.activeChip.value);
+				let betStoreId = pos4Bet.x + '_' +pos4Bet.y;
+
+				if(betStore[betStoreId]){
+					console.log('Апдейтим ставку');
+					betStore[betStoreId].updateBetView(transferFactory.activeChip.value);
+				} else {
+					console.log('Создаём новую ставку');
+
+					let betController = new BetController({
+						pos: {x: pos4Bet.x + gameFieldPos.x, y: pos4Bet.y + gameFieldPos.y},
+						value: transferFactory.activeChip.value,
+						onTouchEndCb: this.onTouchEnd,
+						ctx: this
+					});
+
+					this.stage.addChild(betController.betSprite);
+					betStore[betStoreId] = betController;
+				}
 			}
 		}
+
+		///////////////////////////////////////////////////
+
+
+		// Если отпустили ставку над столом - то проводим её
+		// if(_hf.isPosInBounds(pos, gameFieldPos) && transferFactory.activeChip){
+		// 	let pos4Bet = this.getCoordsForBet({
+		// 		x: pos.x - gameFieldPos.x,
+		// 		y: pos.y - gameFieldPos.y
+		// 	});
+		//
+		// 	if(pos4Bet){
+		// 		this.setBet({
+		// 			x: pos4Bet.x + gameFieldPos.x,
+		// 			y: pos4Bet.y + gameFieldPos.y
+		// 		}, transferFactory.activeChip.value);
+		// 	}
+		// }
 
 		this.clearTableBet();
 	}
@@ -126,7 +165,7 @@ export default class GameController {
 	 */
 	clearTableBet(){
 		transferFactory.activeChip = undefined;
-		this.floatChipContainer.hideFloatChip();
+ 		this.floatChipContainer.hideFloatChip();
 		this.gameField.hideHints();
 	};
 

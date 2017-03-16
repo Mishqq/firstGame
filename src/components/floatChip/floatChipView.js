@@ -3,18 +3,26 @@ import {spritesStore} from './../../spritesStore';
 import {styles} from './../../constants/styles';
 
 export default class FloatChipView extends PIXI.Sprite {
-	constructor() {
+	constructor(config) {
 		super();
+
+		this.onTouchEndCb = (config.onTouchEndCb) ? config.onTouchEndCb : undefined;
+		this.cbCtx = (config.ctx) ? config.ctx : this;
 
 		// Контейнер для плавающей фишки
 		this._floatChipsContainer = new PIXI.Container();
 		this._floatChipsContainer.x = 50;
 		this._floatChipsContainer.y = 50;
 		this._floatChipsContainer.visible = false;
+		this._floatChipsContainer.interactive = true;
+
+		['touchend', 'mouseup', 'pointerup'].forEach((event)=>{
+			this._floatChipsContainer.on(event, this.onTouchEnd, this);
+		});
 
 		['chipSm0', 'chipSm1', 'chipSm2', 'chipSm3', 'chipSm4'].forEach((chipType)=>{
 			let floatChipSprite = new PIXI.Sprite( spritesStore.chips[chipType] );
-			floatChipSprite.visible = false;
+			// floatChipSprite.visible = false;
 			floatChipSprite.anchor.set(0.5);
 			this._floatChipsContainer.addChild(floatChipSprite);
 		});
@@ -35,8 +43,10 @@ export default class FloatChipView extends PIXI.Sprite {
 		return this._floatChipsContainer;
 	}
 
-	setText(text){
-		// let chipValueText = new PIXI.Text( text, floatChipTextStyle );
+	onTouchEnd(event){
+		this.onTouchEndCb ?
+			this.onTouchEndCb.call(this.cbCtx, event) :
+			console.log('floatChipTouchEnd (FloatChipView)');
 	}
 
 	/**

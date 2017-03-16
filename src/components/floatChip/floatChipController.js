@@ -2,10 +2,14 @@ import FloatChipView from './floatChipView';
 import {floatChipTypes} from './../../constants/chipValues';
 
 export default class FloatChipController {
-	constructor() {
+	constructor(configByGameCtrl) {
+		this.onTouchEndCb = (configByGameCtrl.onTouchEndCb) ? configByGameCtrl.onTouchEndCb : undefined;
+		this.cbCtx = (configByGameCtrl.ctx) ? configByGameCtrl.ctx : this;
+
 		let config = {
 			viewFloatChip: this.viewFloatChip,
 			setPosition: this.setPosition,
+			onTouchEndCb: this.onTouchEnd,
 			ctx: this
 		};
 
@@ -26,5 +30,11 @@ export default class FloatChipController {
 
 	setPosition(pos){
 		this._floatChipsSprite.setPosition(pos);
+	}
+
+	onTouchEnd(event){
+		this.onTouchEndCb ?
+			this.onTouchEndCb.call(this.cbCtx, event) :
+			console.log('floatChipTouchEnd (FloatChipController)');
 	}
 }

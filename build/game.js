@@ -28264,29 +28264,29 @@
 	
 	var _helpFunctions = __webpack_require__(145);
 	
-	var _betStore = __webpack_require__(160);
+	var _betStore = __webpack_require__(146);
 	
-	var _background = __webpack_require__(146);
+	var _background = __webpack_require__(147);
 	
 	var _background2 = _interopRequireDefault(_background);
 	
-	var _gameFieldController = __webpack_require__(147);
+	var _gameFieldController = __webpack_require__(148);
 	
 	var _gameFieldController2 = _interopRequireDefault(_gameFieldController);
 	
-	var _buttonController = __webpack_require__(151);
+	var _buttonController = __webpack_require__(152);
 	
 	var _buttonController2 = _interopRequireDefault(_buttonController);
 	
-	var _chipController = __webpack_require__(153);
+	var _chipController = __webpack_require__(154);
 	
 	var _chipController2 = _interopRequireDefault(_chipController);
 	
-	var _floatChipController = __webpack_require__(156);
+	var _floatChipController = __webpack_require__(157);
 	
 	var _floatChipController2 = _interopRequireDefault(_floatChipController);
 	
-	var _betController = __webpack_require__(158);
+	var _betController = __webpack_require__(159);
 	
 	var _betController2 = _interopRequireDefault(_betController);
 	
@@ -28324,9 +28324,9 @@
 					stage.on(event, _this.onTouchMove, _this);
 				});
 	
-				['mouseup', 'touchend', 'pointerup'].forEach(function (event) {
-					stage.on(event, _this.onTouchEnd, _this);
-				});
+				// ['mouseup', 'touchend', 'pointerup'].forEach((event)=>{
+				// 	stage.on(event, this.onTouchEnd, this);
+				// });
 	
 				/**
 	    * Игровое поле
@@ -28348,7 +28348,10 @@
 						stage.addChild(button);
 					});
 	
-					_this.floatChipContainer = new _floatChipController2.default();
+					_this.floatChipContainer = new _floatChipController2.default({
+						onTouchEndCb: _this.onTouchEnd,
+						ctx: _this
+					});
 					stage.addChild(_this.floatChipContainer.getFloatChipsSprite);
 	
 					game.start();
@@ -28368,7 +28371,10 @@
 				var gameFieldPos = this.gameField.gameFieldSprite.getBounds(),
 				    pos = event.data.global;
 	
-				// Если отпустили ставку над столом - то проводим её
+				/////////////////////////////////////
+	
+				// TODO: сделать описание как это работает
+	
 				if (_helpFunctions._hf.isPosInBounds(pos, gameFieldPos) && _transferFactory.transferFactory.activeChip) {
 					var pos4Bet = this.getCoordsForBet({
 						x: pos.x - gameFieldPos.x,
@@ -28376,12 +28382,44 @@
 					});
 	
 					if (pos4Bet) {
-						this.setBet({
-							x: pos4Bet.x + gameFieldPos.x,
-							y: pos4Bet.y + gameFieldPos.y
-						}, _transferFactory.transferFactory.activeChip.value);
+						var betStoreId = pos4Bet.x + '_' + pos4Bet.y;
+	
+						if (_betStore.betStore[betStoreId]) {
+							console.log('Апдейтим ставку');
+							_betStore.betStore[betStoreId].updateBetView(_transferFactory.transferFactory.activeChip.value);
+						} else {
+							console.log('Создаём новую ставку');
+	
+							var betController = new _betController2.default({
+								pos: { x: pos4Bet.x + gameFieldPos.x, y: pos4Bet.y + gameFieldPos.y },
+								value: _transferFactory.transferFactory.activeChip.value,
+								onTouchEndCb: this.onTouchEnd,
+								ctx: this
+							});
+	
+							this.stage.addChild(betController.betSprite);
+							_betStore.betStore[betStoreId] = betController;
+						}
 					}
 				}
+	
+				///////////////////////////////////////////////////
+	
+	
+				// Если отпустили ставку над столом - то проводим её
+				// if(_hf.isPosInBounds(pos, gameFieldPos) && transferFactory.activeChip){
+				// 	let pos4Bet = this.getCoordsForBet({
+				// 		x: pos.x - gameFieldPos.x,
+				// 		y: pos.y - gameFieldPos.y
+				// 	});
+				//
+				// 	if(pos4Bet){
+				// 		this.setBet({
+				// 			x: pos4Bet.x + gameFieldPos.x,
+				// 			y: pos4Bet.y + gameFieldPos.y
+				// 		}, transferFactory.activeChip.value);
+				// 	}
+				// }
 	
 				this.clearTableBet();
 			}
@@ -28811,6 +28849,19 @@
 
 /***/ },
 /* 146 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	var betStore = {};
+	
+	exports.betStore = betStore;
+
+/***/ },
+/* 147 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28852,7 +28903,7 @@
 	exports.default = Background;
 
 /***/ },
-/* 147 */
+/* 148 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28863,11 +28914,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _gameFieldView = __webpack_require__(148);
+	var _gameFieldView = __webpack_require__(149);
 	
 	var _gameFieldView2 = _interopRequireDefault(_gameFieldView);
 	
-	var _gameFieldCellMap = __webpack_require__(149);
+	var _gameFieldCellMap = __webpack_require__(150);
 	
 	var _defaultPositions = __webpack_require__(144);
 	
@@ -28984,7 +29035,7 @@
 	exports.default = GameFieldController;
 
 /***/ },
-/* 148 */
+/* 149 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29001,9 +29052,9 @@
 	
 	var _defaultPositions = __webpack_require__(144);
 	
-	var _gameFieldCellMap = __webpack_require__(149);
+	var _gameFieldCellMap = __webpack_require__(150);
 	
-	var _styles = __webpack_require__(150);
+	var _styles = __webpack_require__(151);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -29290,7 +29341,7 @@
 	exports.default = GameFieldView;
 
 /***/ },
-/* 149 */
+/* 150 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -29386,7 +29437,7 @@
 	exports.pointMap = pointMap;
 
 /***/ },
-/* 150 */
+/* 151 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -29422,7 +29473,7 @@
 	exports.styles = styles;
 
 /***/ },
-/* 151 */
+/* 152 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29433,7 +29484,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _ButtonView = __webpack_require__(152);
+	var _ButtonView = __webpack_require__(153);
 	
 	var _ButtonView2 = _interopRequireDefault(_ButtonView);
 	
@@ -29509,7 +29560,7 @@
 	exports.default = ButtonController;
 
 /***/ },
-/* 152 */
+/* 153 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29592,7 +29643,7 @@
 	exports.default = ButtonView;
 
 /***/ },
-/* 153 */
+/* 154 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29603,11 +29654,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _chipView = __webpack_require__(154);
+	var _chipView = __webpack_require__(155);
 	
 	var _chipView2 = _interopRequireDefault(_chipView);
 	
-	var _chipValues = __webpack_require__(155);
+	var _chipValues = __webpack_require__(156);
 	
 	var _transferFactory = __webpack_require__(143);
 	
@@ -29674,7 +29725,7 @@
 	exports.default = ChipController;
 
 /***/ },
-/* 154 */
+/* 155 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29693,9 +29744,9 @@
 	
 	var _defaultPositions = __webpack_require__(144);
 	
-	var _chipValues = __webpack_require__(155);
+	var _chipValues = __webpack_require__(156);
 	
-	var _styles = __webpack_require__(150);
+	var _styles = __webpack_require__(151);
 	
 	var _helpFunctions = __webpack_require__(145);
 	
@@ -29806,7 +29857,7 @@
 	exports.default = ChipView;
 
 /***/ },
-/* 155 */
+/* 156 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -29841,7 +29892,7 @@
 	exports.floatChipTypes = floatChipTypes;
 
 /***/ },
-/* 156 */
+/* 157 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29852,23 +29903,27 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _floatChipView = __webpack_require__(157);
+	var _floatChipView = __webpack_require__(158);
 	
 	var _floatChipView2 = _interopRequireDefault(_floatChipView);
 	
-	var _chipValues = __webpack_require__(155);
+	var _chipValues = __webpack_require__(156);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var FloatChipController = function () {
-		function FloatChipController() {
+		function FloatChipController(configByGameCtrl) {
 			_classCallCheck(this, FloatChipController);
+	
+			this.onTouchEndCb = configByGameCtrl.onTouchEndCb ? configByGameCtrl.onTouchEndCb : undefined;
+			this.cbCtx = configByGameCtrl.ctx ? configByGameCtrl.ctx : this;
 	
 			var config = {
 				viewFloatChip: this.viewFloatChip,
 				setPosition: this.setPosition,
+				onTouchEndCb: this.onTouchEnd,
 				ctx: this
 			};
 	
@@ -29891,6 +29946,11 @@
 				this._floatChipsSprite.setPosition(pos);
 			}
 		}, {
+			key: 'onTouchEnd',
+			value: function onTouchEnd(event) {
+				this.onTouchEndCb ? this.onTouchEndCb.call(this.cbCtx, event) : console.log('floatChipTouchEnd (FloatChipController)');
+			}
+		}, {
 			key: 'getFloatChipsSprite',
 			get: function get() {
 				return this._floatChipsSprite.floatChipContainer;
@@ -29903,7 +29963,7 @@
 	exports.default = FloatChipController;
 
 /***/ },
-/* 157 */
+/* 158 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29920,7 +29980,7 @@
 	
 	var _spritesStore = __webpack_require__(141);
 	
-	var _styles = __webpack_require__(150);
+	var _styles = __webpack_require__(151);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -29933,20 +29993,28 @@
 	var FloatChipView = function (_PIXI$Sprite) {
 		_inherits(FloatChipView, _PIXI$Sprite);
 	
-		function FloatChipView() {
+		function FloatChipView(config) {
 			_classCallCheck(this, FloatChipView);
 	
-			// Контейнер для плавающей фишки
 			var _this = _possibleConstructorReturn(this, (FloatChipView.__proto__ || Object.getPrototypeOf(FloatChipView)).call(this));
 	
+			_this.onTouchEndCb = config.onTouchEndCb ? config.onTouchEndCb : undefined;
+			_this.cbCtx = config.ctx ? config.ctx : _this;
+	
+			// Контейнер для плавающей фишки
 			_this._floatChipsContainer = new _pixi2.default.Container();
 			_this._floatChipsContainer.x = 50;
 			_this._floatChipsContainer.y = 50;
 			_this._floatChipsContainer.visible = false;
+			_this._floatChipsContainer.interactive = true;
+	
+			['touchend', 'mouseup', 'pointerup'].forEach(function (event) {
+				_this._floatChipsContainer.on(event, _this.onTouchEnd, _this);
+			});
 	
 			['chipSm0', 'chipSm1', 'chipSm2', 'chipSm3', 'chipSm4'].forEach(function (chipType) {
 				var floatChipSprite = new _pixi2.default.Sprite(_spritesStore.spritesStore.chips[chipType]);
-				floatChipSprite.visible = false;
+				// floatChipSprite.visible = false;
 				floatChipSprite.anchor.set(0.5);
 				_this._floatChipsContainer.addChild(floatChipSprite);
 			});
@@ -29967,10 +30035,10 @@
 	
 	
 		_createClass(FloatChipView, [{
-			key: 'setText',
-			value: function setText(text) {}
-			// let chipValueText = new PIXI.Text( text, floatChipTextStyle );
-	
+			key: 'onTouchEnd',
+			value: function onTouchEnd(event) {
+				this.onTouchEndCb ? this.onTouchEndCb.call(this.cbCtx, event) : console.log('floatChipTouchEnd (FloatChipView)');
+			}
 	
 			/**
 	   * Функция показывает плавающую фишку
@@ -30043,7 +30111,7 @@
 	exports.default = FloatChipView;
 
 /***/ },
-/* 158 */
+/* 159 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -30054,28 +30122,32 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _betView = __webpack_require__(159);
+	var _betView = __webpack_require__(160);
 	
 	var _betView2 = _interopRequireDefault(_betView);
 	
-	var _chipValues = __webpack_require__(155);
+	var _chipValues = __webpack_require__(156);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var BetController = function () {
-		function BetController(pos, value) {
+		function BetController(configByGameCtrl) {
 			_classCallCheck(this, BetController);
 	
+			this.onTouchEndCb = configByGameCtrl.onTouchEndCb ? configByGameCtrl.onTouchEndCb : undefined;
+			this.cbCtx = configByGameCtrl.ctx ? configByGameCtrl.ctx : this;
+	
 			var config = {
-				pos: pos,
+				pos: configByGameCtrl.pos,
 				onClick: this.onClick,
 				updateBetModel: this.updateBetModel,
+				onTouchEndCb: this.onTouchEnd,
 				ctx: this
 			};
 	
-			this._betView = new _betView2.default(config, value);
+			this._betView = new _betView2.default(config, configByGameCtrl.value);
 		}
 	
 		_createClass(BetController, [{
@@ -30084,13 +30156,18 @@
 		}, {
 			key: 'updateBetView',
 			value: function updateBetView(value) {
-				console.log('вызываем апдейт вьюхи');
+				console.log('вызываем апдейт вьюхи', value);
 				this._betView.updateBet(value);
 			}
 		}, {
 			key: 'updateBetModel',
 			value: function updateBetModel() {
 				console.log('апдейтим модель ставки');
+			}
+		}, {
+			key: 'onTouchEnd',
+			value: function onTouchEnd(event) {
+				this.onTouchEndCb ? this.onTouchEndCb.call(this.cbCtx, event) : console.log('betTouchEnd (BetController)');
 			}
 		}, {
 			key: 'betSprite',
@@ -30105,7 +30182,7 @@
 	exports.default = BetController;
 
 /***/ },
-/* 159 */
+/* 160 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -30122,11 +30199,13 @@
 	
 	var _spritesStore = __webpack_require__(141);
 	
-	var _styles = __webpack_require__(150);
+	var _styles = __webpack_require__(151);
 	
-	var _chipValues = __webpack_require__(155);
+	var _chipValues = __webpack_require__(156);
 	
 	var _helpFunctions = __webpack_require__(145);
+	
+	var _transferFactory = __webpack_require__(143);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -30150,6 +30229,7 @@
 			for (var smChipKey in _chipValues.smallChipTypes) {
 				if (_chipValues.smallChipTypes[smChipKey] === value) chipType = smChipKey;
 			}_this.onClickCb = config.onClickCb ? config.onClickCb : undefined;
+			_this.onTouchEndCb = config.onTouchEndCb ? config.onTouchEndCb : undefined;
 			_this.updateBetModel = config.updateBetModel ? config.updateBetModel : undefined;
 			_this.cbCtx = config.ctx ? config.ctx : _this;
 	
@@ -30179,12 +30259,20 @@
 			value: function onClick() {
 				this.onClickCb ? this.onClickCb.call(this.cbCtx) : console.log('betClickEvent (betView)');
 			}
+	
+			/**
+	   * Функция вызывается при окончании движения ставки на уже существующем спрайте.
+	   * Тут есть небольшой косяк: вьюха будет знать о модели, т.к. данную функцию
+	   * нельзя вызвать ниоткуда, кроме как событиями 'touchend','mouseup','pointerup' (PIXI-events)
+	   * @param event
+	   */
+	
 		}, {
 			key: 'onTouchEnd',
 			value: function onTouchEnd(event) {
-				event.stopPropagation();
+				this.onTouchEndCb ? this.onTouchEndCb.call(this.cbCtx, event) : console.log('betTouchEnd (BetView)');
 	
-				this.updateBet();
+				// this.updateBet(transferFactory.activeChip.value);
 			}
 		}, {
 			key: 'setText',
@@ -30196,17 +30284,33 @@
 			value: function updateBet(value) {
 				this._summ += value;
 	
-				var sprites = this.betViewContainer.children,
-				    textSprite = sprites[sprites.length - 1];
+				var spriteContainer = this.betViewContainer;
 	
-				textSprite.text = _helpFunctions._hf.formatChipValue(this._summ);
+				var betSprites = this.calculateSprites(this._summ);
 	
-				this.calculateSprites(this._summ);
+				console.log('betSprites ➠ ', betSprites);
+				var sortChipSmTypeArr = [];
+				for (var key in betSprites) {
+					sortChipSmTypeArr.push(key);
+				}sortChipSmTypeArr.reverse();
 	
-				// let chipType = 'chipSm0';
-				// for(let smChipKey in smallChipTypes)
-				// 	if(smallChipTypes[smChipKey] === value) chipType = smChipKey;
+				spriteContainer.removeChildren();
 	
+				var count = 0;
+				sortChipSmTypeArr.forEach(function (chipSmType, idx) {
+					for (var i = 0; i < betSprites[chipSmType]; i += 1) {
+						var newSprite = new _pixi2.default.Sprite(_spritesStore.spritesStore.chips[chipSmType]);
+						newSprite.anchor.set(0.5);
+						newSprite.y -= count * 5;
+						spriteContainer.addChild(newSprite);
+						count++;
+					}
+				});
+	
+				var chipValueText = new _pixi2.default.Text(_helpFunctions._hf.formatChipValue(this._summ), _styles.styles.chipSmTextStyle);
+				chipValueText.anchor.set(0.5);
+	
+				spriteContainer.children[spriteContainer.children.length - 1].addChild(chipValueText);
 	
 				this.updateBetModel ? this.updateBetModel.call(this.cbCtx) : console.log('updateBetModel (betView)', this.updateBetModel);
 			}
@@ -30226,8 +30330,7 @@
 					return a < b;
 				});
 	
-				var q = {};
-	
+				var q = {}; // объект вида {100: 1, 500:2} - одна фишка значения 100, две по 500
 				ranges.forEach(function (range) {
 					var num = Math.floor(value / range);
 					if (num > 0) {
@@ -30235,6 +30338,15 @@
 						value -= q[range] * range;
 					}
 				});
+	
+				var q2 = {}; // объект вида {chipSm0: 1, chipSm1:2} - одна фишка типа chipSm0, две chipSm1
+				for (var _chipType in _chipValues.smallChipTypes) {
+					for (var chipValue in q) {
+						if (_chipValues.smallChipTypes[_chipType] === +chipValue) q2[_chipType] = q[chipValue];
+					}
+				}
+	
+				return q2;
 			}
 		}, {
 			key: 'betViewContainer',
@@ -30247,19 +30359,6 @@
 	}(_pixi2.default.Sprite);
 	
 	exports.default = BetView;
-
-/***/ },
-/* 160 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	var betStore = {};
-	
-	exports.betStore = betStore;
 
 /***/ }
 /******/ ]);
