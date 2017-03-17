@@ -5,7 +5,7 @@ const styles = {
 		align : 'center'
 	},
 	chipSmTextStyle: {
-		font: 'normal 20px Arial',
+		font: 'normal 14px Arial',
 		fill : 'white',
 		align : 'center'
 	},

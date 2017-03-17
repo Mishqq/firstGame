@@ -4,12 +4,15 @@ import {defaultPositions} from './../../constants/defaultPositions';
 import {transferFactory} from './../../servises/transferFactory'
 
 export default class GameFieldController {
-	constructor() {
+	constructor(configByGameCtrl) {
 		let config = {
 			onClickCb: this.onClick,
 			onHoverCb: this.hoverAreas,
 			ctx: this
 		};
+
+		this.onClickCb = (configByGameCtrl.onClickCb) ? configByGameCtrl.onClickCb : undefined;
+		this.ctx = (configByGameCtrl.ctx) ? configByGameCtrl.ctx : this;
 
 		this._gameFieldBig = new GameFieldView(config);
 	}
@@ -19,8 +22,12 @@ export default class GameFieldController {
 	 * @param event
 	 */
 	onClick(event){
-		let localPos = event.data.getLocalPosition(this._gameFieldBig);
-		this.getCellFromPos(localPos);
+		this.onClickCb ?
+			this.onClickCb.call(this.ctx, event) :
+			console.log('gameFieldClickEvent (GameFieldController)');
+
+		// let localPos = event.data.getLocalPosition(this._gameFieldBig);
+		// this.getCellFromPos(localPos);
 	}
 
 	get gameFieldSprite(){
@@ -78,10 +85,21 @@ export default class GameFieldController {
 	 * @param global - boolean, используем ли глобальные координаты, или координаты игрового поля
 	 * @returns {x, y}
 	 */
-	getCoordsForBet(pos, global){
-		//TODO сделать поддержку глобальных координат
+	getPosForBet(pos, global){
+		if(global){
+			pos.x -= defaultPositions.fields.big.x;
+			pos.y -= defaultPositions.fields.big.y;
+		}
+
 		let cell = this.getCellFromPos(pos);
 
-		return cell ? cell.center : false;
+		let center = {};
+		if(cell){
+			center = !global ? cell.center :
+				{x: cell.center.x + defaultPositions.fields.big.x,
+					y: cell.center.y + defaultPositions.fields.big.y};
+		}
+
+		return cell ? center : false;
 	}
 }

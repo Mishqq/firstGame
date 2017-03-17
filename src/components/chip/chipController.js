@@ -35,6 +35,7 @@ export default class ChipController {
 			value: price,
 			type: chipType
 		};
+		transferFactory.lastChip = Object.assign({}, transferFactory.activeChip);
 
 		for(let key in this.chips){
 			if(this.chips[key].active) {

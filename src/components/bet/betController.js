@@ -3,7 +3,12 @@ import {floatChipTypes} from './../../constants/chipValues';
 
 export default class BetController {
 	constructor(configByGameCtrl) {
-		this.onTouchEndCb = (configByGameCtrl.onTouchEndCb) ? configByGameCtrl.onTouchEndCb : undefined;
+		this.onTouchEndCb = (configByGameCtrl.onTouchEndCb) ?
+			configByGameCtrl.onTouchEndCb : undefined;
+
+		this.onTouchStartCb = (configByGameCtrl.onTouchStartCb) ?
+			configByGameCtrl.onTouchStartCb : undefined;
+
 		this.cbCtx = (configByGameCtrl.ctx) ? configByGameCtrl.ctx : this;
 
 		let config = {
@@ -26,7 +31,6 @@ export default class BetController {
 	}
 
 	updateBetView(value){
-		console.log('вызываем апдейт вьюхи', value);
 		this._betView.updateBet(value);
 	}
 
@@ -38,5 +42,9 @@ export default class BetController {
 		this.onTouchEndCb ?
 			this.onTouchEndCb.call(this.cbCtx, event) :
 			console.log('betTouchEnd (BetController)');
+	}
+
+	getTopChipValue(){
+		return this._betView.getTopChipValue();
 	}
 }

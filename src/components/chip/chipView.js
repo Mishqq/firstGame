@@ -4,6 +4,7 @@ import {defaultPositions} from './../../constants/defaultPositions';
 import {chipValues} from './../../constants/chipValues';
 import {styles} from './../../constants/styles';
 import {_hf} from './../../servises/helpFunctions'
+import {transferFactory} from './../../servises/transferFactory'
 
 export default class ChipView extends PIXI.Sprite {
 	constructor(chipType, config) {
@@ -67,6 +68,8 @@ export default class ChipView extends PIXI.Sprite {
 	}
 
 	chipTouchStart(){
+		transferFactory.betTouchStart = false;
+
 		this.onTouchStartCb ?
 			this.onTouchStartCb.call(this.cbCtx, this.chipValue) :
 			console.log('chipTouchStart (ChipView)', this.chipValue);

@@ -28324,14 +28324,17 @@
 					stage.on(event, _this.onTouchMove, _this);
 				});
 	
-				// ['mouseup', 'touchend', 'pointerup'].forEach((event)=>{
-				// 	stage.on(event, this.onTouchEnd, this);
+				// ['touchend', 'mouseup', 'pointerup'].forEach((event)=>{
+				// 	stage.on(event, this.setBet, this);
 				// });
 	
 				/**
 	    * Игровое поле
 	    */
-				this.gameField = new _gameFieldController2.default();
+				this.gameField = new _gameFieldController2.default({
+					onClickCb: this.setBet,
+					ctx: this
+				});
 				stage.addChild(this.gameField.gameFieldSprite);
 	
 				/**
@@ -28349,7 +28352,7 @@
 					});
 	
 					_this.floatChipContainer = new _floatChipController2.default({
-						onTouchEndCb: _this.onTouchEnd,
+						onTouchEndCb: _this.setBet,
 						ctx: _this
 					});
 					stage.addChild(_this.floatChipContainer.getFloatChipsSprite);
@@ -28360,106 +28363,84 @@
 		}, {
 			key: 'onTouchMove',
 			value: function onTouchMove(event) {
-				if (_transferFactory.transferFactory.activeChip) {
+				if (_transferFactory.transferFactory.activeChip && !_transferFactory.transferFactory.betTouchStart) {
 					this.floatChipContainer.viewFloatChip(_transferFactory.transferFactory.activeChip.value);
 					this.floatChipContainer.setPosition(event.data.global);
+				} else if (_transferFactory.transferFactory.betTouchStart) {
+					var pos4Bet = this.getPosForBet(event.data.global, true);
+					var betStoreId = pos4Bet.x + '_' + pos4Bet.y;
+	
+					var value = _betStore.betStore[betStoreId].getTopChipValue();
+	
+					_betStore.betStore[betStoreId].updateBetView(-value);
+					_transferFactory.transferFactory.betTouchStart = false;
+					_transferFactory.transferFactory.activeChip = {
+						value: value
+					};
 				}
 			}
+	
+			/**
+	   * Эта функция является коллбеков, который вызывается по событию touchEnd у компонента bet
+	   * (betView.touchEnd -> betCtrl.touchEnd -> onTouchEnd)
+	   * Описание:
+	   * Функция определяет, было ли событие touchEnd совершено над игровым полем.
+	   * Если да, то вычисляем координаты и создаём новый экземпляр компонента Bet с данными координатами
+	   * (возвращаемые координаты являются локальными для игрового поля, т.е. комп. gameField)
+	   *
+	   * Проверка существующей ставки:
+	   * После того как пришли координаты для комп Bet, создаём объект, в котором ключём будут
+	   * являться наши координаты, а значением - экземпляр контроллера комп Bet. Когда в следующий
+	   * раз мы получим эти же координаты, то проверим, существует ли по ним контроллер. Если да,
+	   * то просто вызываем в нём функцию update
+	   *
+	   * @param event
+	   */
+	
 		}, {
-			key: 'onTouchEnd',
-			value: function onTouchEnd(event) {
-				var gameFieldPos = this.gameField.gameFieldSprite.getBounds(),
-				    pos = event.data.global;
+			key: 'setBet',
+			value: function setBet(event) {
+				var pos4Bet = this.getPosForBet(event.data.global, true);
 	
-				/////////////////////////////////////
+				if (pos4Bet && (_transferFactory.transferFactory.activeChip || _transferFactory.transferFactory.lastChip)) {
+					var betStoreId = pos4Bet.x + '_' + pos4Bet.y;
+					var currentValue = _transferFactory.transferFactory.activeChip ? _transferFactory.transferFactory.activeChip.value : _transferFactory.transferFactory.lastChip.value;
 	
-				// TODO: сделать описание как это работает
+					if (_betStore.betStore[betStoreId]) {
+						_betStore.betStore[betStoreId].updateBetView(currentValue);
+					} else {
+						var configForBetCtrl = {
+							pos: pos4Bet,
+							value: currentValue,
+							onTouchEndCb: this.setBet,
+							onTouchStartCb: this.onTouchMove,
+							ctx: this
+						};
 	
-				if (_helpFunctions._hf.isPosInBounds(pos, gameFieldPos) && _transferFactory.transferFactory.activeChip) {
-					var pos4Bet = this.getCoordsForBet({
-						x: pos.x - gameFieldPos.x,
-						y: pos.y - gameFieldPos.y
-					});
-	
-					if (pos4Bet) {
-						var betStoreId = pos4Bet.x + '_' + pos4Bet.y;
-	
-						if (_betStore.betStore[betStoreId]) {
-							console.log('Апдейтим ставку');
-							_betStore.betStore[betStoreId].updateBetView(_transferFactory.transferFactory.activeChip.value);
-						} else {
-							console.log('Создаём новую ставку');
-	
-							var betController = new _betController2.default({
-								pos: { x: pos4Bet.x + gameFieldPos.x, y: pos4Bet.y + gameFieldPos.y },
-								value: _transferFactory.transferFactory.activeChip.value,
-								onTouchEndCb: this.onTouchEnd,
-								ctx: this
-							});
-	
-							this.stage.addChild(betController.betSprite);
-							_betStore.betStore[betStoreId] = betController;
-						}
+						var betController = new _betController2.default(configForBetCtrl);
+						this.stage.addChild(betController.betSprite);
+						_betStore.betStore[betStoreId] = betController;
 					}
 				}
-	
-				///////////////////////////////////////////////////
-	
-	
-				// Если отпустили ставку над столом - то проводим её
-				// if(_hf.isPosInBounds(pos, gameFieldPos) && transferFactory.activeChip){
-				// 	let pos4Bet = this.getCoordsForBet({
-				// 		x: pos.x - gameFieldPos.x,
-				// 		y: pos.y - gameFieldPos.y
-				// 	});
-				//
-				// 	if(pos4Bet){
-				// 		this.setBet({
-				// 			x: pos4Bet.x + gameFieldPos.x,
-				// 			y: pos4Bet.y + gameFieldPos.y
-				// 		}, transferFactory.activeChip.value);
-				// 	}
-				// }
 	
 				this.clearTableBet();
 			}
 	
 			/**
-	   * Функция ставки.
-	   * @param pos - {x, y} - позиция события
-	   * @param value - Num Величина ставки
-	   */
-	
-		}, {
-			key: 'setBet',
-			value: function setBet(pos, value) {
-				var betStoreId = pos.x + '_' + pos.y;
-	
-				if (_betStore.betStore[betStoreId]) {
-					_betStore.betStore[betStoreId].updateBetView(value);
-				} else {
-					console.log('Создаём новую ставку');
-					var betController = new _betController2.default(pos, value);
-					this.stage.addChild(betController.betSprite);
-					_betStore.betStore[betStoreId] = betController;
-				}
-			}
-		}, {
-			key: 'clearTableBet',
-	
-	
-			/**
 	   * Очищаем стол: скидываем размер ставки, скрываем белые кольца
 	   */
+	
+		}, {
+			key: 'clearTableBet',
 			value: function clearTableBet() {
 				_transferFactory.transferFactory.activeChip = undefined;
 				this.floatChipContainer.hideFloatChip();
 				this.gameField.hideHints();
 			}
 		}, {
-			key: 'getCoordsForBet',
-			value: function getCoordsForBet(pos) {
-				return this.gameField.getCoordsForBet(pos);
+			key: 'getPosForBet',
+			value: function getPosForBet(pos, global) {
+				return this.gameField.getPosForBet(pos, global);
 			}
 		}]);
 	
@@ -28835,9 +28816,8 @@
 	 * @returns {string}
 	 */
 	function formatChipValue(value) {
-	  var str = value;
-	  str = str.toString();
-	  return str.length > 3 ? str.substring(0, 1) + 'K' : value;
+	  var str = value >= 1000 ? value / 1000 + 'K' : value;
+	  return str;
 	}
 	
 	var _hf = {
@@ -28929,7 +28909,7 @@
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var GameFieldController = function () {
-		function GameFieldController() {
+		function GameFieldController(configByGameCtrl) {
 			_classCallCheck(this, GameFieldController);
 	
 			var config = {
@@ -28937,6 +28917,9 @@
 				onHoverCb: this.hoverAreas,
 				ctx: this
 			};
+	
+			this.onClickCb = configByGameCtrl.onClickCb ? configByGameCtrl.onClickCb : undefined;
+			this.ctx = configByGameCtrl.ctx ? configByGameCtrl.ctx : this;
 	
 			this._gameFieldBig = new _gameFieldView2.default(config);
 		}
@@ -28950,8 +28933,10 @@
 		_createClass(GameFieldController, [{
 			key: 'onClick',
 			value: function onClick(event) {
-				var localPos = event.data.getLocalPosition(this._gameFieldBig);
-				this.getCellFromPos(localPos);
+				this.onClickCb ? this.onClickCb.call(this.ctx, event) : console.log('gameFieldClickEvent (GameFieldController)');
+	
+				// let localPos = event.data.getLocalPosition(this._gameFieldBig);
+				// this.getCellFromPos(localPos);
 			}
 		}, {
 			key: 'showHints',
@@ -29015,12 +29000,22 @@
 	   */
 	
 		}, {
-			key: 'getCoordsForBet',
-			value: function getCoordsForBet(pos, global) {
-				//TODO сделать поддержку глобальных координат
+			key: 'getPosForBet',
+			value: function getPosForBet(pos, global) {
+				if (global) {
+					pos.x -= _defaultPositions.defaultPositions.fields.big.x;
+					pos.y -= _defaultPositions.defaultPositions.fields.big.y;
+				}
+	
 				var cell = this.getCellFromPos(pos);
 	
-				return cell ? cell.center : false;
+				var center = {};
+				if (cell) {
+					center = !global ? cell.center : { x: cell.center.x + _defaultPositions.defaultPositions.fields.big.x,
+						y: cell.center.y + _defaultPositions.defaultPositions.fields.big.y };
+				}
+	
+				return cell ? center : false;
 			}
 		}, {
 			key: 'gameFieldSprite',
@@ -29115,7 +29110,7 @@
 	   * @param event
 	   */
 			value: function onClick(event) {
-				this.onClickCb ? this.onClickCb.call(this.cbCtx, event) : console.log('gameFieldClickEvent (ChipView)');
+				this.onClickCb ? this.onClickCb.call(this.cbCtx, event) : console.log('gameFieldClickEvent (GameFieldView)');
 			}
 	
 			/**
@@ -29452,7 +29447,7 @@
 			align: 'center'
 		},
 		chipSmTextStyle: {
-			font: 'normal 20px Arial',
+			font: 'normal 14px Arial',
 			fill: 'white',
 			align: 'center'
 		},
@@ -29701,6 +29696,7 @@
 					value: price,
 					type: chipType
 				};
+				_transferFactory.transferFactory.lastChip = Object.assign({}, _transferFactory.transferFactory.activeChip);
 	
 				for (var _key in this.chips) {
 					if (this.chips[_key].active) {
@@ -29749,6 +29745,8 @@
 	var _styles = __webpack_require__(151);
 	
 	var _helpFunctions = __webpack_require__(145);
+	
+	var _transferFactory = __webpack_require__(143);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -29814,6 +29812,8 @@
 		}, {
 			key: 'chipTouchStart',
 			value: function chipTouchStart() {
+				_transferFactory.transferFactory.betTouchStart = false;
+	
 				this.onTouchStartCb ? this.onTouchStartCb.call(this.cbCtx, this.chipValue) : console.log('chipTouchStart (ChipView)', this.chipValue);
 			}
 		}, {
@@ -30137,6 +30137,9 @@
 			_classCallCheck(this, BetController);
 	
 			this.onTouchEndCb = configByGameCtrl.onTouchEndCb ? configByGameCtrl.onTouchEndCb : undefined;
+	
+			this.onTouchStartCb = configByGameCtrl.onTouchStartCb ? configByGameCtrl.onTouchStartCb : undefined;
+	
 			this.cbCtx = configByGameCtrl.ctx ? configByGameCtrl.ctx : this;
 	
 			var config = {
@@ -30156,7 +30159,6 @@
 		}, {
 			key: 'updateBetView',
 			value: function updateBetView(value) {
-				console.log('вызываем апдейт вьюхи', value);
 				this._betView.updateBet(value);
 			}
 		}, {
@@ -30168,6 +30170,11 @@
 			key: 'onTouchEnd',
 			value: function onTouchEnd(event) {
 				this.onTouchEndCb ? this.onTouchEndCb.call(this.cbCtx, event) : console.log('betTouchEnd (BetController)');
+			}
+		}, {
+			key: 'getTopChipValue',
+			value: function getTopChipValue() {
+				return this._betView.getTopChipValue();
 			}
 		}, {
 			key: 'betSprite',
@@ -30245,6 +30252,10 @@
 			var chipValueText = new _pixi2.default.Text(_helpFunctions._hf.formatChipValue(value), _styles.styles.chipSmTextStyle);
 			chipValueText.anchor.set(0.5);
 	
+			['touchstart', 'mousedown', 'pointerdown'].forEach(function (event) {
+				_this._betContainer.on(event, _this.onTouchStart, _this);
+			});
+	
 			['touchend', 'mouseup', 'pointerup'].forEach(function (event) {
 				_this._betContainer.on(event, _this.onTouchEnd, _this);
 			});
@@ -30271,14 +30282,19 @@
 			key: 'onTouchEnd',
 			value: function onTouchEnd(event) {
 				this.onTouchEndCb ? this.onTouchEndCb.call(this.cbCtx, event) : console.log('betTouchEnd (BetView)');
-	
-				// this.updateBet(transferFactory.activeChip.value);
 			}
 		}, {
-			key: 'setText',
-			value: function setText(text) {
-				// let chipValueText = new PIXI.Text( text, floatChipTextStyle );
+			key: 'onTouchStart',
+			value: function onTouchStart() {
+				_transferFactory.transferFactory.betTouchStart = true;
 			}
+	
+			/**
+	   * Функция апдейта спрайта ставки
+	   * Текст значения добавляется на последнюю фишку в контейнере
+	   * @param value - значение, на которое нало увеличить ставку
+	   */
+	
 		}, {
 			key: 'updateBet',
 			value: function updateBet(value) {
@@ -30288,7 +30304,6 @@
 	
 				var betSprites = this.calculateSprites(this._summ);
 	
-				console.log('betSprites ➠ ', betSprites);
 				var sortChipSmTypeArr = [];
 				for (var key in betSprites) {
 					sortChipSmTypeArr.push(key);
@@ -30307,10 +30322,12 @@
 					}
 				});
 	
-				var chipValueText = new _pixi2.default.Text(_helpFunctions._hf.formatChipValue(this._summ), _styles.styles.chipSmTextStyle);
-				chipValueText.anchor.set(0.5);
+				if (spriteContainer.children.length) {
+					var chipValueText = new _pixi2.default.Text(_helpFunctions._hf.formatChipValue(this._summ), _styles.styles.chipSmTextStyle);
+					chipValueText.anchor.set(0.5, 0.6);
 	
-				spriteContainer.children[spriteContainer.children.length - 1].addChild(chipValueText);
+					spriteContainer.children[spriteContainer.children.length - 1].addChild(chipValueText);
+				}
 	
 				this.updateBetModel ? this.updateBetModel.call(this.cbCtx) : console.log('updateBetModel (betView)', this.updateBetModel);
 			}
@@ -30347,6 +30364,18 @@
 				}
 	
 				return q2;
+			}
+		}, {
+			key: 'getTopChipValue',
+			value: function getTopChipValue() {
+				var betSprites = this.calculateSprites(this._summ);
+	
+				var sortChipSmTypeArr = [];
+				for (var key in betSprites) {
+					sortChipSmTypeArr.push(key);
+				}var value = _chipValues.smallChipTypes[sortChipSmTypeArr[0]];
+	
+				return value;
 			}
 		}, {
 			key: 'betViewContainer',

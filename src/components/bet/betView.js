@@ -32,6 +32,10 @@ export default class BetView extends PIXI.Sprite {
 		let chipValueText = new PIXI.Text( _hf.formatChipValue(value), styles.chipSmTextStyle );
 		chipValueText.anchor.set(0.5);
 
+		['touchstart', 'mousedown', 'pointerdown'].forEach((event)=>{
+			this._betContainer.on(event, this.onTouchStart, this);
+		});
+
 		['touchend', 'mouseup', 'pointerup'].forEach((event)=>{
 			this._betContainer.on(event, this.onTouchEnd, this);
 		});
@@ -60,14 +64,17 @@ export default class BetView extends PIXI.Sprite {
 		this.onTouchEndCb ?
 			this.onTouchEndCb.call(this.cbCtx, event) :
 			console.log('betTouchEnd (BetView)');
-
-		// this.updateBet(transferFactory.activeChip.value);
 	}
 
-	setText(text){
-		// let chipValueText = new PIXI.Text( text, floatChipTextStyle );
+	onTouchStart(){
+		transferFactory.betTouchStart = true;
 	}
 
+	/**
+	 * Функция апдейта спрайта ставки
+	 * Текст значения добавляется на последнюю фишку в контейнере
+	 * @param value - значение, на которое нало увеличить ставку
+	 */
 	updateBet(value){
 		this._summ += value;
 
@@ -75,7 +82,6 @@ export default class BetView extends PIXI.Sprite {
 
 		let betSprites = this.calculateSprites(this._summ);
 
-		console.log('betSprites ➠ ', betSprites);
 		let sortChipSmTypeArr = [];
 		for(let key in betSprites)
 			sortChipSmTypeArr.push(key);
@@ -94,11 +100,12 @@ export default class BetView extends PIXI.Sprite {
 			}
 		});
 
+		if(spriteContainer.children.length){
+			let chipValueText = new PIXI.Text( _hf.formatChipValue(this._summ), styles.chipSmTextStyle );
+			chipValueText.anchor.set(0.5, 0.6);
 
-		let chipValueText = new PIXI.Text( _hf.formatChipValue(this._summ), styles.chipSmTextStyle );
-		chipValueText.anchor.set(0.5);
-
-		spriteContainer.children[ spriteContainer.children.length-1 ].addChild(chipValueText);
+			spriteContainer.children[ spriteContainer.children.length-1 ].addChild(chipValueText);
+		}
 
 		this.updateBetModel ?
 			this.updateBetModel.call(this.cbCtx) :
@@ -133,5 +140,17 @@ export default class BetView extends PIXI.Sprite {
 		}
 
 		return q2;
+	}
+
+	getTopChipValue(){
+		let betSprites = this.calculateSprites(this._summ);
+
+		let sortChipSmTypeArr = [];
+		for(let key in betSprites)
+			sortChipSmTypeArr.push(key);
+
+		let value = smallChipTypes[ sortChipSmTypeArr[0] ];
+
+		return value;
 	}
 }

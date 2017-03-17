@@ -55,7 +55,7 @@ export default class GameFieldView extends PIXI.Sprite {
 	onClick(event){
 		this.onClickCb ?
 			this.onClickCb.call(this.cbCtx, event) :
-			console.log('gameFieldClickEvent (ChipView)');
+			console.log('gameFieldClickEvent (GameFieldView)');
 	}
 
 	/**

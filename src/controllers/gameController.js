@@ -43,14 +43,17 @@ export default class GameController {
 			stage.on(event, this.onTouchMove, this);
 		});
 
-		// ['mouseup', 'touchend', 'pointerup'].forEach((event)=>{
-		// 	stage.on(event, this.onTouchEnd, this);
+		// ['touchend', 'mouseup', 'pointerup'].forEach((event)=>{
+		// 	stage.on(event, this.setBet, this);
 		// });
 
 		/**
 		 * Игровое поле
 		 */
-		this.gameField = new GameFieldController();
+		this.gameField = new GameFieldController({
+			onClickCb: this.setBet,
+			ctx: this
+		});
 		stage.addChild(this.gameField.gameFieldSprite);
 
 		/**
@@ -68,7 +71,7 @@ export default class GameController {
 			});
 
 			this.floatChipContainer = new FloatChipController({
-				onTouchEndCb: this.onTouchEnd,
+				onTouchEndCb: this.setBet,
 				ctx: this
 			});
 			stage.addChild(this.floatChipContainer.getFloatChipsSprite);
@@ -78,87 +81,67 @@ export default class GameController {
 	};
 
 	onTouchMove(event){
-		if(transferFactory.activeChip){
+		if(transferFactory.activeChip && !transferFactory.betTouchStart){
 			this.floatChipContainer.viewFloatChip(transferFactory.activeChip.value);
 			this.floatChipContainer.setPosition( event.data.global );
-		}
-	}
+		} else if(transferFactory.betTouchStart){
+			let pos4Bet = this.getPosForBet(event.data.global, true);
+			let betStoreId = pos4Bet.x + '_' +pos4Bet.y;
 
-	onTouchEnd(event){
-		let gameFieldPos = this.gameField.gameFieldSprite.getBounds(),
-			pos = event.data.global;
+			let value = betStore[betStoreId].getTopChipValue();
 
-
-		/////////////////////////////////////
-
-		// TODO: сделать описание как это работает
-
-		if(_hf.isPosInBounds(pos, gameFieldPos) && transferFactory.activeChip){
-			let pos4Bet = this.getCoordsForBet({
-				x: pos.x - gameFieldPos.x,
-				y: pos.y - gameFieldPos.y
-			});
-
-			if(pos4Bet){
-				let betStoreId = pos4Bet.x + '_' +pos4Bet.y;
-
-				if(betStore[betStoreId]){
-					console.log('Апдейтим ставку');
-					betStore[betStoreId].updateBetView(transferFactory.activeChip.value);
-				} else {
-					console.log('Создаём новую ставку');
-
-					let betController = new BetController({
-						pos: {x: pos4Bet.x + gameFieldPos.x, y: pos4Bet.y + gameFieldPos.y},
-						value: transferFactory.activeChip.value,
-						onTouchEndCb: this.onTouchEnd,
-						ctx: this
-					});
-
-					this.stage.addChild(betController.betSprite);
-					betStore[betStoreId] = betController;
-				}
+			betStore[betStoreId].updateBetView(-value);
+			transferFactory.betTouchStart = false;
+			transferFactory.activeChip = {
+				value: value
 			}
 		}
-
-		///////////////////////////////////////////////////
-
-
-		// Если отпустили ставку над столом - то проводим её
-		// if(_hf.isPosInBounds(pos, gameFieldPos) && transferFactory.activeChip){
-		// 	let pos4Bet = this.getCoordsForBet({
-		// 		x: pos.x - gameFieldPos.x,
-		// 		y: pos.y - gameFieldPos.y
-		// 	});
-		//
-		// 	if(pos4Bet){
-		// 		this.setBet({
-		// 			x: pos4Bet.x + gameFieldPos.x,
-		// 			y: pos4Bet.y + gameFieldPos.y
-		// 		}, transferFactory.activeChip.value);
-		// 	}
-		// }
-
-		this.clearTableBet();
 	}
 
 	/**
-	 * Функция ставки.
-	 * @param pos - {x, y} - позиция события
-	 * @param value - Num Величина ставки
+	 * Эта функция является коллбеков, который вызывается по событию touchEnd у компонента bet
+	 * (betView.touchEnd -> betCtrl.touchEnd -> onTouchEnd)
+	 * Описание:
+	 * Функция определяет, было ли событие touchEnd совершено над игровым полем.
+	 * Если да, то вычисляем координаты и создаём новый экземпляр компонента Bet с данными координатами
+	 * (возвращаемые координаты являются локальными для игрового поля, т.е. комп. gameField)
+	 *
+	 * Проверка существующей ставки:
+	 * После того как пришли координаты для комп Bet, создаём объект, в котором ключём будут
+	 * являться наши координаты, а значением - экземпляр контроллера комп Bet. Когда в следующий
+	 * раз мы получим эти же координаты, то проверим, существует ли по ним контроллер. Если да,
+	 * то просто вызываем в нём функцию update
+	 *
+	 * @param event
 	 */
-	setBet(pos, value){
-		let betStoreId = pos.x + '_' +pos.y;
+	setBet(event){
+		let pos4Bet = this.getPosForBet(event.data.global, true);
 
-		if(betStore[betStoreId]){
-			betStore[betStoreId].updateBetView(value);
-		} else {
-			console.log('Создаём новую ставку');
-			let betController = new BetController(pos, value);
-			this.stage.addChild(betController.betSprite);
-			betStore[betStoreId] = betController;
+		if(pos4Bet && (transferFactory.activeChip || transferFactory.lastChip)){
+			let betStoreId = pos4Bet.x + '_' +pos4Bet.y;
+			let currentValue = (transferFactory.activeChip) ?
+				transferFactory.activeChip.value :
+				transferFactory.lastChip.value;
+
+			if(betStore[betStoreId]){
+				betStore[betStoreId].updateBetView(currentValue);
+			} else {
+				let configForBetCtrl = {
+					pos: pos4Bet,
+					value: currentValue,
+					onTouchEndCb: this.setBet,
+					onTouchStartCb: this.onTouchMove,
+					ctx: this
+				};
+
+				let betController = new BetController(configForBetCtrl);
+				this.stage.addChild(betController.betSprite);
+				betStore[betStoreId] = betController;
+			}
 		}
-	};
+
+		this.clearTableBet();
+	}
 
 	/**
 	 * Очищаем стол: скидываем размер ставки, скрываем белые кольца
@@ -169,7 +152,7 @@ export default class GameController {
 		this.gameField.hideHints();
 	};
 
-	getCoordsForBet(pos){
-		return this.gameField.getCoordsForBet(pos);
+	getPosForBet(pos, global){
+		return this.gameField.getPosForBet(pos, global);
 	}
 }

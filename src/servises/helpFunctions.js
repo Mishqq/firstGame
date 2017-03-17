@@ -14,9 +14,8 @@ function isPosInBounds(pos, bounds){
  * @returns {string}
  */
 function formatChipValue(value){
-	let str = value;
-	str = str.toString();
-	return (str.length > 3) ? str.substring(0, 1) + 'K' : value;
+	let str = (value >= 1000) ? value/1000 + 'K' : value;
+	return str;
 }
 
 let _hf = {
