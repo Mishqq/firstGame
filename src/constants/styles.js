@@ -4,6 +4,11 @@ const styles = {
 		fill : 'white',
 		align : 'center'
 	},
+	buttonStyle: {
+		font: 'normal 26px Arial',
+		fill : 'white',
+		align : 'center'
+	},
 	chipSmTextStyle: {
 		font: 'normal 14px Arial',
 		fill : 'white',

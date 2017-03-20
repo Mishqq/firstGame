@@ -28258,13 +28258,7 @@
 	
 	var _transferFactory = __webpack_require__(143);
 	
-	var _defaultPositions = __webpack_require__(144);
-	
-	var _spritesStore = __webpack_require__(141);
-	
-	var _helpFunctions = __webpack_require__(145);
-	
-	var _betStore = __webpack_require__(146);
+	var _betStoreModule = __webpack_require__(163);
 	
 	var _background = __webpack_require__(147);
 	
@@ -28274,9 +28268,9 @@
 	
 	var _gameFieldController2 = _interopRequireDefault(_gameFieldController);
 	
-	var _buttonController = __webpack_require__(152);
+	var _buttonPanelController = __webpack_require__(161);
 	
-	var _buttonController2 = _interopRequireDefault(_buttonController);
+	var _buttonPanelController2 = _interopRequireDefault(_buttonPanelController);
 	
 	var _chipController = __webpack_require__(154);
 	
@@ -28306,11 +28300,12 @@
 			value: function init() {
 				var _this = this;
 	
-				console.log('init GameController');
 				var game = this.game,
 				    stage = game.stage;
 	
 				this.stage = stage;
+	
+				this.betModel = _betStoreModule.betModel;
 	
 				/**
 	    * background
@@ -28346,7 +28341,14 @@
 						stage.addChild(chipsController.chips[key].sprite);
 					}
 	
-					var buttonsController = new _buttonController2.default();
+					// Панель кнопок
+					var buttonsController = new _buttonPanelController2.default({
+						cancelCb: _this.btnPanelCancelCb,
+						clearCb: _this.btnPanelClearCb,
+						repeatCb: _this.btnPanelRepeatCb,
+						x2Cb: _this.btnPanelX2Cb,
+						ctx: _this
+					});
 					buttonsController.buttons.forEach(function (button) {
 						stage.addChild(button);
 					});
@@ -28363,18 +28365,26 @@
 		}, {
 			key: 'onTouchMove',
 			value: function onTouchMove(event) {
-				if (_transferFactory.transferFactory.activeChip && !_transferFactory.transferFactory.betTouchStart) {
-					this.floatChipContainer.viewFloatChip(_transferFactory.transferFactory.activeChip.value);
-					this.floatChipContainer.setPosition(event.data.global);
-				} else if (_transferFactory.transferFactory.betTouchStart) {
+				var fChip = this.floatChipContainer,
+				    betsCtrl = this.betModel.betsCtrl,
+				    _tf = _transferFactory.transferFactory;
+	
+				// TODO: по-хорошему надо реализовать событийную модель
+	
+				if (_tf.activeChip && !_tf.betTouchStart) {
+					// Если у нас есть активный тип ставки и если тачстарт начался не на существующей ставке
+					fChip.viewFloatChip(_tf.activeChip.value);
+					fChip.setPosition(event.data.global);
+				} else if (_tf.betTouchStart) {
+					// Если тачстарт начался с существующей ставки
 					var pos4Bet = this.getPosForBet(event.data.global, true);
 					var betStoreId = pos4Bet.x + '_' + pos4Bet.y;
 	
-					var value = _betStore.betStore[betStoreId].getTopChipValue();
+					var value = betsCtrl[betStoreId].getTopChipValue();
 	
-					_betStore.betStore[betStoreId].updateBetView(-value);
-					_transferFactory.transferFactory.betTouchStart = false;
-					_transferFactory.transferFactory.activeChip = {
+					betsCtrl[betStoreId].updateBetView(-value);
+					_tf.betTouchStart = false;
+					_tf.activeChip = {
 						value: value
 					};
 				}
@@ -28400,14 +28410,16 @@
 		}, {
 			key: 'setBet',
 			value: function setBet(event) {
-				var pos4Bet = this.getPosForBet(event.data.global, true);
+				var pos4Bet = this.getPosForBet(event.data.global, true),
+				    betsCtrl = this.betModel.betsCtrl,
+				    _tf = _transferFactory.transferFactory;
 	
-				if (pos4Bet && (_transferFactory.transferFactory.activeChip || _transferFactory.transferFactory.lastChip)) {
+				if (pos4Bet && (_tf.activeChip || _tf.lastChip)) {
 					var betStoreId = pos4Bet.x + '_' + pos4Bet.y;
-					var currentValue = _transferFactory.transferFactory.activeChip ? _transferFactory.transferFactory.activeChip.value : _transferFactory.transferFactory.lastChip.value;
+					var currentValue = _tf.activeChip ? _tf.activeChip.value : _tf.lastChip.value;
 	
-					if (_betStore.betStore[betStoreId]) {
-						_betStore.betStore[betStoreId].updateBetView(currentValue);
+					if (betsCtrl[betStoreId]) {
+						betsCtrl[betStoreId].updateBetView(currentValue);
 					} else {
 						var configForBetCtrl = {
 							pos: pos4Bet,
@@ -28419,7 +28431,7 @@
 	
 						var betController = new _betController2.default(configForBetCtrl);
 						this.stage.addChild(betController.betSprite);
-						_betStore.betStore[betStoreId] = betController;
+						betsCtrl[betStoreId] = betController;
 					}
 				}
 	
@@ -28441,6 +28453,43 @@
 			key: 'getPosForBet',
 			value: function getPosForBet(pos, global) {
 				return this.gameField.getPosForBet(pos, global);
+			}
+	
+			/**
+	   * Синхронизируем изменение вьюхи и коллекцию ставок
+	   * (не коллекцию контроллеров компонентов ставок)
+	   */
+	
+		}, {
+			key: 'updateBetModel',
+			value: function updateBetModel() {}
+			// TODO: пробежаться по коллекции контроллеров в модели
+			// ставок и апнуть коллекцию ставок, а затем апнуть общую ставку
+	
+	
+			/**
+	   * ===========================   buttonPanel click callbacks  ================================
+	   */
+	
+		}, {
+			key: 'btnPanelCancelCb',
+			value: function btnPanelCancelCb() {
+				console.log('cancelClick (gameController)');
+			}
+		}, {
+			key: 'btnPanelClearCb',
+			value: function btnPanelClearCb() {
+				console.log('clearClick (gameController)');
+			}
+		}, {
+			key: 'btnPanelRepeatCb',
+			value: function btnPanelRepeatCb() {
+				console.log('repeatClick (gameController)');
+			}
+		}, {
+			key: 'btnPanelX2Cb',
+			value: function btnPanelX2Cb() {
+				console.log('x2Click (gameController)');
 			}
 		}]);
 	
@@ -28828,19 +28877,7 @@
 	exports._hf = _hf;
 
 /***/ },
-/* 146 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	var betStore = {};
-	
-	exports.betStore = betStore;
-
-/***/ },
+/* 146 */,
 /* 147 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -29446,6 +29483,11 @@
 			fill: 'white',
 			align: 'center'
 		},
+		buttonStyle: {
+			font: 'normal 26px Arial',
+			fill: 'white',
+			align: 'center'
+		},
 		chipSmTextStyle: {
 			font: 'normal 14px Arial',
 			fill: 'white',
@@ -29468,176 +29510,8 @@
 	exports.styles = styles;
 
 /***/ },
-/* 152 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _ButtonView = __webpack_require__(153);
-	
-	var _ButtonView2 = _interopRequireDefault(_ButtonView);
-	
-	var _spritesStore = __webpack_require__(141);
-	
-	var _defaultPositions = __webpack_require__(144);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var ButtonController = function () {
-		function ButtonController() {
-			_classCallCheck(this, ButtonController);
-	
-			var buttonsCallbackConfig = {
-				btnCancel: {
-					onClickCb: this.cancelBtnClick,
-					ctx: this
-				},
-				btnClear: {
-					onClickCb: this.clearBtnClick,
-					ctx: this
-				},
-				btnRepeat: {
-					onClickCb: this.repeatBtnClick,
-					ctx: this
-				},
-				btnX2: {
-					onClickCb: this.x2BtnClick,
-					ctx: this
-				}
-			};
-	
-			this._buttons = [];
-	
-			for (var key in buttonsCallbackConfig) {
-				var btn = new _ButtonView2.default(key, buttonsCallbackConfig[key]);
-				this._buttons.push(btn);
-			}
-		}
-	
-		_createClass(ButtonController, [{
-			key: 'cancelBtnClick',
-			value: function cancelBtnClick() {
-				console.log('cancelBtnClick (ButtonController)');
-			}
-		}, {
-			key: 'clearBtnClick',
-			value: function clearBtnClick() {
-				console.log('clearBtnClick (ButtonController)');
-			}
-		}, {
-			key: 'repeatBtnClick',
-			value: function repeatBtnClick() {
-				console.log('repeatBtnClick (ButtonController)');
-			}
-		}, {
-			key: 'x2BtnClick',
-			value: function x2BtnClick() {
-				console.log('x2BtnClick (ButtonController)');
-			}
-		}, {
-			key: 'buttons',
-			get: function get() {
-				return this._buttons;
-			}
-		}]);
-	
-		return ButtonController;
-	}();
-	
-	exports.default = ButtonController;
-
-/***/ },
-/* 153 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _pixi = __webpack_require__(1);
-	
-	var _pixi2 = _interopRequireDefault(_pixi);
-	
-	var _spritesStore = __webpack_require__(141);
-	
-	var _defaultPositions = __webpack_require__(144);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var ButtonView = function (_PIXI$Sprite) {
-		_inherits(ButtonView, _PIXI$Sprite);
-	
-		function ButtonView(btnType, config) {
-			var _ret;
-	
-			_classCallCheck(this, ButtonView);
-	
-			var _this = _possibleConstructorReturn(this, (ButtonView.__proto__ || Object.getPrototypeOf(ButtonView)).call(this));
-	
-			_this.onClickCb = config.onClickCb ? config.onClickCb : undefined;
-			_this.cbCtx = config.ctx ? config.ctx : _this;
-	
-			// Контейнер для фишки с тенью и текстом
-			var spriteContainer = new _pixi2.default.Container();
-	
-			spriteContainer.x = _defaultPositions.defaultPositions.buttons[btnType].x;
-			spriteContainer.y = _defaultPositions.defaultPositions.buttons[btnType].y;
-	
-			if (btnType === 'btnCancel' || btnType === 'btnClear') btnType = 'btnAction';
-	
-			var sprite = new _pixi2.default.Sprite(_spritesStore.spritesStore.buttons[btnType]);
-	
-			// Opt-in to interactivity
-			sprite.interactive = true;
-	
-			// Shows hand cursor
-			sprite.buttonMode = true;
-	
-			sprite.anchor.set(0.5);
-	
-			sprite.on('tap', _this.onClick, _this);
-			sprite.on('click', _this.onClick, _this);
-	
-			spriteContainer.addChild(sprite);
-	
-			return _ret = spriteContainer, _possibleConstructorReturn(_this, _ret);
-		}
-	
-		_createClass(ButtonView, [{
-			key: 'onClick',
-			value: function onClick() {
-				if (this.onClickCb) {
-					this.onClickCb.call(this.cbCtx, 'lol');
-				} else {
-					console.log('this default click on button sprite');
-				}
-			}
-		}]);
-	
-		return ButtonView;
-	}(_pixi2.default.Sprite);
-	
-	exports.default = ButtonView;
-
-/***/ },
+/* 152 */,
+/* 153 */,
 /* 154 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -29792,11 +29666,13 @@
 			var chipValueText = new _pixi2.default.Text(_helpFunctions._hf.formatChipValue(_this.chipValue), _styles.styles.chipTextStyle);
 			chipValueText.anchor.set(0.5);
 	
-			sprite.on('tap', _this.onClick, _this);
-			sprite.on('click', _this.onClick, _this);
+			['tap', 'click', 'pointertap'].forEach(function (event) {
+				sprite.on(event, _this.onClick, _this);
+			});
 	
-			sprite.on('mousedown', _this.chipTouchStart, _this);
-			sprite.on('touchstart', _this.chipTouchStart, _this);
+			['touchstart', 'mousedown', 'pointerdown'].forEach(function (event) {
+				sprite.on(event, _this.chipTouchStart, _this);
+			});
 	
 			spriteContainer.addChild(shadow).addChild(sprite).addChild(chipValueText);
 	
@@ -30388,6 +30264,433 @@
 	}(_pixi2.default.Sprite);
 	
 	exports.default = BetView;
+
+/***/ },
+/* 161 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _buttonPanelView = __webpack_require__(162);
+	
+	var _buttonPanelView2 = _interopRequireDefault(_buttonPanelView);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var ButtonController = function () {
+		function ButtonController(cfgFromGameCtrl) {
+			_classCallCheck(this, ButtonController);
+	
+			// Конфиг, пришедший от контроллера выше
+			this._cfg = cfgFromGameCtrl;
+	
+			// Конфиг, который передаём во вьюху
+			var buttonsCallbackConfig = {
+				btnCancel: {
+					onClickCb: this.cancelBtnClick,
+					ctx: this
+				},
+				btnClear: {
+					onClickCb: this.clearBtnClick,
+					ctx: this
+				},
+				btnRepeat: {
+					onClickCb: this.repeatBtnClick,
+					ctx: this
+				},
+				btnX2: {
+					onClickCb: this.x2BtnClick,
+					ctx: this
+				}
+			};
+	
+			this._buttons = []; // коллекция спрайтов панели кнопок
+			this._buttonClasses = []; // коллекция инстансов классов вьюх панели кнопок
+	
+			for (var key in buttonsCallbackConfig) {
+				var btn = new _buttonPanelView2.default(key, buttonsCallbackConfig[key]);
+				this._buttonClasses.push(btn);
+				this._buttons.push(btn.getPixiSprite);
+			}
+		}
+	
+		_createClass(ButtonController, [{
+			key: 'disableButtons',
+			value: function disableButtons() {
+				this._buttonClasses.forEach(function (btnView) {
+					btnView.btnDisable();
+				});
+			}
+		}, {
+			key: 'cancelBtnClick',
+			value: function cancelBtnClick() {
+				if (this._cfg && this._cfg.cancelCb) {
+					this._cfg.cancelCb.call(this._cfg.ctx);
+				} else {
+					console.log('cancelBtnClick (ButtonPanelController)');
+				}
+			}
+		}, {
+			key: 'clearBtnClick',
+			value: function clearBtnClick() {
+				if (this._cfg && this._cfg.clearCb) {
+					this._cfg.clearCb.call(this._cfg.ctx);
+				} else {
+					console.log('clearBtnClick (ButtonPanelController)');
+				}
+			}
+		}, {
+			key: 'repeatBtnClick',
+			value: function repeatBtnClick() {
+				if (this._cfg && this._cfg.repeatCb) {
+					this._cfg.repeatCb.call(this._cfg.ctx);
+				} else {
+					console.log('repeatBtnClick (ButtonPanelController)');
+				}
+			}
+		}, {
+			key: 'x2BtnClick',
+			value: function x2BtnClick() {
+				if (this._cfg && this._cfg.x2Cb) {
+					this._cfg.x2Cb.call(this._cfg.ctx);
+				} else {
+					console.log('x2BtnClick (ButtonPanelController)');
+				}
+			}
+		}, {
+			key: 'buttons',
+			get: function get() {
+				return this._buttons;
+			}
+		}]);
+	
+		return ButtonController;
+	}();
+	
+	exports.default = ButtonController;
+
+/***/ },
+/* 162 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _pixi = __webpack_require__(1);
+	
+	var _pixi2 = _interopRequireDefault(_pixi);
+	
+	var _spritesStore = __webpack_require__(141);
+	
+	var _defaultPositions = __webpack_require__(144);
+	
+	var _styles = __webpack_require__(151);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+	
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+	
+	var ButtonView = function (_PIXI$Sprite) {
+		_inherits(ButtonView, _PIXI$Sprite);
+	
+		function ButtonView(btnType, config) {
+			_classCallCheck(this, ButtonView);
+	
+			var _this = _possibleConstructorReturn(this, (ButtonView.__proto__ || Object.getPrototypeOf(ButtonView)).call(this));
+	
+			_this.onClickCb = config.onClickCb ? config.onClickCb : undefined;
+			_this.cbCtx = config.ctx ? config.ctx : _this;
+	
+			// Контейнер для фишки с тенью и текстом
+			var spriteContainer = new _pixi2.default.Container();
+			_this._spriteContainer = spriteContainer;
+	
+			spriteContainer.interactive = true;
+			spriteContainer.buttonMode = true;
+	
+			spriteContainer.x = _defaultPositions.defaultPositions.buttons[btnType].x;
+			spriteContainer.y = _defaultPositions.defaultPositions.buttons[btnType].y;
+	
+			if (btnType === 'btnCancel' || btnType === 'btnClear') {
+				_this._sqrBtn = _this.squareBtnCreate(btnType);
+			} else {
+				_this._rndBtn = _this.roundBtnCreate(btnType);
+			}
+	
+			['tap', 'click', 'pointertap'].forEach(function (event) {
+				spriteContainer.on(event, _this.onClick, _this);
+			});
+	
+			['touchstart', 'mousedown', 'pointerdown'].forEach(function (event) {
+				spriteContainer.on(event, _this.onTouchStart, _this);
+			});
+			return _this;
+		}
+	
+		_createClass(ButtonView, [{
+			key: 'onClick',
+			value: function onClick() {
+				this.btnDefault();
+	
+				if (this.onClickCb) {
+					this.onClickCb.call(this.cbCtx, 'lol');
+				} else {
+					console.log('this default click on button sprite');
+				}
+			}
+		}, {
+			key: 'onTouchStart',
+			value: function onTouchStart() {
+				this.btnSelect();
+			}
+		}, {
+			key: 'btnDefault',
+			value: function btnDefault() {
+				if (this._sqrBtn) {
+					this._sqrBtn.stateDef.visible = true;
+					this._sqrBtn.icoDef.visible = true;
+					this._sqrBtn.stateSel.visible = false;
+					this._sqrBtn.icoDis.visible = false;
+					this._sqrBtn.text.alpha = 1;
+				} else {
+					this._rndBtn.stateDef.visible = true;
+					this._rndBtn.stateSel.visible = false;
+					this._rndBtn.stateDis.visible = false;
+				}
+			}
+		}, {
+			key: 'btnSelect',
+			value: function btnSelect() {
+				if (this._sqrBtn) {
+					this._sqrBtn.stateDef.visible = false;
+					this._sqrBtn.stateSel.visible = true;
+				} else {
+					this._rndBtn.stateDef.visible = false;
+					this._rndBtn.stateSel.visible = true;
+				}
+			}
+		}, {
+			key: 'btnDisable',
+			value: function btnDisable() {
+				if (this._sqrBtn) {
+					this._sqrBtn.icoDef.visible = false;
+					this._sqrBtn.icoDis.visible = true;
+					this._sqrBtn.text.alpha = 0.5;
+				} else {
+					this._rndBtn.stateDef.visible = false;
+					this._rndBtn.stateSel.visible = false;
+					this._rndBtn.stateDis.visible = true;
+				}
+			}
+	
+			/**
+	   * Создание квадратных кнопок
+	   * @param btnSquareType
+	   */
+	
+		}, {
+			key: 'squareBtnCreate',
+			value: function squareBtnCreate(btnSquareType) {
+				var _this2 = this;
+	
+				var type = btnSquareType === 'btnCancel' ? 'cn' : 'cl';
+	
+				var stateDef = new _pixi2.default.Sprite(_spritesStore.spritesStore.buttons['btnAction']),
+				    stateSel = new _pixi2.default.Sprite(_spritesStore.spritesStore.buttons['btnActionSel']),
+				    icoDef = new _pixi2.default.Sprite(_spritesStore.spritesStore.buttons[type === 'cn' ? 'icoCancel' : 'icoClear']),
+				    icoDis = new _pixi2.default.Sprite(_spritesStore.spritesStore.buttons[type === 'cn' ? 'icoCancelDis' : 'icoClearDis']),
+				    text = new _pixi2.default.Text(type === 'cn' ? 'Отменить' : 'Очистить', _styles.styles.buttonStyle);
+	
+				stateSel.visible = false;
+				icoDis.visible = false;
+	
+				[stateDef, stateSel, icoDef, icoDis, text].forEach(function (item) {
+					_this2._spriteContainer.addChild(item);
+					item.anchor.set(0.5);
+				});
+	
+				text.anchor.set(0.35, 0.5);
+				icoDef.x = -65;
+				icoDis.x = -65;
+	
+				return { stateDef: stateDef, stateSel: stateSel, icoDef: icoDef, icoDis: icoDis, text: text };
+			}
+	
+			/**
+	   * Создание круглых кнопок
+	   * @param btnSquareType
+	   */
+	
+		}, {
+			key: 'roundBtnCreate',
+			value: function roundBtnCreate(btnSquareType) {
+				var _this3 = this;
+	
+				var type = btnSquareType === 'btnRepeat' ? 'rpt' : 'x2';
+	
+				var stateDef = new _pixi2.default.Sprite(_spritesStore.spritesStore.buttons[type === 'rpt' ? 'btnRepeat' : 'btnX2']),
+				    stateSel = new _pixi2.default.Sprite(_spritesStore.spritesStore.buttons[type === 'rpt' ? 'btnRepeatSel' : 'btnX2Sel']),
+				    stateDis = new _pixi2.default.Sprite(_spritesStore.spritesStore.buttons[type === 'rpt' ? 'btnRepeatDis' : 'btnX2Dis']);
+	
+				stateSel.visible = false;
+				stateDis.visible = false;
+	
+				[stateDef, stateSel, stateDis].forEach(function (item) {
+					_this3._spriteContainer.addChild(item);
+					item.anchor.set(0.5);
+				});
+	
+				return { stateDef: stateDef, stateSel: stateSel, stateDis: stateDis };
+			}
+		}, {
+			key: 'getPixiSprite',
+			get: function get() {
+				return this._spriteContainer;
+			}
+		}]);
+	
+		return ButtonView;
+	}(_pixi2.default.Sprite);
+	
+	exports.default = ButtonView;
+
+/***/ },
+/* 163 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var betModelClass = function () {
+		function betModelClass() {
+			_classCallCheck(this, betModelClass);
+	
+			this.bets = {};
+			this.betsCtrl = {};
+	
+			this.proxy = new Proxy(this.bets, {
+				get: function get(target, prop) {
+					console.log('`Чтение ${prop}` ➠ ', '\u0427\u0442\u0435\u043D\u0438\u0435 ' + prop);
+					return target[prop];
+				},
+				set: function set(target, prop, value) {
+					console.log('`Запись ${prop} ${value}` ➠ ', '\u0417\u0430\u043F\u0438\u0441\u044C ' + prop + ' ' + value);
+					target[prop] = value;
+					return true;
+				}
+			});
+		}
+	
+		/**
+	  * Коллекция ставок с привязкой к полям
+	  * @param bets
+	  */
+	
+	
+		_createClass(betModelClass, [{
+			key: 'clearBets',
+	
+	
+			/**
+	   * Очищаем все данные модели
+	   */
+			value: function clearBets() {
+				this.bets = [];
+				this.currentBetSum = 0;
+			}
+	
+			/**
+	   * Добавление ставки
+	   * @param bet - {field, bet}
+	   */
+	
+		}, {
+			key: 'addBet',
+			value: function addBet(bet) {
+				this.bets[bet.field] = bet.value;
+			}
+	
+			/**
+	   * Удаление ставки
+	   * @param field - название поля
+	   */
+	
+		}, {
+			key: 'removeBet',
+			value: function removeBet(field) {
+				this.bets[field] = undefined;
+			}
+		}, {
+			key: 'bets',
+			set: function set(bets) {
+				// this.proxy = bets; - если захотим попроксировать
+				this._bets = bets;
+			},
+			get: function get() {
+				// return this.proxy;
+				return this._bets;
+			}
+	
+			/**
+	   * Коллекция ставок с привязкой к полям
+	   * @param bets
+	   */
+	
+		}, {
+			key: 'betsCtrl',
+			set: function set(betsCtrl) {
+				this._betsCtrl = betsCtrl;
+			},
+			get: function get() {
+				return this._betsCtrl;
+			}
+	
+			/**
+	   * Текущая сумма ставок
+	   * @param bet
+	   */
+	
+		}, {
+			key: 'currentBetSum',
+			set: function set(bet) {
+				this._currentBetSum = bet;
+			},
+			get: function get() {
+				return this._currentBetSum;
+			}
+		}]);
+	
+		return betModelClass;
+	}();
+	
+	var instance = new betModelClass();
+	Object.freeze(instance);
+	
+	exports.betModel = instance;
 
 /***/ }
 /******/ ]);

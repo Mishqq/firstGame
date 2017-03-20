@@ -38,11 +38,13 @@ export default class ChipView extends PIXI.Sprite {
 		let chipValueText = new PIXI.Text( _hf.formatChipValue(this.chipValue), styles.chipTextStyle );
 		chipValueText.anchor.set(0.5);
 
-		sprite.on('tap', this.onClick, this);
-		sprite.on('click', this.onClick, this);
+		['tap', 'click', 'pointertap'].forEach((event)=>{
+			sprite.on(event, this.onClick, this);
+		});
 
-		sprite.on('mousedown', this.chipTouchStart, this);
-		sprite.on('touchstart', this.chipTouchStart, this);
+		['touchstart', 'mousedown', 'pointerdown'].forEach((event)=>{
+			sprite.on(event, this.chipTouchStart, this);
+		});
 
 		spriteContainer.addChild(shadow).addChild(sprite).addChild(chipValueText);
 

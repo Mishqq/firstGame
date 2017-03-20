@@ -1,3 +1,0 @@
-let betStore = {};
-
-export {betStore};
