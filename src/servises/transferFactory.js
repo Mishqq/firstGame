@@ -1,3 +1,0 @@
-let transferFactory = {};
-
-export {transferFactory};

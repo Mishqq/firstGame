@@ -1,7 +1,7 @@
 import GameFieldView from './gameFieldView';
 import {clickAreas} from './gameFieldCellMap';
 import {defaultPositions} from './../../constants/defaultPositions';
-import {transferFactory} from './../../servises/transferFactory'
+import {betStore} from './../../servises/betStore'
 
 export default class GameFieldController {
 	constructor(configByGameCtrl) {
@@ -58,7 +58,7 @@ export default class GameFieldController {
 	 * @returns {boolean}
 	 */
 	hoverAreas(event){
-		if(!transferFactory.activeChip) return false;
+		if(!betStore.activeChip && !betStore.floatChip) return false;
 
 		// т.к. событие mousemove и touchmove у нас отрабатывают по всей сцене
 		// (не важно на что вешаем), то вычисляем координаты нужного поля относительно

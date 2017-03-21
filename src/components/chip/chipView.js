@@ -4,14 +4,11 @@ import {defaultPositions} from './../../constants/defaultPositions';
 import {chipValues} from './../../constants/chipValues';
 import {styles} from './../../constants/styles';
 import {_hf} from './../../servises/helpFunctions'
-import {transferFactory} from './../../servises/transferFactory'
 
-export default class ChipView extends PIXI.Sprite {
+export default class ChipView {
 	constructor(chipType, config) {
-		super();
-
 		this.onClickCb = (config.onClickCb) ? config.onClickCb : undefined;
-		this.onTouchStartCb = (config.chipTouchStartCb) ? config.chipTouchStartCb : undefined;
+		this.chipTouchStartCb = (config.chipTouchStartCb) ? config.chipTouchStartCb : undefined;
 		this.cbCtx = (config.ctx) ? config.ctx : this;
 
 		// Контейнер для фишки с тенью и текстом
@@ -35,11 +32,12 @@ export default class ChipView extends PIXI.Sprite {
 
 		// Значение ставки на фишке
 		this.chipValue = chipValues[chipType];
+		this.chipType = chipType;
 		let chipValueText = new PIXI.Text( _hf.formatChipValue(this.chipValue), styles.chipTextStyle );
 		chipValueText.anchor.set(0.5);
 
-		['tap', 'click', 'pointertap'].forEach((event)=>{
-			sprite.on(event, this.onClick, this);
+		['touchend', 'mouseup', 'pointerup'].forEach((event)=>{
+			sprite.on(event, this.chipTouchEnd, this);
 		});
 
 		['touchstart', 'mousedown', 'pointerdown'].forEach((event)=>{
@@ -63,18 +61,16 @@ export default class ChipView extends PIXI.Sprite {
 		return this._active;
 	}
 
-	onClick(){
+	chipTouchEnd(){
 		this.onClickCb ?
 			this.onClickCb.call(this.cbCtx, this.chipValue) :
 			console.log('chipClickEvent (ChipView)', this.chipValue);
 	}
 
 	chipTouchStart(){
-		transferFactory.betTouchStart = false;
-
-		this.onTouchStartCb ?
-			this.onTouchStartCb.call(this.cbCtx, this.chipValue) :
-			console.log('chipTouchStart (ChipView)', this.chipValue);
+		this.chipTouchStartCb ?
+			this.chipTouchStartCb.call(this.cbCtx, this.chipValue) :
+			console.log('chipTouchMove (ChipView)', this.chipValue);
 	}
 
 	setActive(){
@@ -93,5 +89,9 @@ export default class ChipView extends PIXI.Sprite {
 			childSprite.scale.x -= 0.15;
 			childSprite.scale.y -= 0.15;
 		});
+	}
+
+	chipData(){
+		return {value: this.chipValue, type: this.chipType};
 	}
 }

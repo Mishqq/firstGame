@@ -2,10 +2,8 @@ import PIXI from 'pixi.js';
 import {spritesStore} from './../../spritesStore';
 import {styles} from './../../constants/styles';
 
-export default class FloatChipView extends PIXI.Sprite {
+export default class FloatChipView {
 	constructor(config) {
-		super();
-
 		this.onTouchEndCb = (config.onTouchEndCb) ? config.onTouchEndCb : undefined;
 		this.cbCtx = (config.ctx) ? config.ctx : this;
 

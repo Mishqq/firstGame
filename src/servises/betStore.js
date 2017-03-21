@@ -1,4 +1,4 @@
-class betModelClass{
+class betStoreClass{
 	constructor(){
 		this.bets = {};
 		this.betsCtrl = {};
@@ -52,6 +52,32 @@ class betModelClass{
 		return this._currentBetSum;
 	}
 
+
+	/**
+	 * Активный тип ставки (одна из фишек на панели - 100/500/1К...)
+	 * @param chip
+	 */
+	set activeChip(chip){
+		this._activeChip = chip;
+	}
+	get activeChip(){
+		return this._activeChip;
+	}
+
+
+	/**
+	 * Активный тип ставки (одна из фишек на панели - 100/500/1К...)
+	 * @param chip
+	 */
+	set floatChip(chip){
+		this._floatChip = chip;
+	}
+	get floatChip(){
+		return this._floatChip;
+	}
+
+
+
 	/**
 	 * Очищаем все данные модели
 	 */
@@ -77,7 +103,7 @@ class betModelClass{
 	}
 }
 
-let instance = new betModelClass();
-Object.freeze(instance);
+let instance = new betStoreClass();
+// Object.preventExtensions(instance); - не хочет работать 'set activeChip'
 
-export {instance as betModel};
+export {instance as betStore};

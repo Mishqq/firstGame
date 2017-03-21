@@ -3,10 +3,8 @@ import {spritesStore} from './../../spritesStore';
 import {defaultPositions} from './../../constants/defaultPositions';
 import {styles} from './../../constants/styles';
 
-export default class ButtonView extends PIXI.Sprite {
+export default class ButtonView {
 	constructor(btnType, config) {
-		super();
-
 		this.onClickCb = (config.onClickCb) ? config.onClickCb : undefined;
 		this.cbCtx = (config.ctx) ? config.ctx : this;
 

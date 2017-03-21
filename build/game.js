@@ -28256,23 +28256,23 @@
 	
 	var _assetsLoader = __webpack_require__(140);
 	
-	var _transferFactory = __webpack_require__(143);
+	var _touchEvents = __webpack_require__(161);
 	
-	var _betStoreModule = __webpack_require__(163);
+	var _betStore = __webpack_require__(162);
 	
-	var _background = __webpack_require__(147);
+	var _background = __webpack_require__(145);
 	
 	var _background2 = _interopRequireDefault(_background);
 	
-	var _gameFieldController = __webpack_require__(148);
+	var _gameFieldController = __webpack_require__(146);
 	
 	var _gameFieldController2 = _interopRequireDefault(_gameFieldController);
 	
-	var _buttonPanelController = __webpack_require__(161);
+	var _buttonPanelController = __webpack_require__(151);
 	
 	var _buttonPanelController2 = _interopRequireDefault(_buttonPanelController);
 	
-	var _chipController = __webpack_require__(154);
+	var _chipController = __webpack_require__(153);
 	
 	var _chipController2 = _interopRequireDefault(_chipController);
 	
@@ -28305,8 +28305,6 @@
 	
 				this.stage = stage;
 	
-				this.betModel = _betStoreModule.betModel;
-	
 				/**
 	    * background
 	    */
@@ -28337,6 +28335,7 @@
 	    */
 				(0, _assetsLoader.assetLoader)(function () {
 					var chipsController = new _chipController2.default();
+					_this.chipsController = chipsController;
 					for (var key in chipsController.chips) {
 						stage.addChild(chipsController.chips[key].sprite);
 					}
@@ -28366,16 +28365,13 @@
 			key: 'onTouchMove',
 			value: function onTouchMove(event) {
 				var fChip = this.floatChipContainer,
-				    betsCtrl = this.betModel.betsCtrl,
-				    _tf = _transferFactory.transferFactory;
+				    betsCtrl = _betStore.betStore.betsCtrl;
 	
-				// TODO: по-хорошему надо реализовать событийную модель
-	
-				if (_tf.activeChip && !_tf.betTouchStart) {
+				if (_betStore.betStore.activeChip && !_touchEvents._tev.isActive(_touchEvents._tevStore.BET_TOUCH_START)) {
 					// Если у нас есть активный тип ставки и если тачстарт начался не на существующей ставке
-					fChip.viewFloatChip(_tf.activeChip.value);
+					fChip.viewFloatChip(_betStore.betStore.activeChip.value);
 					fChip.setPosition(event.data.global);
-				} else if (_tf.betTouchStart) {
+				} else if (_touchEvents._tev.isActive(_touchEvents._tevStore.BET_TOUCH_START)) {
 					// Если тачстарт начался с существующей ставки
 					var pos4Bet = this.getPosForBet(event.data.global, true);
 					var betStoreId = pos4Bet.x + '_' + pos4Bet.y;
@@ -28383,10 +28379,9 @@
 					var value = betsCtrl[betStoreId].getTopChipValue();
 	
 					betsCtrl[betStoreId].updateBetView(-value);
-					_tf.betTouchStart = false;
-					_tf.activeChip = {
-						value: value
-					};
+					_betStore.betStore.activeChip = { value: value };
+	
+					_touchEvents._tev.clearEvents();
 				}
 			}
 	
@@ -28411,12 +28406,14 @@
 			key: 'setBet',
 			value: function setBet(event) {
 				var pos4Bet = this.getPosForBet(event.data.global, true),
-				    betsCtrl = this.betModel.betsCtrl,
-				    _tf = _transferFactory.transferFactory;
+				    betsCtrl = _betStore.betStore.betsCtrl,
+				    chip = _betStore.betStore.activeChip;
 	
-				if (pos4Bet && (_tf.activeChip || _tf.lastChip)) {
+				if (!chip && this.chipsController.getActiveChip()) chip = this.chipsController.getActiveChip().chipData();
+	
+				if (pos4Bet && chip) {
 					var betStoreId = pos4Bet.x + '_' + pos4Bet.y;
-					var currentValue = _tf.activeChip ? _tf.activeChip.value : _tf.lastChip.value;
+					var currentValue = chip.value;
 	
 					if (betsCtrl[betStoreId]) {
 						betsCtrl[betStoreId].updateBetView(currentValue);
@@ -28426,6 +28423,7 @@
 							value: currentValue,
 							onTouchEndCb: this.setBet,
 							onTouchStartCb: this.onTouchMove,
+							deleteBetCb: this.deleteBet,
 							ctx: this
 						};
 	
@@ -28434,8 +28432,11 @@
 						betsCtrl[betStoreId] = betController;
 					}
 				}
+				_betStore.betStore.activeChip = undefined;
 	
 				this.clearTableBet();
+	
+				this.updateBetModel();
 			}
 	
 			/**
@@ -28445,7 +28446,6 @@
 		}, {
 			key: 'clearTableBet',
 			value: function clearTableBet() {
-				_transferFactory.transferFactory.activeChip = undefined;
 				this.floatChipContainer.hideFloatChip();
 				this.gameField.hideHints();
 			}
@@ -28454,18 +28454,22 @@
 			value: function getPosForBet(pos, global) {
 				return this.gameField.getPosForBet(pos, global);
 			}
+		}, {
+			key: 'deleteBet',
+			value: function deleteBet(betCtrl) {
+				for (var ctrl in _betStore.betStore.betsCtrl) {
+					if (ctrl === betCtrl) delete _betStore.betStore.betsCtrl[betCtrl];
+				}
+			}
+		}, {
+			key: 'updateBetModel',
+	
 	
 			/**
 	   * Синхронизируем изменение вьюхи и коллекцию ставок
 	   * (не коллекцию контроллеров компонентов ставок)
 	   */
-	
-		}, {
-			key: 'updateBetModel',
 			value: function updateBetModel() {}
-			// TODO: пробежаться по коллекции контроллеров в модели
-			// ставок и апнуть коллекцию ставок, а затем апнуть общую ставку
-	
 	
 			/**
 	   * ===========================   buttonPanel click callbacks  ================================
@@ -28479,7 +28483,14 @@
 		}, {
 			key: 'btnPanelClearCb',
 			value: function btnPanelClearCb() {
-				console.log('clearClick (gameController)');
+				for (var key in _betStore.betStore.betsCtrl) {
+					var ctrl = _betStore.betStore.betsCtrl[key];
+					ctrl.betSprite.removeChildren();
+	
+					this.stage.removeChild(ctrl.betSprite);
+	
+					delete _betStore.betStore.betsCtrl[key];
+				}
 			}
 		}, {
 			key: 'btnPanelRepeatCb',
@@ -28489,7 +28500,12 @@
 		}, {
 			key: 'btnPanelX2Cb',
 			value: function btnPanelX2Cb() {
-				console.log('x2Click (gameController)');
+				for (var key in _betStore.betStore.betsCtrl) {
+					var ctrl = _betStore.betStore.betsCtrl[key],
+					    value = ctrl.balance;
+	
+					ctrl.updateBetView(value);
+				}
 			}
 		}]);
 	
@@ -28798,87 +28814,9 @@
 	exports.constants = constants;
 
 /***/ },
-/* 143 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	var transferFactory = {};
-	
-	exports.transferFactory = transferFactory;
-
-/***/ },
-/* 144 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	var defaultPositions = {
-		chips: {
-			chip0: { x: 640, y: 957 },
-			chip1: { x: 800, y: 957 },
-			chip2: { x: 960, y: 957 },
-			chip3: { x: 1120, y: 957 },
-			chip4: { x: 1280, y: 957 }
-		},
-		buttons: {
-			btnCancel: { x: 180, y: 934 },
-			btnClear: { x: 410, y: 934 },
-			btnRepeat: { x: 1450, y: 934 },
-			btnX2: { x: 1570, y: 934 }
-		},
-		fields: {
-			big: { x: 200, y: 300 },
-			small: { x: 1200, y: 300 }
-		}
-	};
-	
-	exports.defaultPositions = defaultPositions;
-
-/***/ },
+/* 143 */,
+/* 144 */,
 /* 145 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-	  value: true
-	});
-	/**
-	 * Проверка принадлежности по координатам
-	 * @param pos - {x, y}
-	 * @param bounds - {x, y, width, height}
-	 */
-	function isPosInBounds(pos, bounds) {
-	  return pos.x >= bounds.x && pos.x <= bounds.x + bounds.width && pos.y >= bounds.y && pos.y <= bounds.y + bounds.height;
-	}
-	
-	/**
-	 * Форматирование значения ставки
-	 * @param value
-	 * @returns {string}
-	 */
-	function formatChipValue(value) {
-	  var str = value >= 1000 ? value / 1000 + 'K' : value;
-	  return str;
-	}
-	
-	var _hf = {
-	  isPosInBounds: isPosInBounds,
-	  formatChipValue: formatChipValue
-	};
-	
-	exports._hf = _hf;
-
-/***/ },
-/* 146 */,
-/* 147 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28920,7 +28858,7 @@
 	exports.default = Background;
 
 /***/ },
-/* 148 */
+/* 146 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28931,15 +28869,15 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _gameFieldView = __webpack_require__(149);
+	var _gameFieldView = __webpack_require__(147);
 	
 	var _gameFieldView2 = _interopRequireDefault(_gameFieldView);
 	
-	var _gameFieldCellMap = __webpack_require__(150);
+	var _gameFieldCellMap = __webpack_require__(149);
 	
-	var _defaultPositions = __webpack_require__(144);
+	var _defaultPositions = __webpack_require__(148);
 	
-	var _transferFactory = __webpack_require__(143);
+	var _betStore = __webpack_require__(162);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -29008,7 +28946,7 @@
 		}, {
 			key: 'hoverAreas',
 			value: function hoverAreas(event) {
-				if (!_transferFactory.transferFactory.activeChip) return false;
+				if (!_betStore.betStore.activeChip && !_betStore.betStore.floatChip) return false;
 	
 				// т.к. событие mousemove и touchmove у нас отрабатывают по всей сцене
 				// (не важно на что вешаем), то вычисляем координаты нужного поля относительно
@@ -29067,7 +29005,7 @@
 	exports.default = GameFieldController;
 
 /***/ },
-/* 149 */
+/* 147 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29082,35 +29020,29 @@
 	
 	var _pixi2 = _interopRequireDefault(_pixi);
 	
-	var _defaultPositions = __webpack_require__(144);
+	var _defaultPositions = __webpack_require__(148);
 	
-	var _gameFieldCellMap = __webpack_require__(150);
+	var _gameFieldCellMap = __webpack_require__(149);
 	
-	var _styles = __webpack_require__(151);
+	var _styles = __webpack_require__(150);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var GameFieldView = function (_PIXI$Sprite) {
-		_inherits(GameFieldView, _PIXI$Sprite);
-	
+	var GameFieldView = function () {
 		function GameFieldView(config) {
+			var _this = this;
+	
 			_classCallCheck(this, GameFieldView);
 	
-			var _this = _possibleConstructorReturn(this, (GameFieldView.__proto__ || Object.getPrototypeOf(GameFieldView)).call(this));
-	
-			_this.onClickCb = config.onClickCb ? config.onClickCb : undefined;
-			_this.onHoverCb = config.onHoverCb ? config.onHoverCb : undefined;
-			_this.cbCtx = config.ctx ? config.ctx : _this;
+			this.onClickCb = config.onClickCb ? config.onClickCb : undefined;
+			this.onHoverCb = config.onHoverCb ? config.onHoverCb : undefined;
+			this.cbCtx = config.ctx ? config.ctx : this;
 	
 			// Контейнер для фишки с тенью и текстом
 			var spriteContainer = new _pixi2.default.Container();
-			_this.pixiContainer = spriteContainer;
+			this.pixiContainer = spriteContainer;
 	
 			spriteContainer.x = _defaultPositions.defaultPositions.fields.big.x;
 			spriteContainer.y = _defaultPositions.defaultPositions.fields.big.y;
@@ -29132,10 +29064,9 @@
 	
 			spriteContainer.addChild(sprite);
 	
-			_this.drawHints();
+			this.drawHints();
 	
 			// this.devModeInteractiveAreas();
-			return _this;
 		}
 	
 		_createClass(GameFieldView, [{
@@ -29368,12 +29299,43 @@
 		}]);
 	
 		return GameFieldView;
-	}(_pixi2.default.Sprite);
+	}();
 	
 	exports.default = GameFieldView;
 
 /***/ },
-/* 150 */
+/* 148 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	var defaultPositions = {
+		chips: {
+			chip0: { x: 640, y: 957 },
+			chip1: { x: 800, y: 957 },
+			chip2: { x: 960, y: 957 },
+			chip3: { x: 1120, y: 957 },
+			chip4: { x: 1280, y: 957 }
+		},
+		buttons: {
+			btnCancel: { x: 180, y: 934 },
+			btnClear: { x: 410, y: 934 },
+			btnRepeat: { x: 1450, y: 934 },
+			btnX2: { x: 1570, y: 934 }
+		},
+		fields: {
+			big: { x: 200, y: 300 },
+			small: { x: 1200, y: 300 }
+		}
+	};
+	
+	exports.defaultPositions = defaultPositions;
+
+/***/ },
+/* 149 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -29469,7 +29431,7 @@
 	exports.pointMap = pointMap;
 
 /***/ },
-/* 151 */
+/* 150 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -29510,9 +29472,7 @@
 	exports.styles = styles;
 
 /***/ },
-/* 152 */,
-/* 153 */,
-/* 154 */
+/* 151 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29523,761 +29483,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _chipView = __webpack_require__(155);
-	
-	var _chipView2 = _interopRequireDefault(_chipView);
-	
-	var _chipValues = __webpack_require__(156);
-	
-	var _transferFactory = __webpack_require__(143);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var ChipController = function () {
-		function ChipController() {
-			var _this = this;
-	
-			_classCallCheck(this, ChipController);
-	
-			var config = {
-				onClickCb: this.onClick,
-				chipTouchStartCb: this.chipTouchStart,
-				ctx: this
-			};
-	
-			this._chips = {};
-	
-			['chip0', 'chip1', 'chip2', 'chip3', 'chip4'].forEach(function (item) {
-				var chip = new _chipView2.default(item, config);
-				_this._chips[item] = chip;
-			});
-		}
-	
-		_createClass(ChipController, [{
-			key: 'onClick',
-			value: function onClick(price) {
-				console.log('chipClickEvent (ChipController)', price);
-			}
-		}, {
-			key: 'chipTouchStart',
-			value: function chipTouchStart(price) {
-				var chipType = void 0;
-				for (var key in _chipValues.chipValues) {
-					if (_chipValues.chipValues[key] === price) chipType = key;
-				}_transferFactory.transferFactory.activeChip = {
-					value: price,
-					type: chipType
-				};
-				_transferFactory.transferFactory.lastChip = Object.assign({}, _transferFactory.transferFactory.activeChip);
-	
-				for (var _key in this.chips) {
-					if (this.chips[_key].active) {
-						this.chips[_key].setDefault();
-					}
-				}
-	
-				this.chips[chipType].setActive();
-	
-				// console.log('chipTouchStart (ChipController)', price);
-			}
-		}, {
-			key: 'chips',
-			get: function get() {
-				return this._chips;
-			}
-		}]);
-	
-		return ChipController;
-	}();
-	
-	exports.default = ChipController;
-
-/***/ },
-/* 155 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _pixi = __webpack_require__(1);
-	
-	var _pixi2 = _interopRequireDefault(_pixi);
-	
-	var _spritesStore = __webpack_require__(141);
-	
-	var _defaultPositions = __webpack_require__(144);
-	
-	var _chipValues = __webpack_require__(156);
-	
-	var _styles = __webpack_require__(151);
-	
-	var _helpFunctions = __webpack_require__(145);
-	
-	var _transferFactory = __webpack_require__(143);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var ChipView = function (_PIXI$Sprite) {
-		_inherits(ChipView, _PIXI$Sprite);
-	
-		function ChipView(chipType, config) {
-			_classCallCheck(this, ChipView);
-	
-			var _this = _possibleConstructorReturn(this, (ChipView.__proto__ || Object.getPrototypeOf(ChipView)).call(this));
-	
-			_this.onClickCb = config.onClickCb ? config.onClickCb : undefined;
-			_this.onTouchStartCb = config.chipTouchStartCb ? config.chipTouchStartCb : undefined;
-			_this.cbCtx = config.ctx ? config.ctx : _this;
-	
-			// Контейнер для фишки с тенью и текстом
-			var spriteContainer = new _pixi2.default.Container();
-			_this._spriteContainer = spriteContainer;
-	
-			spriteContainer.x = _defaultPositions.defaultPositions.chips[chipType].x;
-			spriteContainer.y = _defaultPositions.defaultPositions.chips[chipType].y;
-	
-			var sprite = new _pixi2.default.Sprite(_spritesStore.spritesStore.chips[chipType]);
-	
-			// Opt-in to interactivity
-			sprite.interactive = true;
-			// Shows hand cursor
-			sprite.buttonMode = true;
-			sprite.anchor.set(0.5);
-	
-			// Тень под фишкой
-			var shadow = new _pixi2.default.Sprite(_spritesStore.spritesStore.chips.chipShadow);
-			shadow.anchor.set(0.5);
-	
-			// Значение ставки на фишке
-			_this.chipValue = _chipValues.chipValues[chipType];
-			var chipValueText = new _pixi2.default.Text(_helpFunctions._hf.formatChipValue(_this.chipValue), _styles.styles.chipTextStyle);
-			chipValueText.anchor.set(0.5);
-	
-			['tap', 'click', 'pointertap'].forEach(function (event) {
-				sprite.on(event, _this.onClick, _this);
-			});
-	
-			['touchstart', 'mousedown', 'pointerdown'].forEach(function (event) {
-				sprite.on(event, _this.chipTouchStart, _this);
-			});
-	
-			spriteContainer.addChild(shadow).addChild(sprite).addChild(chipValueText);
-	
-			_this.active = false;
-			return _this;
-		}
-	
-		_createClass(ChipView, [{
-			key: 'onClick',
-			value: function onClick() {
-				this.onClickCb ? this.onClickCb.call(this.cbCtx, this.chipValue) : console.log('chipClickEvent (ChipView)', this.chipValue);
-			}
-		}, {
-			key: 'chipTouchStart',
-			value: function chipTouchStart() {
-				_transferFactory.transferFactory.betTouchStart = false;
-	
-				this.onTouchStartCb ? this.onTouchStartCb.call(this.cbCtx, this.chipValue) : console.log('chipTouchStart (ChipView)', this.chipValue);
-			}
-		}, {
-			key: 'setActive',
-			value: function setActive() {
-				this.active = true;
-	
-				this.sprite.children.forEach(function (childSprite) {
-					childSprite.scale.x += 0.15;
-					childSprite.scale.y += 0.15;
-				});
-			}
-		}, {
-			key: 'setDefault',
-			value: function setDefault() {
-				this.active = false;
-	
-				this.sprite.children.forEach(function (childSprite) {
-					childSprite.scale.x -= 0.15;
-					childSprite.scale.y -= 0.15;
-				});
-			}
-		}, {
-			key: 'sprite',
-			get: function get() {
-				return this._spriteContainer;
-			}
-		}, {
-			key: 'active',
-			set: function set(active) {
-				this._active = active;
-			},
-			get: function get() {
-				return this._active;
-			}
-		}]);
-	
-		return ChipView;
-	}(_pixi2.default.Sprite);
-	
-	exports.default = ChipView;
-
-/***/ },
-/* 156 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	var chipValues = {
-		chip0: 100,
-		chip1: 500,
-		chip2: 1000,
-		chip3: 2000,
-		chip4: 3000
-	};
-	
-	var smallChipTypes = {
-		chipSm0: chipValues.chip0,
-		chipSm1: chipValues.chip1,
-		chipSm2: chipValues.chip2,
-		chipSm3: chipValues.chip3,
-		chipSm4: chipValues.chip4
-	};
-	
-	var floatChipTypes = {},
-	    count = 0;
-	for (var key in chipValues) {
-		floatChipTypes[chipValues[key]] = 'fChip' + count++;
-	}
-	
-	exports.chipValues = chipValues;
-	exports.smallChipTypes = smallChipTypes;
-	exports.floatChipTypes = floatChipTypes;
-
-/***/ },
-/* 157 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _floatChipView = __webpack_require__(158);
-	
-	var _floatChipView2 = _interopRequireDefault(_floatChipView);
-	
-	var _chipValues = __webpack_require__(156);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var FloatChipController = function () {
-		function FloatChipController(configByGameCtrl) {
-			_classCallCheck(this, FloatChipController);
-	
-			this.onTouchEndCb = configByGameCtrl.onTouchEndCb ? configByGameCtrl.onTouchEndCb : undefined;
-			this.cbCtx = configByGameCtrl.ctx ? configByGameCtrl.ctx : this;
-	
-			var config = {
-				viewFloatChip: this.viewFloatChip,
-				setPosition: this.setPosition,
-				onTouchEndCb: this.onTouchEnd,
-				ctx: this
-			};
-	
-			this._floatChipsSprite = new _floatChipView2.default(config);
-		}
-	
-		_createClass(FloatChipController, [{
-			key: 'viewFloatChip',
-			value: function viewFloatChip(value) {
-				this._floatChipsSprite.viewFloatChip(_chipValues.floatChipTypes[value], value);
-			}
-		}, {
-			key: 'hideFloatChip',
-			value: function hideFloatChip() {
-				this._floatChipsSprite.hideFloatChips();
-			}
-		}, {
-			key: 'setPosition',
-			value: function setPosition(pos) {
-				this._floatChipsSprite.setPosition(pos);
-			}
-		}, {
-			key: 'onTouchEnd',
-			value: function onTouchEnd(event) {
-				this.onTouchEndCb ? this.onTouchEndCb.call(this.cbCtx, event) : console.log('floatChipTouchEnd (FloatChipController)');
-			}
-		}, {
-			key: 'getFloatChipsSprite',
-			get: function get() {
-				return this._floatChipsSprite.floatChipContainer;
-			}
-		}]);
-	
-		return FloatChipController;
-	}();
-	
-	exports.default = FloatChipController;
-
-/***/ },
-/* 158 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _pixi = __webpack_require__(1);
-	
-	var _pixi2 = _interopRequireDefault(_pixi);
-	
-	var _spritesStore = __webpack_require__(141);
-	
-	var _styles = __webpack_require__(151);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var FloatChipView = function (_PIXI$Sprite) {
-		_inherits(FloatChipView, _PIXI$Sprite);
-	
-		function FloatChipView(config) {
-			_classCallCheck(this, FloatChipView);
-	
-			var _this = _possibleConstructorReturn(this, (FloatChipView.__proto__ || Object.getPrototypeOf(FloatChipView)).call(this));
-	
-			_this.onTouchEndCb = config.onTouchEndCb ? config.onTouchEndCb : undefined;
-			_this.cbCtx = config.ctx ? config.ctx : _this;
-	
-			// Контейнер для плавающей фишки
-			_this._floatChipsContainer = new _pixi2.default.Container();
-			_this._floatChipsContainer.x = 50;
-			_this._floatChipsContainer.y = 50;
-			_this._floatChipsContainer.visible = false;
-			_this._floatChipsContainer.interactive = true;
-	
-			['touchend', 'mouseup', 'pointerup'].forEach(function (event) {
-				_this._floatChipsContainer.on(event, _this.onTouchEnd, _this);
-			});
-	
-			['chipSm0', 'chipSm1', 'chipSm2', 'chipSm3', 'chipSm4'].forEach(function (chipType) {
-				var floatChipSprite = new _pixi2.default.Sprite(_spritesStore.spritesStore.chips[chipType]);
-				// floatChipSprite.visible = false;
-				floatChipSprite.anchor.set(0.5);
-				_this._floatChipsContainer.addChild(floatChipSprite);
-			});
-	
-			// Значение на фишке
-			var chipValueText = new _pixi2.default.Text(';)', _styles.styles.floatChipTextStyle);
-			chipValueText.visible = false;
-			_this._floatChipsContainer.addChild(chipValueText);
-			chipValueText.anchor.x = 0.5;
-			chipValueText.anchor.y = 0.55;
-			return _this;
-		}
-	
-		/**
-	  * Возвращает контейнер со спрайтами фишек, тенью и текстом
-	  * @returns {PIXI.Container|*}
-	  */
-	
-	
-		_createClass(FloatChipView, [{
-			key: 'onTouchEnd',
-			value: function onTouchEnd(event) {
-				this.onTouchEndCb ? this.onTouchEndCb.call(this.cbCtx, event) : console.log('floatChipTouchEnd (FloatChipView)');
-			}
-	
-			/**
-	   * Функция показывает плавающую фишку
-	   * @param type - тип показываемой фишки
-	   * @param text - устанавливаемый текст
-	   */
-	
-		}, {
-			key: 'viewFloatChip',
-			value: function viewFloatChip(type, value) {
-				var arr = ['fChip0', 'fChip1', 'fChip2', 'fChip3', 'fChip4'],
-				    idx = arr.indexOf(type);
-	
-				this.hideFloatChips();
-	
-				this._floatChipsContainer.visible = true;
-				this._floatChipsContainer.children[idx].visible = true;
-	
-				this._floatChipsContainer.children[5].text = this.formatChipValue(value);
-				this._floatChipsContainer.children[5].visible = true;
-			}
-	
-			/**
-	   * Скрывает все фишки и текст с тенью
-	   */
-	
-		}, {
-			key: 'hideFloatChips',
-			value: function hideFloatChips() {
-				this._floatChipsContainer.children.forEach(function (fChip) {
-					fChip.visible = false;
-				});
-			}
-	
-			/**
-	   * Установка позиции контейнера со спрайтом фишки
-	   * @param pos - {x: Number, y: Number}
-	   */
-	
-		}, {
-			key: 'setPosition',
-			value: function setPosition(pos) {
-				this._floatChipsContainer.x = pos.x;
-				this._floatChipsContainer.y = pos.y;
-			}
-	
-			/**
-	   * Форматирование значения ставки
-	   * @param value
-	   * @returns {string}
-	   */
-	
-		}, {
-			key: 'formatChipValue',
-			value: function formatChipValue(value) {
-				var str = value;
-				str = str.toString();
-				return str.length > 3 ? str.substring(0, 1) + 'K' : value;
-			}
-		}, {
-			key: 'floatChipContainer',
-			get: function get() {
-				return this._floatChipsContainer;
-			}
-		}]);
-	
-		return FloatChipView;
-	}(_pixi2.default.Sprite);
-	
-	exports.default = FloatChipView;
-
-/***/ },
-/* 159 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _betView = __webpack_require__(160);
-	
-	var _betView2 = _interopRequireDefault(_betView);
-	
-	var _chipValues = __webpack_require__(156);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var BetController = function () {
-		function BetController(configByGameCtrl) {
-			_classCallCheck(this, BetController);
-	
-			this.onTouchEndCb = configByGameCtrl.onTouchEndCb ? configByGameCtrl.onTouchEndCb : undefined;
-	
-			this.onTouchStartCb = configByGameCtrl.onTouchStartCb ? configByGameCtrl.onTouchStartCb : undefined;
-	
-			this.cbCtx = configByGameCtrl.ctx ? configByGameCtrl.ctx : this;
-	
-			var config = {
-				pos: configByGameCtrl.pos,
-				onClick: this.onClick,
-				updateBetModel: this.updateBetModel,
-				onTouchEndCb: this.onTouchEnd,
-				ctx: this
-			};
-	
-			this._betView = new _betView2.default(config, configByGameCtrl.value);
-		}
-	
-		_createClass(BetController, [{
-			key: 'onClick',
-			value: function onClick(event) {}
-		}, {
-			key: 'updateBetView',
-			value: function updateBetView(value) {
-				this._betView.updateBet(value);
-			}
-		}, {
-			key: 'updateBetModel',
-			value: function updateBetModel() {
-				console.log('апдейтим модель ставки');
-			}
-		}, {
-			key: 'onTouchEnd',
-			value: function onTouchEnd(event) {
-				this.onTouchEndCb ? this.onTouchEndCb.call(this.cbCtx, event) : console.log('betTouchEnd (BetController)');
-			}
-		}, {
-			key: 'getTopChipValue',
-			value: function getTopChipValue() {
-				return this._betView.getTopChipValue();
-			}
-		}, {
-			key: 'betSprite',
-			get: function get() {
-				return this._betView.betViewContainer;
-			}
-		}]);
-	
-		return BetController;
-	}();
-	
-	exports.default = BetController;
-
-/***/ },
-/* 160 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _pixi = __webpack_require__(1);
-	
-	var _pixi2 = _interopRequireDefault(_pixi);
-	
-	var _spritesStore = __webpack_require__(141);
-	
-	var _styles = __webpack_require__(151);
-	
-	var _chipValues = __webpack_require__(156);
-	
-	var _helpFunctions = __webpack_require__(145);
-	
-	var _transferFactory = __webpack_require__(143);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var BetView = function (_PIXI$Sprite) {
-		_inherits(BetView, _PIXI$Sprite);
-	
-		function BetView(config, value) {
-			_classCallCheck(this, BetView);
-	
-			var _this = _possibleConstructorReturn(this, (BetView.__proto__ || Object.getPrototypeOf(BetView)).call(this));
-	
-			_this._summ = value ? value : 0;
-	
-			var chipType = 'chipSm0';
-			for (var smChipKey in _chipValues.smallChipTypes) {
-				if (_chipValues.smallChipTypes[smChipKey] === value) chipType = smChipKey;
-			}_this.onClickCb = config.onClickCb ? config.onClickCb : undefined;
-			_this.onTouchEndCb = config.onTouchEndCb ? config.onTouchEndCb : undefined;
-			_this.updateBetModel = config.updateBetModel ? config.updateBetModel : undefined;
-			_this.cbCtx = config.ctx ? config.ctx : _this;
-	
-			_this._betContainer = new _pixi2.default.Container();
-			_this._betContainer.x = config.pos.x;
-			_this._betContainer.y = config.pos.y;
-	
-			_this._betContainer.interactive = true;
-	
-			var betSprite = new _pixi2.default.Sprite(_spritesStore.spritesStore.chips[chipType]);
-			betSprite.anchor.set(0.5);
-	
-			var chipValueText = new _pixi2.default.Text(_helpFunctions._hf.formatChipValue(value), _styles.styles.chipSmTextStyle);
-			chipValueText.anchor.set(0.5);
-	
-			['touchstart', 'mousedown', 'pointerdown'].forEach(function (event) {
-				_this._betContainer.on(event, _this.onTouchStart, _this);
-			});
-	
-			['touchend', 'mouseup', 'pointerup'].forEach(function (event) {
-				_this._betContainer.on(event, _this.onTouchEnd, _this);
-			});
-	
-			_this._betContainer.addChild(betSprite);
-			_this._betContainer.addChild(chipValueText);
-			return _this;
-		}
-	
-		_createClass(BetView, [{
-			key: 'onClick',
-			value: function onClick() {
-				this.onClickCb ? this.onClickCb.call(this.cbCtx) : console.log('betClickEvent (betView)');
-			}
-	
-			/**
-	   * Функция вызывается при окончании движения ставки на уже существующем спрайте.
-	   * Тут есть небольшой косяк: вьюха будет знать о модели, т.к. данную функцию
-	   * нельзя вызвать ниоткуда, кроме как событиями 'touchend','mouseup','pointerup' (PIXI-events)
-	   * @param event
-	   */
-	
-		}, {
-			key: 'onTouchEnd',
-			value: function onTouchEnd(event) {
-				this.onTouchEndCb ? this.onTouchEndCb.call(this.cbCtx, event) : console.log('betTouchEnd (BetView)');
-			}
-		}, {
-			key: 'onTouchStart',
-			value: function onTouchStart() {
-				_transferFactory.transferFactory.betTouchStart = true;
-			}
-	
-			/**
-	   * Функция апдейта спрайта ставки
-	   * Текст значения добавляется на последнюю фишку в контейнере
-	   * @param value - значение, на которое нало увеличить ставку
-	   */
-	
-		}, {
-			key: 'updateBet',
-			value: function updateBet(value) {
-				this._summ += value;
-	
-				var spriteContainer = this.betViewContainer;
-	
-				var betSprites = this.calculateSprites(this._summ);
-	
-				var sortChipSmTypeArr = [];
-				for (var key in betSprites) {
-					sortChipSmTypeArr.push(key);
-				}sortChipSmTypeArr.reverse();
-	
-				spriteContainer.removeChildren();
-	
-				var count = 0;
-				sortChipSmTypeArr.forEach(function (chipSmType, idx) {
-					for (var i = 0; i < betSprites[chipSmType]; i += 1) {
-						var newSprite = new _pixi2.default.Sprite(_spritesStore.spritesStore.chips[chipSmType]);
-						newSprite.anchor.set(0.5);
-						newSprite.y -= count * 5;
-						spriteContainer.addChild(newSprite);
-						count++;
-					}
-				});
-	
-				if (spriteContainer.children.length) {
-					var chipValueText = new _pixi2.default.Text(_helpFunctions._hf.formatChipValue(this._summ), _styles.styles.chipSmTextStyle);
-					chipValueText.anchor.set(0.5, 0.6);
-	
-					spriteContainer.children[spriteContainer.children.length - 1].addChild(chipValueText);
-				}
-	
-				this.updateBetModel ? this.updateBetModel.call(this.cbCtx) : console.log('updateBetModel (betView)', this.updateBetModel);
-			}
-	
-			/**
-	   * Функция рассчитывает какое количество каких типов фишек нужно для данного значения
-	   * @param value
-	   */
-	
-		}, {
-			key: 'calculateSprites',
-			value: function calculateSprites(value) {
-				var ranges = [];
-				for (var key in _chipValues.smallChipTypes) {
-					ranges.push(_chipValues.smallChipTypes[key]);
-				}ranges.sort(function (a, b) {
-					return a < b;
-				});
-	
-				var q = {}; // объект вида {100: 1, 500:2} - одна фишка значения 100, две по 500
-				ranges.forEach(function (range) {
-					var num = Math.floor(value / range);
-					if (num > 0) {
-						q[range] = num;
-						value -= q[range] * range;
-					}
-				});
-	
-				var q2 = {}; // объект вида {chipSm0: 1, chipSm1:2} - одна фишка типа chipSm0, две chipSm1
-				for (var _chipType in _chipValues.smallChipTypes) {
-					for (var chipValue in q) {
-						if (_chipValues.smallChipTypes[_chipType] === +chipValue) q2[_chipType] = q[chipValue];
-					}
-				}
-	
-				return q2;
-			}
-		}, {
-			key: 'getTopChipValue',
-			value: function getTopChipValue() {
-				var betSprites = this.calculateSprites(this._summ);
-	
-				var sortChipSmTypeArr = [];
-				for (var key in betSprites) {
-					sortChipSmTypeArr.push(key);
-				}var value = _chipValues.smallChipTypes[sortChipSmTypeArr[0]];
-	
-				return value;
-			}
-		}, {
-			key: 'betViewContainer',
-			get: function get() {
-				return this._betContainer;
-			}
-		}]);
-	
-		return BetView;
-	}(_pixi2.default.Sprite);
-	
-	exports.default = BetView;
-
-/***/ },
-/* 161 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _buttonPanelView = __webpack_require__(162);
+	var _buttonPanelView = __webpack_require__(152);
 	
 	var _buttonPanelView2 = _interopRequireDefault(_buttonPanelView);
 	
@@ -30378,7 +29584,7 @@
 	exports.default = ButtonController;
 
 /***/ },
-/* 162 */
+/* 152 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -30395,32 +29601,26 @@
 	
 	var _spritesStore = __webpack_require__(141);
 	
-	var _defaultPositions = __webpack_require__(144);
+	var _defaultPositions = __webpack_require__(148);
 	
-	var _styles = __webpack_require__(151);
+	var _styles = __webpack_require__(150);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-	
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-	
-	var ButtonView = function (_PIXI$Sprite) {
-		_inherits(ButtonView, _PIXI$Sprite);
-	
+	var ButtonView = function () {
 		function ButtonView(btnType, config) {
+			var _this = this;
+	
 			_classCallCheck(this, ButtonView);
 	
-			var _this = _possibleConstructorReturn(this, (ButtonView.__proto__ || Object.getPrototypeOf(ButtonView)).call(this));
-	
-			_this.onClickCb = config.onClickCb ? config.onClickCb : undefined;
-			_this.cbCtx = config.ctx ? config.ctx : _this;
+			this.onClickCb = config.onClickCb ? config.onClickCb : undefined;
+			this.cbCtx = config.ctx ? config.ctx : this;
 	
 			// Контейнер для фишки с тенью и текстом
 			var spriteContainer = new _pixi2.default.Container();
-			_this._spriteContainer = spriteContainer;
+			this._spriteContainer = spriteContainer;
 	
 			spriteContainer.interactive = true;
 			spriteContainer.buttonMode = true;
@@ -30429,9 +29629,9 @@
 			spriteContainer.y = _defaultPositions.defaultPositions.buttons[btnType].y;
 	
 			if (btnType === 'btnCancel' || btnType === 'btnClear') {
-				_this._sqrBtn = _this.squareBtnCreate(btnType);
+				this._sqrBtn = this.squareBtnCreate(btnType);
 			} else {
-				_this._rndBtn = _this.roundBtnCreate(btnType);
+				this._rndBtn = this.roundBtnCreate(btnType);
 			}
 	
 			['tap', 'click', 'pointertap'].forEach(function (event) {
@@ -30441,7 +29641,6 @@
 			['touchstart', 'mousedown', 'pointerdown'].forEach(function (event) {
 				spriteContainer.on(event, _this.onTouchStart, _this);
 			});
-			return _this;
 		}
 	
 		_createClass(ButtonView, [{
@@ -30567,12 +29766,821 @@
 		}]);
 	
 		return ButtonView;
-	}(_pixi2.default.Sprite);
+	}();
 	
 	exports.default = ButtonView;
 
 /***/ },
-/* 163 */
+/* 153 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _chipView = __webpack_require__(154);
+	
+	var _chipView2 = _interopRequireDefault(_chipView);
+	
+	var _chipValues = __webpack_require__(155);
+	
+	var _betStore = __webpack_require__(162);
+	
+	var _touchEvents = __webpack_require__(161);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var ChipController = function () {
+		function ChipController() {
+			var _this = this;
+	
+			_classCallCheck(this, ChipController);
+	
+			var config = {
+				onClickCb: this.onClick,
+				chipTouchStartCb: this.chipTouchStart,
+				ctx: this
+			};
+	
+			this._chips = {};
+	
+			['chip0', 'chip1', 'chip2', 'chip3', 'chip4'].forEach(function (item) {
+				var chip = new _chipView2.default(item, config);
+				_this._chips[item] = chip;
+			});
+		}
+	
+		_createClass(ChipController, [{
+			key: 'onClick',
+			value: function onClick(price) {
+				var chipType = this.returnChipType(price),
+				    thisChip = this.chips[chipType];
+	
+				for (var key in this.chips) {
+					if (this.chips[key] === thisChip) {
+						thisChip.active ? thisChip.setDefault() : thisChip.setActive();
+					} else if (this.chips[key].active) {
+						this.chips[key].setDefault();
+					}
+				}
+	
+				_betStore.betStore.activeChip = thisChip.active ? thisChip.chipData() : undefined;
+			}
+		}, {
+			key: 'chipTouchStart',
+			value: function chipTouchStart(price) {
+				var chipType = this.returnChipType(price);
+				_betStore.betStore.activeChip = { value: price, type: chipType };
+			}
+		}, {
+			key: 'returnChipType',
+			value: function returnChipType(price) {
+				var chipType = void 0;
+				for (var key in _chipValues.chipValues) {
+					if (_chipValues.chipValues[key] === price) chipType = key;
+				}return chipType;
+			}
+		}, {
+			key: 'getActiveChip',
+			value: function getActiveChip() {
+				var chipActive = void 0;
+	
+				for (var chip in this.chips) {
+					if (this.chips[chip].active) chipActive = this.chips[chip];
+				}
+	
+				return chipActive;
+			}
+		}, {
+			key: 'chips',
+			get: function get() {
+				return this._chips;
+			}
+		}]);
+	
+		return ChipController;
+	}();
+	
+	exports.default = ChipController;
+
+/***/ },
+/* 154 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _pixi = __webpack_require__(1);
+	
+	var _pixi2 = _interopRequireDefault(_pixi);
+	
+	var _spritesStore = __webpack_require__(141);
+	
+	var _defaultPositions = __webpack_require__(148);
+	
+	var _chipValues = __webpack_require__(155);
+	
+	var _styles = __webpack_require__(150);
+	
+	var _helpFunctions = __webpack_require__(156);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var ChipView = function () {
+		function ChipView(chipType, config) {
+			var _this = this;
+	
+			_classCallCheck(this, ChipView);
+	
+			this.onClickCb = config.onClickCb ? config.onClickCb : undefined;
+			this.chipTouchStartCb = config.chipTouchStartCb ? config.chipTouchStartCb : undefined;
+			this.cbCtx = config.ctx ? config.ctx : this;
+	
+			// Контейнер для фишки с тенью и текстом
+			var spriteContainer = new _pixi2.default.Container();
+			this._spriteContainer = spriteContainer;
+	
+			spriteContainer.x = _defaultPositions.defaultPositions.chips[chipType].x;
+			spriteContainer.y = _defaultPositions.defaultPositions.chips[chipType].y;
+	
+			var sprite = new _pixi2.default.Sprite(_spritesStore.spritesStore.chips[chipType]);
+	
+			// Opt-in to interactivity
+			sprite.interactive = true;
+			// Shows hand cursor
+			sprite.buttonMode = true;
+			sprite.anchor.set(0.5);
+	
+			// Тень под фишкой
+			var shadow = new _pixi2.default.Sprite(_spritesStore.spritesStore.chips.chipShadow);
+			shadow.anchor.set(0.5);
+	
+			// Значение ставки на фишке
+			this.chipValue = _chipValues.chipValues[chipType];
+			this.chipType = chipType;
+			var chipValueText = new _pixi2.default.Text(_helpFunctions._hf.formatChipValue(this.chipValue), _styles.styles.chipTextStyle);
+			chipValueText.anchor.set(0.5);
+	
+			['touchend', 'mouseup', 'pointerup'].forEach(function (event) {
+				sprite.on(event, _this.chipTouchEnd, _this);
+			});
+	
+			['touchstart', 'mousedown', 'pointerdown'].forEach(function (event) {
+				sprite.on(event, _this.chipTouchStart, _this);
+			});
+	
+			spriteContainer.addChild(shadow).addChild(sprite).addChild(chipValueText);
+	
+			this.active = false;
+		}
+	
+		_createClass(ChipView, [{
+			key: 'chipTouchEnd',
+			value: function chipTouchEnd() {
+				this.onClickCb ? this.onClickCb.call(this.cbCtx, this.chipValue) : console.log('chipClickEvent (ChipView)', this.chipValue);
+			}
+		}, {
+			key: 'chipTouchStart',
+			value: function chipTouchStart() {
+				this.chipTouchStartCb ? this.chipTouchStartCb.call(this.cbCtx, this.chipValue) : console.log('chipTouchMove (ChipView)', this.chipValue);
+			}
+		}, {
+			key: 'setActive',
+			value: function setActive() {
+				this.active = true;
+	
+				this.sprite.children.forEach(function (childSprite) {
+					childSprite.scale.x += 0.15;
+					childSprite.scale.y += 0.15;
+				});
+			}
+		}, {
+			key: 'setDefault',
+			value: function setDefault() {
+				this.active = false;
+	
+				this.sprite.children.forEach(function (childSprite) {
+					childSprite.scale.x -= 0.15;
+					childSprite.scale.y -= 0.15;
+				});
+			}
+		}, {
+			key: 'chipData',
+			value: function chipData() {
+				return { value: this.chipValue, type: this.chipType };
+			}
+		}, {
+			key: 'sprite',
+			get: function get() {
+				return this._spriteContainer;
+			}
+		}, {
+			key: 'active',
+			set: function set(active) {
+				this._active = active;
+			},
+			get: function get() {
+				return this._active;
+			}
+		}]);
+	
+		return ChipView;
+	}();
+	
+	exports.default = ChipView;
+
+/***/ },
+/* 155 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	var chipValues = {
+		chip0: 100,
+		chip1: 500,
+		chip2: 1000,
+		chip3: 2000,
+		chip4: 3000
+	};
+	
+	var smallChipTypes = {
+		chipSm0: chipValues.chip0,
+		chipSm1: chipValues.chip1,
+		chipSm2: chipValues.chip2,
+		chipSm3: chipValues.chip3,
+		chipSm4: chipValues.chip4
+	};
+	
+	var floatChipTypes = {},
+	    count = 0;
+	for (var key in chipValues) {
+		floatChipTypes[chipValues[key]] = 'fChip' + count++;
+	}
+	
+	exports.chipValues = chipValues;
+	exports.smallChipTypes = smallChipTypes;
+	exports.floatChipTypes = floatChipTypes;
+
+/***/ },
+/* 156 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	/**
+	 * Проверка принадлежности по координатам
+	 * @param pos - {x, y}
+	 * @param bounds - {x, y, width, height}
+	 */
+	function isPosInBounds(pos, bounds) {
+	  return pos.x >= bounds.x && pos.x <= bounds.x + bounds.width && pos.y >= bounds.y && pos.y <= bounds.y + bounds.height;
+	}
+	
+	/**
+	 * Форматирование значения ставки
+	 * @param value
+	 * @returns {string}
+	 */
+	function formatChipValue(value) {
+	  var str = value >= 1000 ? value / 1000 + 'K' : value;
+	  return str;
+	}
+	
+	var _hf = {
+	  isPosInBounds: isPosInBounds,
+	  formatChipValue: formatChipValue
+	};
+	
+	exports._hf = _hf;
+
+/***/ },
+/* 157 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _floatChipView = __webpack_require__(158);
+	
+	var _floatChipView2 = _interopRequireDefault(_floatChipView);
+	
+	var _chipValues = __webpack_require__(155);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var FloatChipController = function () {
+		function FloatChipController(configByGameCtrl) {
+			_classCallCheck(this, FloatChipController);
+	
+			this.onTouchEndCb = configByGameCtrl.onTouchEndCb ? configByGameCtrl.onTouchEndCb : undefined;
+			this.cbCtx = configByGameCtrl.ctx ? configByGameCtrl.ctx : this;
+	
+			var config = {
+				viewFloatChip: this.viewFloatChip,
+				setPosition: this.setPosition,
+				onTouchEndCb: this.onTouchEnd,
+				ctx: this
+			};
+	
+			this._floatChipsSprite = new _floatChipView2.default(config);
+		}
+	
+		_createClass(FloatChipController, [{
+			key: 'viewFloatChip',
+			value: function viewFloatChip(value) {
+				this._floatChipsSprite.viewFloatChip(_chipValues.floatChipTypes[value], value);
+			}
+		}, {
+			key: 'hideFloatChip',
+			value: function hideFloatChip() {
+				this._floatChipsSprite.hideFloatChips();
+			}
+		}, {
+			key: 'setPosition',
+			value: function setPosition(pos) {
+				this._floatChipsSprite.setPosition(pos);
+			}
+		}, {
+			key: 'onTouchEnd',
+			value: function onTouchEnd(event) {
+				this.onTouchEndCb ? this.onTouchEndCb.call(this.cbCtx, event) : console.log('floatChipTouchEnd (FloatChipController)');
+			}
+		}, {
+			key: 'getFloatChipsSprite',
+			get: function get() {
+				return this._floatChipsSprite.floatChipContainer;
+			}
+		}]);
+	
+		return FloatChipController;
+	}();
+	
+	exports.default = FloatChipController;
+
+/***/ },
+/* 158 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _pixi = __webpack_require__(1);
+	
+	var _pixi2 = _interopRequireDefault(_pixi);
+	
+	var _spritesStore = __webpack_require__(141);
+	
+	var _styles = __webpack_require__(150);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var FloatChipView = function () {
+		function FloatChipView(config) {
+			var _this = this;
+	
+			_classCallCheck(this, FloatChipView);
+	
+			this.onTouchEndCb = config.onTouchEndCb ? config.onTouchEndCb : undefined;
+			this.cbCtx = config.ctx ? config.ctx : this;
+	
+			// Контейнер для плавающей фишки
+			this._floatChipsContainer = new _pixi2.default.Container();
+			this._floatChipsContainer.x = 50;
+			this._floatChipsContainer.y = 50;
+			this._floatChipsContainer.visible = false;
+			this._floatChipsContainer.interactive = true;
+	
+			['touchend', 'mouseup', 'pointerup'].forEach(function (event) {
+				_this._floatChipsContainer.on(event, _this.onTouchEnd, _this);
+			});
+	
+			['chipSm0', 'chipSm1', 'chipSm2', 'chipSm3', 'chipSm4'].forEach(function (chipType) {
+				var floatChipSprite = new _pixi2.default.Sprite(_spritesStore.spritesStore.chips[chipType]);
+				// floatChipSprite.visible = false;
+				floatChipSprite.anchor.set(0.5);
+				_this._floatChipsContainer.addChild(floatChipSprite);
+			});
+	
+			// Значение на фишке
+			var chipValueText = new _pixi2.default.Text(';)', _styles.styles.floatChipTextStyle);
+			chipValueText.visible = false;
+			this._floatChipsContainer.addChild(chipValueText);
+			chipValueText.anchor.x = 0.5;
+			chipValueText.anchor.y = 0.55;
+		}
+	
+		/**
+	  * Возвращает контейнер со спрайтами фишек, тенью и текстом
+	  * @returns {PIXI.Container|*}
+	  */
+	
+	
+		_createClass(FloatChipView, [{
+			key: 'onTouchEnd',
+			value: function onTouchEnd(event) {
+				this.onTouchEndCb ? this.onTouchEndCb.call(this.cbCtx, event) : console.log('floatChipTouchEnd (FloatChipView)');
+			}
+	
+			/**
+	   * Функция показывает плавающую фишку
+	   * @param type - тип показываемой фишки
+	   * @param text - устанавливаемый текст
+	   */
+	
+		}, {
+			key: 'viewFloatChip',
+			value: function viewFloatChip(type, value) {
+				var arr = ['fChip0', 'fChip1', 'fChip2', 'fChip3', 'fChip4'],
+				    idx = arr.indexOf(type);
+	
+				this.hideFloatChips();
+	
+				this._floatChipsContainer.visible = true;
+				this._floatChipsContainer.children[idx].visible = true;
+	
+				this._floatChipsContainer.children[5].text = this.formatChipValue(value);
+				this._floatChipsContainer.children[5].visible = true;
+			}
+	
+			/**
+	   * Скрывает все фишки и текст с тенью
+	   */
+	
+		}, {
+			key: 'hideFloatChips',
+			value: function hideFloatChips() {
+				this._floatChipsContainer.children.forEach(function (fChip) {
+					fChip.visible = false;
+				});
+			}
+	
+			/**
+	   * Установка позиции контейнера со спрайтом фишки
+	   * @param pos - {x: Number, y: Number}
+	   */
+	
+		}, {
+			key: 'setPosition',
+			value: function setPosition(pos) {
+				this._floatChipsContainer.x = pos.x;
+				this._floatChipsContainer.y = pos.y;
+			}
+	
+			/**
+	   * Форматирование значения ставки
+	   * @param value
+	   * @returns {string}
+	   */
+	
+		}, {
+			key: 'formatChipValue',
+			value: function formatChipValue(value) {
+				var str = value;
+				str = str.toString();
+				return str.length > 3 ? str.substring(0, 1) + 'K' : value;
+			}
+		}, {
+			key: 'floatChipContainer',
+			get: function get() {
+				return this._floatChipsContainer;
+			}
+		}]);
+	
+		return FloatChipView;
+	}();
+	
+	exports.default = FloatChipView;
+
+/***/ },
+/* 159 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _betView = __webpack_require__(160);
+	
+	var _betView2 = _interopRequireDefault(_betView);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var BetController = function () {
+		function BetController(configByGameCtrl) {
+			_classCallCheck(this, BetController);
+	
+			this.onTouchEndCb = configByGameCtrl.onTouchEndCb ? configByGameCtrl.onTouchEndCb : undefined;
+	
+			this.onTouchStartCb = configByGameCtrl.onTouchStartCb ? configByGameCtrl.onTouchStartCb : undefined;
+	
+			this.deleteBetCb = configByGameCtrl.deleteBetCb ? configByGameCtrl.deleteBetCb : undefined;
+	
+			this.cbCtx = configByGameCtrl.ctx ? configByGameCtrl.ctx : this;
+	
+			var config = {
+				pos: configByGameCtrl.pos,
+				onTouchStartCb: this.touchStart,
+				updateBetModel: this.updateBetModel,
+				onTouchEndCb: this.onTouchEnd,
+				ctx: this
+			};
+	
+			this._betView = new _betView2.default(config, configByGameCtrl.value);
+		}
+	
+		_createClass(BetController, [{
+			key: 'touchStart',
+			value: function touchStart(price) {}
+		}, {
+			key: 'updateBetView',
+			value: function updateBetView(value) {
+				this._betView.updateBet(value);
+			}
+	
+			/**
+	   * Вызывается вьюхой
+	   */
+	
+		}, {
+			key: 'updateBetModel',
+			value: function updateBetModel() {
+				if (this._betView.balance === 0) {
+					console.log('удаляем ставку');
+					this.deleteBetCb ? this.deleteBetCb.call(this.cbCtx, this) : console.log('betDelete (BetController)');
+				} else {
+					console.log('апдейтим модель ставки');
+				}
+			}
+		}, {
+			key: 'onTouchEnd',
+			value: function onTouchEnd(event) {
+				this.onTouchEndCb ? this.onTouchEndCb.call(this.cbCtx, event) : console.log('betTouchEnd (BetController)');
+			}
+		}, {
+			key: 'getTopChipValue',
+			value: function getTopChipValue() {
+				return this._betView.getTopChipValue();
+			}
+		}, {
+			key: 'betSprite',
+			get: function get() {
+				return this._betView.betViewContainer;
+			}
+		}, {
+			key: 'balance',
+			get: function get() {
+				return this._betView.balance;
+			}
+		}]);
+	
+		return BetController;
+	}();
+	
+	exports.default = BetController;
+
+/***/ },
+/* 160 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _pixi = __webpack_require__(1);
+	
+	var _pixi2 = _interopRequireDefault(_pixi);
+	
+	var _spritesStore = __webpack_require__(141);
+	
+	var _styles = __webpack_require__(150);
+	
+	var _chipValues = __webpack_require__(155);
+	
+	var _helpFunctions = __webpack_require__(156);
+	
+	var _touchEvents = __webpack_require__(161);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var BetView = function () {
+		function BetView(config, value) {
+			var _this = this;
+	
+			_classCallCheck(this, BetView);
+	
+			this._summ = value ? value : 0;
+	
+			var chipType = 'chipSm0';
+			for (var smChipKey in _chipValues.smallChipTypes) {
+				if (_chipValues.smallChipTypes[smChipKey] === value) chipType = smChipKey;
+			}this.onClickCb = config.onClickCb ? config.onClickCb : undefined;
+			this.onTouchEndCb = config.onTouchEndCb ? config.onTouchEndCb : undefined;
+			this.onTouchStartCb = config.onTouchStartCb ? config.onTouchStartCb : undefined;
+			this.updateBetModel = config.updateBetModel ? config.updateBetModel : undefined;
+			this.cbCtx = config.ctx ? config.ctx : this;
+	
+			this._betContainer = new _pixi2.default.Container();
+			this._betContainer.x = config.pos.x;
+			this._betContainer.y = config.pos.y;
+	
+			this._betContainer.interactive = true;
+	
+			var betSprite = new _pixi2.default.Sprite(_spritesStore.spritesStore.chips[chipType]);
+			betSprite.anchor.set(0.5);
+	
+			var chipValueText = new _pixi2.default.Text(_helpFunctions._hf.formatChipValue(value), _styles.styles.chipSmTextStyle);
+			chipValueText.anchor.set(0.5);
+	
+			['touchstart', 'mousedown', 'pointerdown'].forEach(function (event) {
+				_this._betContainer.on(event, _this.onTouchStart, _this);
+			});
+	
+			['touchend', 'mouseup', 'pointerup'].forEach(function (event) {
+				_this._betContainer.on(event, _this.onTouchEnd, _this);
+			});
+	
+			this._betContainer.addChild(betSprite);
+			this._betContainer.addChild(chipValueText);
+		}
+	
+		_createClass(BetView, [{
+			key: 'onClick',
+			value: function onClick() {
+				this.onClickCb ? this.onClickCb.call(this.cbCtx) : console.log('betClickEvent (betView)');
+			}
+	
+			/**
+	   * Функция вызывается при окончании движения ставки на уже существующем спрайте.
+	   * Тут есть небольшой косяк: вьюха будет знать о модели, т.к. данную функцию
+	   * нельзя вызвать ниоткуда, кроме как событиями 'touchend','mouseup','pointerup' (PIXI-events)
+	   * @param event
+	   */
+	
+		}, {
+			key: 'onTouchEnd',
+			value: function onTouchEnd(event) {
+				this.onTouchEndCb ? this.onTouchEndCb.call(this.cbCtx, event) : console.log('betTouchEnd (BetView)');
+			}
+		}, {
+			key: 'onTouchStart',
+			value: function onTouchStart() {
+				_touchEvents._tev.setEvent(_touchEvents._tevStore.BET_TOUCH_START);
+	
+				this.onTouchStartCb ? this.onTouchStartCb.call(this.cbCtx, this.getTopChipValue()) : console.log('betTouchStart (BetView)');
+			}
+	
+			/**
+	   * Функция апдейта спрайта ставки
+	   * Текст значения добавляется на последнюю фишку в контейнере
+	   * @param value - значение, на которое нало увеличить ставку
+	   */
+	
+		}, {
+			key: 'updateBet',
+			value: function updateBet(value) {
+				this._summ += value;
+	
+				var spriteContainer = this.betViewContainer;
+	
+				var betSprites = this.calculateSprites(this._summ);
+	
+				var sortChipSmTypeArr = [];
+				for (var key in betSprites) {
+					sortChipSmTypeArr.push(key);
+				}sortChipSmTypeArr.reverse();
+	
+				spriteContainer.removeChildren();
+	
+				var count = 0;
+				sortChipSmTypeArr.forEach(function (chipSmType, idx) {
+					for (var i = 0; i < betSprites[chipSmType]; i += 1) {
+						var newSprite = new _pixi2.default.Sprite(_spritesStore.spritesStore.chips[chipSmType]);
+						newSprite.anchor.set(0.5);
+						newSprite.y -= count * 5;
+						spriteContainer.addChild(newSprite);
+						count++;
+					}
+				});
+	
+				if (spriteContainer.children.length) {
+					var chipValueText = new _pixi2.default.Text(_helpFunctions._hf.formatChipValue(this._summ), _styles.styles.chipSmTextStyle);
+					chipValueText.anchor.set(0.5, 0.6);
+	
+					spriteContainer.children[spriteContainer.children.length - 1].addChild(chipValueText);
+				}
+	
+				this.updateBetModel ? this.updateBetModel.call(this.cbCtx) : console.log('updateBetModel (betView)', this.updateBetModel);
+			}
+	
+			/**
+	   * Функция рассчитывает какое количество каких типов фишек нужно для данного значения
+	   * @param value
+	   */
+	
+		}, {
+			key: 'calculateSprites',
+			value: function calculateSprites(value) {
+				var ranges = [];
+				for (var key in _chipValues.smallChipTypes) {
+					ranges.push(_chipValues.smallChipTypes[key]);
+				}ranges.sort(function (a, b) {
+					return a < b;
+				});
+	
+				var q = {}; // объект вида {100: 1, 500:2} - одна фишка значения 100, две по 500
+				ranges.forEach(function (range) {
+					var num = Math.floor(value / range);
+					if (num > 0) {
+						q[range] = num;
+						value -= q[range] * range;
+					}
+				});
+	
+				var q2 = {}; // объект вида {chipSm0: 1, chipSm1:2} - одна фишка типа chipSm0, две chipSm1
+				for (var _chipType in _chipValues.smallChipTypes) {
+					for (var chipValue in q) {
+						if (_chipValues.smallChipTypes[_chipType] === +chipValue) q2[_chipType] = q[chipValue];
+					}
+				}
+	
+				return q2;
+			}
+		}, {
+			key: 'getTopChipValue',
+			value: function getTopChipValue() {
+				var betSprites = this.calculateSprites(this._summ);
+	
+				var sortChipSmTypeArr = [];
+				for (var key in betSprites) {
+					sortChipSmTypeArr.push(key);
+				}var value = _chipValues.smallChipTypes[sortChipSmTypeArr[0]];
+	
+				return value;
+			}
+		}, {
+			key: 'betViewContainer',
+			get: function get() {
+				return this._betContainer;
+			}
+		}, {
+			key: 'balance',
+			get: function get() {
+				return this._summ;
+			}
+		}]);
+	
+		return BetView;
+	}();
+	
+	exports.default = BetView;
+
+/***/ },
+/* 161 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -30585,9 +30593,90 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var betModelClass = function () {
-		function betModelClass() {
-			_classCallCheck(this, betModelClass);
+	var touchEventsStore = {
+		BET_TOUCH_START: 'betTouchStart',
+		BET_TOUCH_MOVE: 'betTouchMove',
+		CHIP_TOUCH_START: 'chipTouchStart',
+		CHIP_TOUCH_MOVE: 'chipTouchMove',
+		FLOAT_CHIP_MOVE: 'floatChipMove'
+	};
+	
+	var touchEventsClass = function () {
+		function touchEventsClass() {
+			_classCallCheck(this, touchEventsClass);
+	
+			this._touchStates = {};
+			for (var key in touchEventsStore) {
+				this._touchStates[touchEventsStore[key]] = false;
+			}
+		}
+	
+		/**
+	  * Вовзращает/устанавливает активное состояние
+	  * @returns {*}
+	  */
+	
+	
+		_createClass(touchEventsClass, [{
+			key: 'clearEvents',
+			value: function clearEvents() {
+				for (var key in this._touchStates) {
+					this._touchStates[key] = false;
+				}
+			}
+		}, {
+			key: 'cancelEvent',
+			value: function cancelEvent(event) {
+				this._touchStates[event] = false;
+			}
+		}, {
+			key: 'setEvent',
+			value: function setEvent(event) {
+				this.clearEvents();
+				this._touchStates[event] = true;
+			}
+		}, {
+			key: 'isActive',
+			value: function isActive(event) {
+				return this._touchStates[event];
+			}
+		}, {
+			key: 'touchState',
+			get: function get() {
+				var activeState = void 0;
+				for (var key in this._touchStates) {
+					activeState = this._touchStates[key] ? key : 'undefined';
+				}
+				return activeState;
+			}
+		}]);
+	
+		return touchEventsClass;
+	}();
+	
+	var instance = new touchEventsClass();
+	Object.freeze(instance);
+	
+	exports._tevStore = touchEventsStore;
+	exports._tev = instance;
+
+/***/ },
+/* 162 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var betStoreClass = function () {
+		function betStoreClass() {
+			_classCallCheck(this, betStoreClass);
 	
 			this.bets = {};
 			this.betsCtrl = {};
@@ -30611,7 +30700,7 @@
 	  */
 	
 	
-		_createClass(betModelClass, [{
+		_createClass(betStoreClass, [{
 			key: 'clearBets',
 	
 	
@@ -30682,15 +30771,43 @@
 			get: function get() {
 				return this._currentBetSum;
 			}
+	
+			/**
+	   * Активный тип ставки (одна из фишек на панели - 100/500/1К...)
+	   * @param chip
+	   */
+	
+		}, {
+			key: 'activeChip',
+			set: function set(chip) {
+				this._activeChip = chip;
+			},
+			get: function get() {
+				return this._activeChip;
+			}
+	
+			/**
+	   * Активный тип ставки (одна из фишек на панели - 100/500/1К...)
+	   * @param chip
+	   */
+	
+		}, {
+			key: 'floatChip',
+			set: function set(chip) {
+				this._floatChip = chip;
+			},
+			get: function get() {
+				return this._floatChip;
+			}
 		}]);
 	
-		return betModelClass;
+		return betStoreClass;
 	}();
 	
-	var instance = new betModelClass();
-	Object.freeze(instance);
+	var instance = new betStoreClass();
+	// Object.preventExtensions(instance); - не хочет работать 'set activeChip'
 	
-	exports.betModel = instance;
+	exports.betStore = instance;
 
 /***/ }
 /******/ ]);

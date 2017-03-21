@@ -3,12 +3,10 @@ import {spritesStore} from './../../spritesStore';
 import {styles} from './../../constants/styles';
 import {smallChipTypes} from './../../constants/chipValues';
 import {_hf} from './../../servises/helpFunctions'
-import {transferFactory} from './../../servises/transferFactory'
+import {_tevStore, _tev} from './../../servises/touchEvents'
 
-export default class BetView extends PIXI.Sprite {
+export default class BetView {
 	constructor(config, value) {
-		super();
-
 		this._summ = (value) ? value : 0;
 
 		let chipType = 'chipSm0';
@@ -17,6 +15,7 @@ export default class BetView extends PIXI.Sprite {
 
 		this.onClickCb = (config.onClickCb) ? config.onClickCb : undefined;
 		this.onTouchEndCb = (config.onTouchEndCb) ? config.onTouchEndCb : undefined;
+		this.onTouchStartCb = (config.onTouchStartCb) ? config.onTouchStartCb : undefined;
 		this.updateBetModel = (config.updateBetModel) ? config.updateBetModel : undefined;
 		this.cbCtx = (config.ctx) ? config.ctx : this;
 
@@ -66,8 +65,16 @@ export default class BetView extends PIXI.Sprite {
 			console.log('betTouchEnd (BetView)');
 	}
 
+	get balance(){
+		return this._summ;
+	}
+
 	onTouchStart(){
-		transferFactory.betTouchStart = true;
+		_tev.setEvent(_tevStore.BET_TOUCH_START);
+
+		this.onTouchStartCb ?
+			this.onTouchStartCb.call(this.cbCtx, this.getTopChipValue()) :
+			console.log('betTouchStart (BetView)');
 	}
 
 	/**

@@ -3,10 +3,8 @@ import {defaultPositions} from './../../constants/defaultPositions';
 import {clickAreas, pointMap} from './gameFieldCellMap';
 import {styles} from './../../constants/styles';
 
-export default class GameFieldView extends PIXI.Sprite {
+export default class GameFieldView {
 	constructor(config) {
-		super();
-
 		this.onClickCb = (config.onClickCb) ? config.onClickCb : undefined;
 		this.onHoverCb = (config.onHoverCb) ? config.onHoverCb : undefined;
 		this.cbCtx = (config.ctx) ? config.ctx : this;

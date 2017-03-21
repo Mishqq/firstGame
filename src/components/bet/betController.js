@@ -1,5 +1,4 @@
 import BetView from './betView';
-import {floatChipTypes} from './../../constants/chipValues';
 
 export default class BetController {
 	constructor(configByGameCtrl) {
@@ -9,11 +8,14 @@ export default class BetController {
 		this.onTouchStartCb = (configByGameCtrl.onTouchStartCb) ?
 			configByGameCtrl.onTouchStartCb : undefined;
 
+		this.deleteBetCb = (configByGameCtrl.deleteBetCb) ?
+			configByGameCtrl.deleteBetCb : undefined;
+
 		this.cbCtx = (configByGameCtrl.ctx) ? configByGameCtrl.ctx : this;
 
 		let config = {
 			pos: configByGameCtrl.pos,
-			onClick: this.onClick,
+			onTouchStartCb: this.touchStart,
 			updateBetModel: this.updateBetModel,
 			onTouchEndCb: this.onTouchEnd,
 			ctx: this
@@ -26,7 +28,11 @@ export default class BetController {
 		return this._betView.betViewContainer
 	}
 
-	onClick(event){
+	get balance(){
+		return this._betView.balance;
+	}
+
+	touchStart(price){
 
 	}
 
@@ -34,8 +40,18 @@ export default class BetController {
 		this._betView.updateBet(value);
 	}
 
+	/**
+	 * Вызывается вьюхой
+	 */
 	updateBetModel(){
-		console.log('апдейтим модель ставки');
+		if(this._betView.balance === 0){
+			console.log('удаляем ставку');
+			this.deleteBetCb ?
+				this.deleteBetCb.call(this.cbCtx, this) :
+				console.log('betDelete (BetController)');
+		} else {
+			console.log('апдейтим модель ставки');
+		}
 	}
 
 	onTouchEnd(event){
