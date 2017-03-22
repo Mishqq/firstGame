@@ -14,6 +14,7 @@ import ButtonController     from '../components/button/buttonPanelController';
 import ChipController       from './../components/chip/chipController';
 import FloatChipController  from './../components/floatChip/floatChipController';
 import BetController        from './../components/bet/betController';
+import TimeScaleController  from './../components/timeScale/timeScaleController';
 
 
 export default class GameController {
@@ -81,6 +82,15 @@ export default class GameController {
 				ctx: this
 			});
 			stage.addChild(this.floatChipContainer.getFloatChipsSprite);
+
+
+			this._timeScale = new TimeScaleController();
+			stage.addChild(this._timeScale.pixiSprite);
+			this._timeScale.start();
+			// setTimeout(() => {
+			// 	this._timeScale.pause();
+			// }, 3000);
+
 
 			game.start();
 		});

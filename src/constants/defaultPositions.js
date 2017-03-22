@@ -13,9 +13,10 @@ const defaultPositions = {
 		btnX2:          {x: 1570, y: 934}
 	},
 	fields: {
-		big: {x: 200, y: 300},
+		big: {x: 200, y: 350},
 		small: {x: 1200, y: 300}
-	}
+	},
+	timeScale: {x: 725, y: 320}
 };
 
 export {defaultPositions}

@@ -28256,9 +28256,9 @@
 	
 	var _assetsLoader = __webpack_require__(140);
 	
-	var _touchEvents = __webpack_require__(161);
+	var _touchEvents = __webpack_require__(143);
 	
-	var _betStore = __webpack_require__(162);
+	var _betStore = __webpack_require__(144);
 	
 	var _background = __webpack_require__(145);
 	
@@ -28283,6 +28283,10 @@
 	var _betController = __webpack_require__(159);
 	
 	var _betController2 = _interopRequireDefault(_betController);
+	
+	var _timeScaleController = __webpack_require__(161);
+	
+	var _timeScaleController2 = _interopRequireDefault(_timeScaleController);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -28357,6 +28361,14 @@
 						ctx: _this
 					});
 					stage.addChild(_this.floatChipContainer.getFloatChipsSprite);
+	
+					_this._timeScale = new _timeScaleController2.default();
+					stage.addChild(_this._timeScale.pixiSprite);
+					_this._timeScale.start();
+					// setTimeout(() => {
+					// 	this._timeScale.pause();
+					// }, 3000);
+	
 	
 					game.start();
 				});
@@ -28814,8 +28826,236 @@
 	exports.constants = constants;
 
 /***/ },
-/* 143 */,
-/* 144 */,
+/* 143 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var touchEventsStore = {
+		BET_TOUCH_START: 'betTouchStart',
+		BET_TOUCH_MOVE: 'betTouchMove',
+		CHIP_TOUCH_START: 'chipTouchStart',
+		CHIP_TOUCH_MOVE: 'chipTouchMove',
+		FLOAT_CHIP_MOVE: 'floatChipMove'
+	};
+	
+	var touchEventsClass = function () {
+		function touchEventsClass() {
+			_classCallCheck(this, touchEventsClass);
+	
+			this._touchStates = {};
+			for (var key in touchEventsStore) {
+				this._touchStates[touchEventsStore[key]] = false;
+			}
+		}
+	
+		/**
+	  * Вовзращает/устанавливает активное состояние
+	  * @returns {*}
+	  */
+	
+	
+		_createClass(touchEventsClass, [{
+			key: 'clearEvents',
+			value: function clearEvents() {
+				for (var key in this._touchStates) {
+					this._touchStates[key] = false;
+				}
+			}
+		}, {
+			key: 'cancelEvent',
+			value: function cancelEvent(event) {
+				this._touchStates[event] = false;
+			}
+		}, {
+			key: 'setEvent',
+			value: function setEvent(event) {
+				this.clearEvents();
+				this._touchStates[event] = true;
+			}
+		}, {
+			key: 'isActive',
+			value: function isActive(event) {
+				return this._touchStates[event];
+			}
+		}, {
+			key: 'touchState',
+			get: function get() {
+				var activeState = void 0;
+				for (var key in this._touchStates) {
+					activeState = this._touchStates[key] ? key : 'undefined';
+				}
+				return activeState;
+			}
+		}]);
+	
+		return touchEventsClass;
+	}();
+	
+	var instance = new touchEventsClass();
+	Object.freeze(instance);
+	
+	exports._tevStore = touchEventsStore;
+	exports._tev = instance;
+
+/***/ },
+/* 144 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var betStoreClass = function () {
+		function betStoreClass() {
+			_classCallCheck(this, betStoreClass);
+	
+			this.bets = {};
+			this.betsCtrl = {};
+	
+			this.proxy = new Proxy(this.bets, {
+				get: function get(target, prop) {
+					console.log('`Чтение ${prop}` ➠ ', '\u0427\u0442\u0435\u043D\u0438\u0435 ' + prop);
+					return target[prop];
+				},
+				set: function set(target, prop, value) {
+					console.log('`Запись ${prop} ${value}` ➠ ', '\u0417\u0430\u043F\u0438\u0441\u044C ' + prop + ' ' + value);
+					target[prop] = value;
+					return true;
+				}
+			});
+		}
+	
+		/**
+	  * Коллекция ставок с привязкой к полям
+	  * @param bets
+	  */
+	
+	
+		_createClass(betStoreClass, [{
+			key: 'clearBets',
+	
+	
+			/**
+	   * Очищаем все данные модели
+	   */
+			value: function clearBets() {
+				this.bets = [];
+				this.currentBetSum = 0;
+			}
+	
+			/**
+	   * Добавление ставки
+	   * @param bet - {field, bet}
+	   */
+	
+		}, {
+			key: 'addBet',
+			value: function addBet(bet) {
+				this.bets[bet.field] = bet.value;
+			}
+	
+			/**
+	   * Удаление ставки
+	   * @param field - название поля
+	   */
+	
+		}, {
+			key: 'removeBet',
+			value: function removeBet(field) {
+				this.bets[field] = undefined;
+			}
+		}, {
+			key: 'bets',
+			set: function set(bets) {
+				// this.proxy = bets; - если захотим попроксировать
+				this._bets = bets;
+			},
+			get: function get() {
+				// return this.proxy;
+				return this._bets;
+			}
+	
+			/**
+	   * Коллекция ставок с привязкой к полям
+	   * @param bets
+	   */
+	
+		}, {
+			key: 'betsCtrl',
+			set: function set(betsCtrl) {
+				this._betsCtrl = betsCtrl;
+			},
+			get: function get() {
+				return this._betsCtrl;
+			}
+	
+			/**
+	   * Текущая сумма ставок
+	   * @param bet
+	   */
+	
+		}, {
+			key: 'currentBetSum',
+			set: function set(bet) {
+				this._currentBetSum = bet;
+			},
+			get: function get() {
+				return this._currentBetSum;
+			}
+	
+			/**
+	   * Активный тип ставки (одна из фишек на панели - 100/500/1К...)
+	   * @param chip
+	   */
+	
+		}, {
+			key: 'activeChip',
+			set: function set(chip) {
+				this._activeChip = chip;
+			},
+			get: function get() {
+				return this._activeChip;
+			}
+	
+			/**
+	   * Активный тип ставки (одна из фишек на панели - 100/500/1К...)
+	   * @param chip
+	   */
+	
+		}, {
+			key: 'floatChip',
+			set: function set(chip) {
+				this._floatChip = chip;
+			},
+			get: function get() {
+				return this._floatChip;
+			}
+		}]);
+	
+		return betStoreClass;
+	}();
+	
+	var instance = new betStoreClass();
+	// Object.preventExtensions(instance); - не хочет работать 'set activeChip'
+	
+	exports.betStore = instance;
+
+/***/ },
 /* 145 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -28877,7 +29117,7 @@
 	
 	var _defaultPositions = __webpack_require__(148);
 	
-	var _betStore = __webpack_require__(162);
+	var _betStore = __webpack_require__(144);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -29327,9 +29567,10 @@
 			btnX2: { x: 1570, y: 934 }
 		},
 		fields: {
-			big: { x: 200, y: 300 },
+			big: { x: 200, y: 350 },
 			small: { x: 1200, y: 300 }
-		}
+		},
+		timeScale: { x: 725, y: 320 }
 	};
 	
 	exports.defaultPositions = defaultPositions;
@@ -29788,9 +30029,9 @@
 	
 	var _chipValues = __webpack_require__(155);
 	
-	var _betStore = __webpack_require__(162);
+	var _betStore = __webpack_require__(144);
 	
-	var _touchEvents = __webpack_require__(161);
+	var _touchEvents = __webpack_require__(143);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -30401,7 +30642,7 @@
 	
 	var _helpFunctions = __webpack_require__(156);
 	
-	var _touchEvents = __webpack_require__(161);
+	var _touchEvents = __webpack_require__(143);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -30581,7 +30822,7 @@
 
 /***/ },
 /* 161 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -30591,78 +30832,53 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
+	var _timeScaleView = __webpack_require__(162);
+	
+	var _timeScaleView2 = _interopRequireDefault(_timeScaleView);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var touchEventsStore = {
-		BET_TOUCH_START: 'betTouchStart',
-		BET_TOUCH_MOVE: 'betTouchMove',
-		CHIP_TOUCH_START: 'chipTouchStart',
-		CHIP_TOUCH_MOVE: 'chipTouchMove',
-		FLOAT_CHIP_MOVE: 'floatChipMove'
-	};
+	var TimeScaleController = function () {
+		function TimeScaleController(cfgFromGameCtrl) {
+			_classCallCheck(this, TimeScaleController);
 	
-	var touchEventsClass = function () {
-		function touchEventsClass() {
-			_classCallCheck(this, touchEventsClass);
-	
-			this._touchStates = {};
-			for (var key in touchEventsStore) {
-				this._touchStates[touchEventsStore[key]] = false;
+			if (cfgFromGameCtrl) {
+				this.ctx = cfgFromGameCtrl.ctx ? cfgFromGameCtrl.ctx : undefined;
+				this.blockBetCb = cfgFromGameCtrl.blockBetCb ? cfgFromGameCtrl.blockBetCb : undefined;
 			}
+	
+			var time = 3;
+	
+			this._timeScale = new _timeScaleView2.default(time);
 		}
 	
-		/**
-	  * Вовзращает/устанавливает активное состояние
-	  * @returns {*}
-	  */
-	
-	
-		_createClass(touchEventsClass, [{
-			key: 'clearEvents',
-			value: function clearEvents() {
-				for (var key in this._touchStates) {
-					this._touchStates[key] = false;
-				}
+		_createClass(TimeScaleController, [{
+			key: 'start',
+			value: function start() {
+				this._timeScale.start();
 			}
 		}, {
-			key: 'cancelEvent',
-			value: function cancelEvent(event) {
-				this._touchStates[event] = false;
+			key: 'pause',
+			value: function pause() {
+				this._timeScale.pause();
 			}
 		}, {
-			key: 'setEvent',
-			value: function setEvent(event) {
-				this.clearEvents();
-				this._touchStates[event] = true;
-			}
-		}, {
-			key: 'isActive',
-			value: function isActive(event) {
-				return this._touchStates[event];
-			}
-		}, {
-			key: 'touchState',
+			key: 'pixiSprite',
 			get: function get() {
-				var activeState = void 0;
-				for (var key in this._touchStates) {
-					activeState = this._touchStates[key] ? key : 'undefined';
-				}
-				return activeState;
+				return this._timeScale.pixiContainer;
 			}
 		}]);
 	
-		return touchEventsClass;
+		return TimeScaleController;
 	}();
 	
-	var instance = new touchEventsClass();
-	Object.freeze(instance);
-	
-	exports._tevStore = touchEventsStore;
-	exports._tev = instance;
+	exports.default = TimeScaleController;
 
 /***/ },
 /* 162 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
@@ -30672,142 +30888,111 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
+	var _pixi = __webpack_require__(1);
+	
+	var _pixi2 = _interopRequireDefault(_pixi);
+	
+	var _defaultPositions = __webpack_require__(148);
+	
+	var _styles = __webpack_require__(150);
+	
+	var _spritesStore = __webpack_require__(141);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var betStoreClass = function () {
-		function betStoreClass() {
-			_classCallCheck(this, betStoreClass);
+	var TimeScaleView = function () {
+		function TimeScaleView(time) {
+			_classCallCheck(this, TimeScaleView);
 	
-			this.bets = {};
-			this.betsCtrl = {};
+			this.time = time;
+			this.actionStatus = false;
 	
-			this.proxy = new Proxy(this.bets, {
-				get: function get(target, prop) {
-					console.log('`Чтение ${prop}` ➠ ', '\u0427\u0442\u0435\u043D\u0438\u0435 ' + prop);
-					return target[prop];
-				},
-				set: function set(target, prop, value) {
-					console.log('`Запись ${prop} ${value}` ➠ ', '\u0417\u0430\u043F\u0438\u0441\u044C ' + prop + ' ' + value);
-					target[prop] = value;
-					return true;
-				}
-			});
+			// Контейнер для фишки с тенью и текстом
+			var spriteContainer = new _pixi2.default.Container();
+			this.pixiContainer = spriteContainer;
+	
+			spriteContainer.x = _defaultPositions.defaultPositions.timeScale.x;
+			spriteContainer.y = _defaultPositions.defaultPositions.timeScale.y;
+	
+			this.sprites = {};
+	
+			this.sprites.tsBg = new _pixi2.default.Sprite(_spritesStore.spritesStore.timer.timerBack);
+			this.sprites.tsYellow = new _pixi2.default.Sprite(_spritesStore.spritesStore.timer.timerYellow);
+			this.sprites.tsRed = new _pixi2.default.Sprite(_spritesStore.spritesStore.timer.timerRed);
+	
+			for (var sprite in this.sprites) {
+				this.sprites[sprite].anchor.set(0);
+			}
+			this.sprites.tsRed.visible = false;
+	
+			spriteContainer.addChild(this.sprites.tsBg);
+			spriteContainer.addChild(this.sprites.tsYellow);
+			spriteContainer.addChild(this.sprites.tsRed);
 		}
 	
-		/**
-	  * Коллекция ставок с привязкой к полям
-	  * @param bets
-	  */
+		_createClass(TimeScaleView, [{
+			key: 'start',
+			value: function start() {
+				// Если таймер уже запущен
+				if (this.actionStatus) return false;
 	
-	
-		_createClass(betStoreClass, [{
-			key: 'clearBets',
-	
-	
-			/**
-	   * Очищаем все данные модели
-	   */
-			value: function clearBets() {
-				this.bets = [];
-				this.currentBetSum = 0;
-			}
-	
-			/**
-	   * Добавление ставки
-	   * @param bet - {field, bet}
-	   */
-	
-		}, {
-			key: 'addBet',
-			value: function addBet(bet) {
-				this.bets[bet.field] = bet.value;
-			}
-	
-			/**
-	   * Удаление ставки
-	   * @param field - название поля
-	   */
-	
-		}, {
-			key: 'removeBet',
-			value: function removeBet(field) {
-				this.bets[field] = undefined;
+				this.actionStatus = true;
+				this.timeScaleLoop();
 			}
 		}, {
-			key: 'bets',
-			set: function set(bets) {
-				// this.proxy = bets; - если захотим попроксировать
-				this._bets = bets;
+			key: 'pause',
+			value: function pause() {
+				this.actionStatus = false;
+			}
+		}, {
+			key: 'timeScaleLoop',
+			value: function timeScaleLoop() {
+				var _self = this,
+				    originWitdh = this.sprites.tsBg.width,
+				    fps = 60,
+				    deltaX = originWitdh / (this.time * fps),
+				    redLine = this.sprites.tsRed,
+				    yellowLine = this.sprites.tsYellow;
+	
+				this.timerId = setTimeout(function tick() {
+					var width = yellowLine.width;
+	
+					var line = redLine.visible ? redLine : yellowLine;
+	
+					if (width / originWitdh <= 0.5 && !_self.sprites.tsRed.visible) {
+						line = redLine;
+						redLine.width = width;
+						redLine.visible = true;
+	
+						yellowLine.visible = false;
+					}
+	
+					if (line.width - deltaX <= 0 || !_self.actionStatus) {
+						if (line.width - deltaX) line.width = 0;
+						clearTimeout(_self.timerId);
+						return false;
+					} else {
+						line.width -= deltaX;
+						_self.timerId = setTimeout(tick, 1000 / fps);
+					}
+				}, 1000 / fps);
+			}
+		}, {
+			key: 'pixiContainer',
+			set: function set(container) {
+				this._spriteContainer = container;
 			},
 			get: function get() {
-				// return this.proxy;
-				return this._bets;
-			}
-	
-			/**
-	   * Коллекция ставок с привязкой к полям
-	   * @param bets
-	   */
-	
-		}, {
-			key: 'betsCtrl',
-			set: function set(betsCtrl) {
-				this._betsCtrl = betsCtrl;
-			},
-			get: function get() {
-				return this._betsCtrl;
-			}
-	
-			/**
-	   * Текущая сумма ставок
-	   * @param bet
-	   */
-	
-		}, {
-			key: 'currentBetSum',
-			set: function set(bet) {
-				this._currentBetSum = bet;
-			},
-			get: function get() {
-				return this._currentBetSum;
-			}
-	
-			/**
-	   * Активный тип ставки (одна из фишек на панели - 100/500/1К...)
-	   * @param chip
-	   */
-	
-		}, {
-			key: 'activeChip',
-			set: function set(chip) {
-				this._activeChip = chip;
-			},
-			get: function get() {
-				return this._activeChip;
-			}
-	
-			/**
-	   * Активный тип ставки (одна из фишек на панели - 100/500/1К...)
-	   * @param chip
-	   */
-	
-		}, {
-			key: 'floatChip',
-			set: function set(chip) {
-				this._floatChip = chip;
-			},
-			get: function get() {
-				return this._floatChip;
+				return this._spriteContainer;
 			}
 		}]);
 	
-		return betStoreClass;
+		return TimeScaleView;
 	}();
 	
-	var instance = new betStoreClass();
-	// Object.preventExtensions(instance); - не хочет работать 'set activeChip'
-	
-	exports.betStore = instance;
+	exports.default = TimeScaleView;
 
 /***/ }
 /******/ ]);
