@@ -3,6 +3,8 @@ import {chipValues} from './../../constants/chipValues';
 import {betStore} from './../../servises/betStore'
 import {_tevStore, _tev} from './../../servises/touchEvents'
 
+//TODO: Переделатю вьюху: класс контейнера должен быть один, а не по количеству фишек
+
 export default class ChipController {
 	constructor() {
 		let config = {
@@ -46,6 +48,17 @@ export default class ChipController {
 		betStore.activeChip = {value: price, type: chipType};
 	}
 
+	disablePanel(){
+		for(let key in this.chips){
+			this.chips[key].disableChip();
+		}
+	}
+
+	/**
+	 * Возвращает тип ставки по значению
+	 * @param price
+	 * @returns {*}
+	 */
 	returnChipType(price){
 		let chipType;
 		for(let key in chipValues)
@@ -53,6 +66,10 @@ export default class ChipController {
 		return chipType;
 	}
 
+	/**
+	 * Возвращает объект активной фишки
+	 * @returns {*}
+	 */
 	getActiveChip(){
 		let chipActive;
 

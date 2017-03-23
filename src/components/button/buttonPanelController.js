@@ -39,7 +39,7 @@ export default class ButtonController {
 		return this._buttons
 	}
 
-	disableButtons(){
+	disablePanel(){
 		this._buttonClasses.forEach((btnView)=>{
 			btnView.btnDisable();
 		})

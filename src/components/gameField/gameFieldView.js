@@ -16,20 +16,20 @@ export default class GameFieldView {
 		spriteContainer.x = defaultPositions.fields.big.x;
 		spriteContainer.y = defaultPositions.fields.big.y;
 
-		let sprite = new PIXI.Sprite.fromImage( './assets/images/table.png' );
-
 		// Opt-in to interactivity
-		sprite.interactive = true;
+		spriteContainer.interactive = true;
 		// Shows hand cursor
-		sprite.buttonMode = true;
+		spriteContainer.buttonMode = true;
 
 		['tap', 'click', 'pointertap'].forEach((event)=>{
-			sprite.on(event, this.onClick, this);
+			spriteContainer.on(event, this.onClick, this);
 		});
 
 		['mousemove', 'touchmove', 'pointermove'].forEach((event)=>{
-			sprite.on(event, this.hoverAreas, this);
+			spriteContainer.on(event, this.hoverAreas, this);
 		});
+
+		let sprite = new PIXI.Sprite.fromImage( './assets/images/table.png' );
 
 		spriteContainer.addChild(sprite);
 
@@ -200,6 +200,13 @@ export default class GameFieldView {
 	}
 
 
+	disableField(){
+		this.pixiContainer.interactive = false;
+	}
+
+	enableField(){
+		this.pixiContainer.interactive = true;
+	}
 
 
 	/**

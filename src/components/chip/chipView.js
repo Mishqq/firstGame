@@ -14,16 +14,18 @@ export default class ChipView {
 		// Контейнер для фишки с тенью и текстом
 		let spriteContainer = new PIXI.Container();
 		this._spriteContainer = spriteContainer;
+		// Opt-in to interactivity
+		spriteContainer.interactive = true;
+		// Shows hand cursor
+		spriteContainer.buttonMode = true;
+
 
 		spriteContainer.x = defaultPositions.chips[chipType].x;
 		spriteContainer.y = defaultPositions.chips[chipType].y;
 
 		let sprite = new PIXI.Sprite( spritesStore.chips[chipType] );
 
-		// Opt-in to interactivity
-		sprite.interactive = true;
-		// Shows hand cursor
-		sprite.buttonMode = true;
+
 		sprite.anchor.set(0.5);
 
 		// Тень под фишкой
@@ -37,11 +39,11 @@ export default class ChipView {
 		chipValueText.anchor.set(0.5);
 
 		['touchend', 'mouseup', 'pointerup'].forEach((event)=>{
-			sprite.on(event, this.chipTouchEnd, this);
+			spriteContainer.on(event, this.chipTouchEnd, this);
 		});
 
 		['touchstart', 'mousedown', 'pointerdown'].forEach((event)=>{
-			sprite.on(event, this.chipTouchStart, this);
+			spriteContainer.on(event, this.chipTouchStart, this);
 		});
 
 		spriteContainer.addChild(shadow).addChild(sprite).addChild(chipValueText);
@@ -93,5 +95,21 @@ export default class ChipView {
 
 	chipData(){
 		return {value: this.chipValue, type: this.chipType};
+	}
+
+	disableChip(){
+		let sp = this._spriteContainer;
+
+		sp.interactive = false;
+		sp.buttonMode = false;
+		sp.alpha = 0.7;
+	}
+
+	enableChip(){
+		let sp = this._spriteContainer;
+
+		sp.interactive = true;
+		sp.buttonMode = true;
+		sp.alpha = 1;
 	}
 }

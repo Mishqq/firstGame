@@ -63,4 +63,12 @@ export default class BetController {
 	getTopChipValue(){
 		return this._betView.getTopChipValue();
 	}
+
+	disableMove(){
+		this._betView.disableMove();
+	}
+
+	enableMove(){
+		this._betView.enableMove();
+	}
 }

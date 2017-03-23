@@ -102,4 +102,12 @@ export default class GameFieldController {
 
 		return cell ? center : false;
 	}
+
+	disableField(){
+		this._gameFieldBig.disableField();
+	}
+
+	enableField(){
+		this._gameFieldBig.enableField();
+	}
 }

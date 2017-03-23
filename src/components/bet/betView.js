@@ -160,4 +160,12 @@ export default class BetView {
 
 		return value;
 	}
+
+	disableMove(){
+		this.betViewContainer.interactive = false;
+	}
+
+	enableMove(){
+		this.betViewContainer.interactive = true;
+	}
 }

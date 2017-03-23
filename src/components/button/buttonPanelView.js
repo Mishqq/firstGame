@@ -52,6 +52,8 @@ export default class ButtonView {
 	}
 
 	btnDefault(){
+		this._spriteContainer.interactive = true;
+		this._spriteContainer.buttonMode = true;
 		if(this._sqrBtn){
 			this._sqrBtn.stateDef.visible = true;
 			this._sqrBtn.icoDef.visible = true;
@@ -76,6 +78,8 @@ export default class ButtonView {
 	}
 
 	btnDisable(){
+		this._spriteContainer.interactive = false;
+		this._spriteContainer.buttonMode = false;
 		if(this._sqrBtn){
 			this._sqrBtn.icoDef.visible = false;
 			this._sqrBtn.icoDis.visible = true;

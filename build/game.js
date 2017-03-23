@@ -28352,6 +28352,7 @@
 						x2Cb: _this.btnPanelX2Cb,
 						ctx: _this
 					});
+					_this.buttonsController = buttonsController;
 					buttonsController.buttons.forEach(function (button) {
 						stage.addChild(button);
 					});
@@ -28362,7 +28363,10 @@
 					});
 					stage.addChild(_this.floatChipContainer.getFloatChipsSprite);
 	
-					_this._timeScale = new _timeScaleController2.default();
+					_this._timeScale = new _timeScaleController2.default({
+						disableCb: _this.disableChipsAndButtons,
+						ctx: _this
+					});
 					stage.addChild(_this._timeScale.pixiSprite);
 					_this._timeScale.start();
 					// setTimeout(() => {
@@ -28482,6 +28486,25 @@
 	   * (не коллекцию контроллеров компонентов ставок)
 	   */
 			value: function updateBetModel() {}
+	
+			/**
+	   * Метод лочит панель фишек и кнопок по истечению времени
+	   */
+	
+		}, {
+			key: 'disableChipsAndButtons',
+			value: function disableChipsAndButtons() {
+				console.log('Вызываем методы блокировки фишек и кнопок ➠ ');
+				this.stage.interactive = false;
+	
+				this.chipsController.disablePanel();
+				this.buttonsController.disablePanel();
+				this.gameField.disableField();
+	
+				for (var key in _betStore.betStore.betsCtrl) {
+					_betStore.betStore.betsCtrl[key].disableMove();
+				}
+			}
 	
 			/**
 	   * ===========================   buttonPanel click callbacks  ================================
@@ -29233,6 +29256,16 @@
 				return cell ? center : false;
 			}
 		}, {
+			key: 'disableField',
+			value: function disableField() {
+				this._gameFieldBig.disableField();
+			}
+		}, {
+			key: 'enableField',
+			value: function enableField() {
+				this._gameFieldBig.enableField();
+			}
+		}, {
 			key: 'gameFieldSprite',
 			get: function get() {
 				return this._gameFieldBig.pixiContainer;
@@ -29287,20 +29320,20 @@
 			spriteContainer.x = _defaultPositions.defaultPositions.fields.big.x;
 			spriteContainer.y = _defaultPositions.defaultPositions.fields.big.y;
 	
-			var sprite = new _pixi2.default.Sprite.fromImage('./assets/images/table.png');
-	
 			// Opt-in to interactivity
-			sprite.interactive = true;
+			spriteContainer.interactive = true;
 			// Shows hand cursor
-			sprite.buttonMode = true;
+			spriteContainer.buttonMode = true;
 	
 			['tap', 'click', 'pointertap'].forEach(function (event) {
-				sprite.on(event, _this.onClick, _this);
+				spriteContainer.on(event, _this.onClick, _this);
 			});
 	
 			['mousemove', 'touchmove', 'pointermove'].forEach(function (event) {
-				sprite.on(event, _this.hoverAreas, _this);
+				spriteContainer.on(event, _this.hoverAreas, _this);
 			});
+	
+			var sprite = new _pixi2.default.Sprite.fromImage('./assets/images/table.png');
 	
 			spriteContainer.addChild(sprite);
 	
@@ -29487,6 +29520,16 @@
 			key: 'hoverAreas',
 			value: function hoverAreas(event) {
 				this.onHoverCb ? this.onHoverCb.call(this.cbCtx, event) : console.log('hoverAreas (ChipView)');
+			}
+		}, {
+			key: 'disableField',
+			value: function disableField() {
+				this.pixiContainer.interactive = false;
+			}
+		}, {
+			key: 'enableField',
+			value: function enableField() {
+				this.pixiContainer.interactive = true;
 			}
 	
 			/**
@@ -29707,6 +29750,12 @@
 			fill: 'white',
 			stroke: 'black',
 			strokeThickness: 5
+		},
+		timeScale: {
+			font: "normal 36px Arial",
+			fontVariant: 'small-caps',
+			wordWrapWidth: 0,
+			fill: 'white'
 		}
 	};
 	
@@ -29770,8 +29819,8 @@
 		}
 	
 		_createClass(ButtonController, [{
-			key: 'disableButtons',
-			value: function disableButtons() {
+			key: 'disablePanel',
+			value: function disablePanel() {
 				this._buttonClasses.forEach(function (btnView) {
 					btnView.btnDisable();
 				});
@@ -29903,6 +29952,8 @@
 		}, {
 			key: 'btnDefault',
 			value: function btnDefault() {
+				this._spriteContainer.interactive = true;
+				this._spriteContainer.buttonMode = true;
 				if (this._sqrBtn) {
 					this._sqrBtn.stateDef.visible = true;
 					this._sqrBtn.icoDef.visible = true;
@@ -29929,6 +29980,8 @@
 		}, {
 			key: 'btnDisable',
 			value: function btnDisable() {
+				this._spriteContainer.interactive = false;
+				this._spriteContainer.buttonMode = false;
 				if (this._sqrBtn) {
 					this._sqrBtn.icoDef.visible = false;
 					this._sqrBtn.icoDis.visible = true;
@@ -30037,6 +30090,8 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
+	//TODO: Переделатю вьюху: класс контейнера должен быть один, а не по количеству фишек
+	
 	var ChipController = function () {
 		function ChipController() {
 			var _this = this;
@@ -30080,6 +30135,20 @@
 				_betStore.betStore.activeChip = { value: price, type: chipType };
 			}
 		}, {
+			key: 'disablePanel',
+			value: function disablePanel() {
+				for (var key in this.chips) {
+					this.chips[key].disableChip();
+				}
+			}
+	
+			/**
+	   * Возвращает тип ставки по значению
+	   * @param price
+	   * @returns {*}
+	   */
+	
+		}, {
 			key: 'returnChipType',
 			value: function returnChipType(price) {
 				var chipType = void 0;
@@ -30087,6 +30156,12 @@
 					if (_chipValues.chipValues[key] === price) chipType = key;
 				}return chipType;
 			}
+	
+			/**
+	   * Возвращает объект активной фишки
+	   * @returns {*}
+	   */
+	
 		}, {
 			key: 'getActiveChip',
 			value: function getActiveChip() {
@@ -30153,16 +30228,16 @@
 			// Контейнер для фишки с тенью и текстом
 			var spriteContainer = new _pixi2.default.Container();
 			this._spriteContainer = spriteContainer;
+			// Opt-in to interactivity
+			spriteContainer.interactive = true;
+			// Shows hand cursor
+			spriteContainer.buttonMode = true;
 	
 			spriteContainer.x = _defaultPositions.defaultPositions.chips[chipType].x;
 			spriteContainer.y = _defaultPositions.defaultPositions.chips[chipType].y;
 	
 			var sprite = new _pixi2.default.Sprite(_spritesStore.spritesStore.chips[chipType]);
 	
-			// Opt-in to interactivity
-			sprite.interactive = true;
-			// Shows hand cursor
-			sprite.buttonMode = true;
 			sprite.anchor.set(0.5);
 	
 			// Тень под фишкой
@@ -30176,11 +30251,11 @@
 			chipValueText.anchor.set(0.5);
 	
 			['touchend', 'mouseup', 'pointerup'].forEach(function (event) {
-				sprite.on(event, _this.chipTouchEnd, _this);
+				spriteContainer.on(event, _this.chipTouchEnd, _this);
 			});
 	
 			['touchstart', 'mousedown', 'pointerdown'].forEach(function (event) {
-				sprite.on(event, _this.chipTouchStart, _this);
+				spriteContainer.on(event, _this.chipTouchStart, _this);
 			});
 	
 			spriteContainer.addChild(shadow).addChild(sprite).addChild(chipValueText);
@@ -30222,6 +30297,24 @@
 			key: 'chipData',
 			value: function chipData() {
 				return { value: this.chipValue, type: this.chipType };
+			}
+		}, {
+			key: 'disableChip',
+			value: function disableChip() {
+				var sp = this._spriteContainer;
+	
+				sp.interactive = false;
+				sp.buttonMode = false;
+				sp.alpha = 0.7;
+			}
+		}, {
+			key: 'enableChip',
+			value: function enableChip() {
+				var sp = this._spriteContainer;
+	
+				sp.interactive = true;
+				sp.buttonMode = true;
+				sp.alpha = 1;
 			}
 		}, {
 			key: 'sprite',
@@ -30602,6 +30695,16 @@
 				return this._betView.getTopChipValue();
 			}
 		}, {
+			key: 'disableMove',
+			value: function disableMove() {
+				this._betView.disableMove();
+			}
+		}, {
+			key: 'enableMove',
+			value: function enableMove() {
+				this._betView.enableMove();
+			}
+		}, {
 			key: 'betSprite',
 			get: function get() {
 				return this._betView.betViewContainer;
@@ -30804,6 +30907,16 @@
 				return value;
 			}
 		}, {
+			key: 'disableMove',
+			value: function disableMove() {
+				this.betViewContainer.interactive = false;
+			}
+		}, {
+			key: 'enableMove',
+			value: function enableMove() {
+				this.betViewContainer.interactive = true;
+			}
+		}, {
 			key: 'betViewContainer',
 			get: function get() {
 				return this._betContainer;
@@ -30836,6 +30949,8 @@
 	
 	var _timeScaleView2 = _interopRequireDefault(_timeScaleView);
 	
+	var _timeScaleConfig = __webpack_require__(163);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -30846,12 +30961,15 @@
 	
 			if (cfgFromGameCtrl) {
 				this.ctx = cfgFromGameCtrl.ctx ? cfgFromGameCtrl.ctx : undefined;
-				this.blockBetCb = cfgFromGameCtrl.blockBetCb ? cfgFromGameCtrl.blockBetCb : undefined;
+				this.disableCb = cfgFromGameCtrl.disableCb ? cfgFromGameCtrl.disableCb : undefined;
 			}
 	
-			var time = 3;
+			var cbForView = {
+				disableCb: this.endTime,
+				ctx: this
+			};
 	
-			this._timeScale = new _timeScaleView2.default(time);
+			this._timeScale = new _timeScaleView2.default(cbForView, _timeScaleConfig.timeScaleConfig, _timeScaleConfig.timeScaleText);
 		}
 	
 		_createClass(TimeScaleController, [{
@@ -30863,6 +30981,11 @@
 			key: 'pause',
 			value: function pause() {
 				this._timeScale.pause();
+			}
+		}, {
+			key: 'endTime',
+			value: function endTime() {
+				this.disableCb ? this.disableCb.call(this.ctx) : console.log('chipClickEvent (ChipView)');
 			}
 		}, {
 			key: 'pixiSprite',
@@ -30903,11 +31026,16 @@
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var TimeScaleView = function () {
-		function TimeScaleView(time) {
+		function TimeScaleView(callbacks, config, statusText) {
+			var _this = this;
+	
 			_classCallCheck(this, TimeScaleView);
 	
-			this.time = time;
-			this.actionStatus = false;
+			this.callbacks = callbacks;
+			this.cfg = config;
+			this.text = statusText;
+			this.isRun = false;
+			this.state = 0;
 	
 			// Контейнер для фишки с тенью и текстом
 			var spriteContainer = new _pixi2.default.Container();
@@ -30918,66 +31046,107 @@
 	
 			this.sprites = {};
 	
-			this.sprites.tsBg = new _pixi2.default.Sprite(_spritesStore.spritesStore.timer.timerBack);
-			this.sprites.tsYellow = new _pixi2.default.Sprite(_spritesStore.spritesStore.timer.timerYellow);
-			this.sprites.tsRed = new _pixi2.default.Sprite(_spritesStore.spritesStore.timer.timerRed);
+			['timerBack', 'timerYellow', 'timerRed'].forEach(function (item) {
+				_this.sprites[item] = new _pixi2.default.Sprite(_spritesStore.spritesStore.timer[item]);
+				if (item === 'timerRed') _this.sprites[item].visible = false;
+				spriteContainer.addChild(_this.sprites[item]);
+			});
 	
-			for (var sprite in this.sprites) {
-				this.sprites[sprite].anchor.set(0);
-			}
-			this.sprites.tsRed.visible = false;
-	
-			spriteContainer.addChild(this.sprites.tsBg);
-			spriteContainer.addChild(this.sprites.tsYellow);
-			spriteContainer.addChild(this.sprites.tsRed);
+			var pixiText = new _pixi2.default.Text(statusText['status' + this.state], _styles.styles.timeScale);
+			pixiText.anchor.set(0.5);
+			pixiText.x = spriteContainer.width / 2;
+			pixiText.y = -30;
+			spriteContainer.addChild(pixiText);
+			this.sprites.text = pixiText;
 		}
 	
 		_createClass(TimeScaleView, [{
 			key: 'start',
 			value: function start() {
 				// Если таймер уже запущен
-				if (this.actionStatus) return false;
+				if (this.isRun) return false;
 	
-				this.actionStatus = true;
+				this.isRun = true;
 				this.timeScaleLoop();
 			}
 		}, {
 			key: 'pause',
 			value: function pause() {
-				this.actionStatus = false;
+				this.isRun = false;
 			}
+	
+			/**
+	   * Функция анимации временной шкалы
+	   */
+	
 		}, {
 			key: 'timeScaleLoop',
 			value: function timeScaleLoop() {
-				var _self = this,
-				    originWitdh = this.sprites.tsBg.width,
-				    fps = 60,
-				    deltaX = originWitdh / (this.time * fps),
-				    redLine = this.sprites.tsRed,
-				    yellowLine = this.sprites.tsYellow;
+				var _this2 = this;
 	
-				this.timerId = setTimeout(function tick() {
-					var width = yellowLine.width;
+				var cfg = this.cfg,
+				    sprites = this.sprites,
+				    tsWidth = sprites.timerBack.width,
+				    redLine = sprites.timerRed,
+				    yellowLine = sprites.timerYellow,
+				    deltaX = tsWidth / (cfg.time * cfg.fps);
 	
-					var line = redLine.visible ? redLine : yellowLine;
-	
-					if (width / originWitdh <= 0.5 && !_self.sprites.tsRed.visible) {
-						line = redLine;
-						redLine.width = width;
+				// Функция шага уменьшения шкалы
+				var tick = function tick() {
+					if (yellowLine.width / tsWidth <= cfg.changeColorPer && !sprites.timerRed.visible) {
 						redLine.visible = true;
-	
 						yellowLine.visible = false;
 					}
 	
-					if (line.width - deltaX <= 0 || !_self.actionStatus) {
-						if (line.width - deltaX) line.width = 0;
-						clearTimeout(_self.timerId);
+					if (redLine.width - deltaX <= 0 || !_this2.isRun) {
+						if (redLine.width - deltaX) redLine.width = 0;
+						clearTimeout(_this2.timerId);
+						_this2.lastTimeCb();
 						return false;
-					} else {
-						line.width -= deltaX;
-						_self.timerId = setTimeout(tick, 1000 / fps);
 					}
-				}, 1000 / fps);
+	
+					redLine.width -= deltaX;
+					yellowLine.width -= deltaX;
+					_this2.timerId = setTimeout(tick, 1000 / cfg.fps);
+				};
+	
+				this.timerId = setTimeout(tick, 1000 / cfg.fps);
+			}
+	
+			/**
+	   * Метод вызывает коллбек из gameCtrl для блокирования возможности ставок
+	   * через заданное время после окончания времени на временной шкале
+	   */
+	
+		}, {
+			key: 'lastTimeCb',
+			value: function lastTimeCb() {
+				var _this3 = this;
+	
+				var cfg = this.cfg;
+				this.setState('next');
+	
+				console.log('Последние ставки - ', cfg.lastTime, 'сек');
+				setTimeout(function () {
+					_this3.setState('next');
+	
+					console.log('Лочим возможность ставок');
+	
+					if (_this3.callbacks) _this3.callbacks.disableCb.call(_this3.callbacks.ctx);
+				}, cfg.lastTime * 1000);
+			}
+	
+			/**
+	   * Состояние компонента
+	   * @param state - [0-3] || 'next'/'prev'
+	   */
+	
+		}, {
+			key: 'setState',
+			value: function setState(state) {
+				this.state = typeof state === 'number' ? state : state === 'next' ? this.state + 1 : this.state - 1;
+	
+				this.sprites.text.text = this.text['status' + this.state];
 			}
 		}, {
 			key: 'pixiContainer',
@@ -30993,6 +31162,32 @@
 	}();
 	
 	exports.default = TimeScaleView;
+
+/***/ },
+/* 163 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	var timeScaleConfig = {
+		time: 6,
+		changeColorPer: 0.25,
+		fps: 60,
+		lastTime: 3
+	};
+	
+	var timeScaleText = {
+		status0: 'Приём ставок',
+		status1: 'Последние ставки',
+		status2: 'Ставок больше нет',
+		status3: 'Выигрышное число '
+	};
+	
+	exports.timeScaleConfig = timeScaleConfig;
+	exports.timeScaleText = timeScaleText;
 
 /***/ }
 /******/ ]);

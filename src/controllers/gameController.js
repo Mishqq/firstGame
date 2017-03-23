@@ -72,6 +72,7 @@ export default class GameController {
 				x2Cb: this.btnPanelX2Cb,
 				ctx: this
 			});
+			this.buttonsController = buttonsController;
 			buttonsController.buttons.forEach((button)=>{
 				stage.addChild(button);
 			});
@@ -84,7 +85,10 @@ export default class GameController {
 			stage.addChild(this.floatChipContainer.getFloatChipsSprite);
 
 
-			this._timeScale = new TimeScaleController();
+			this._timeScale = new TimeScaleController({
+				disableCb:this.disableChipsAndButtons,
+				ctx: this
+			});
 			stage.addChild(this._timeScale.pixiSprite);
 			this._timeScale.start();
 			// setTimeout(() => {
@@ -195,6 +199,23 @@ export default class GameController {
 	 */
 	updateBetModel(){
 
+	}
+
+
+	/**
+	 * Метод лочит панель фишек и кнопок по истечению времени
+	 */
+	disableChipsAndButtons(){
+		console.log('Вызываем методы блокировки фишек и кнопок ➠ ');
+		this.stage.interactive = false;
+
+		this.chipsController.disablePanel();
+		this.buttonsController.disablePanel();
+		this.gameField.disableField();
+
+		for(let key in betStore.betsCtrl){
+			betStore.betsCtrl[key].disableMove();
+		}
 	}
 
 

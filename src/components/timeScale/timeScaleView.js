@@ -4,9 +4,12 @@ import {styles} from './../../constants/styles';
 import {spritesStore} from './../../spritesStore';
 
 export default class TimeScaleView {
-	constructor(time) {
-		this.time = time;
-		this.actionStatus = false;
+	constructor(callbacks, config, statusText) {
+		this.callbacks = callbacks;
+		this.cfg = config;
+		this.text = statusText;
+		this.isRun = false;
+		this.state = 0;
 
 		// Контейнер для фишки с тенью и текстом
 		let spriteContainer = new PIXI.Container();
@@ -17,18 +20,18 @@ export default class TimeScaleView {
 
 		this.sprites = {};
 
-		this.sprites.tsBg = new PIXI.Sprite( spritesStore.timer.timerBack );
-		this.sprites.tsYellow = new PIXI.Sprite( spritesStore.timer.timerYellow );
-		this.sprites.tsRed = new PIXI.Sprite( spritesStore.timer.timerRed );
+		['timerBack', 'timerYellow', 'timerRed'].forEach((item) => {
+			this.sprites[item] = new PIXI.Sprite( spritesStore.timer[item] );
+			if(item === 'timerRed') this.sprites[item].visible = false;
+			spriteContainer.addChild( this.sprites[item] );
+		});
 
-		for(let sprite in this.sprites){
-			this.sprites[sprite].anchor.set(0);
-		}
-		this.sprites.tsRed.visible = false;
-
-		spriteContainer.addChild(this.sprites.tsBg);
-		spriteContainer.addChild(this.sprites.tsYellow);
-		spriteContainer.addChild(this.sprites.tsRed);
+		let pixiText = new PIXI.Text(statusText['status' + this.state], styles.timeScale);
+		pixiText.anchor.set(0.5);
+		pixiText.x = spriteContainer.width/2;
+		pixiText.y = -30;
+		spriteContainer.addChild( pixiText );
+		this.sprites.text = pixiText;
 	}
 
 	set pixiContainer(container){
@@ -41,46 +44,75 @@ export default class TimeScaleView {
 
 	start(){
 		// Если таймер уже запущен
-		if(this.actionStatus) return false;
+		if(this.isRun) return false;
 
-		this.actionStatus = true;
+		this.isRun = true;
 		this.timeScaleLoop();
 	}
 
 	pause(){
-		this.actionStatus = false;
+		this.isRun = false;
 	}
 
+	/**
+	 * Функция анимации временной шкалы
+	 */
 	timeScaleLoop(){
-		let _self = this,
-			originWitdh = this.sprites.tsBg.width,
-			fps = 60,
-			deltaX = originWitdh/(this.time*fps),
-			redLine = this.sprites.tsRed,
-			yellowLine = this.sprites.tsYellow;
+		let cfg = this.cfg,
+			sprites =  this.sprites,
+			tsWidth = sprites.timerBack.width,
+			redLine = sprites.timerRed,
+			yellowLine = sprites.timerYellow,
+			deltaX = tsWidth/(cfg.time*cfg.fps);
 
-
-		this.timerId = setTimeout(function tick() {
-			let width = yellowLine.width;
-
-			let line = redLine.visible ? redLine : yellowLine;
-
-			if(width/originWitdh <= 0.5 && !_self.sprites.tsRed.visible){
-				line = redLine;
-				redLine.width = width;
+		// Функция шага уменьшения шкалы
+		let tick = ()=>{
+			if(yellowLine.width/tsWidth <= cfg.changeColorPer && !sprites.timerRed.visible){
 				redLine.visible = true;
-
 				yellowLine.visible = false;
 			}
 
-			if(line.width - deltaX <= 0 || !_self.actionStatus){
-				if(line.width - deltaX) line.width = 0;
-				clearTimeout(_self.timerId);
+			if(redLine.width - deltaX <= 0 || !this.isRun){
+				if(redLine.width - deltaX) redLine.width = 0;
+				clearTimeout(this.timerId);
+				this.lastTimeCb();
 				return false;
-			} else {
-				line.width -= deltaX;
-				_self.timerId = setTimeout(tick, 1000/fps);
 			}
-		}, 1000/fps);
+
+			redLine.width -= deltaX;
+			yellowLine.width -= deltaX;
+			this.timerId = setTimeout(tick, 1000/cfg.fps);
+		};
+
+		this.timerId = setTimeout(tick, 1000/cfg.fps);
+	}
+
+	/**
+	 * Метод вызывает коллбек из gameCtrl для блокирования возможности ставок
+	 * через заданное время после окончания времени на временной шкале
+	 */
+	lastTimeCb(){
+		let cfg = this.cfg;
+		this.setState('next');
+
+		console.log('Последние ставки - ', cfg.lastTime, 'сек');
+		setTimeout(()=>{
+			this.setState('next');
+
+			console.log('Лочим возможность ставок');
+
+			if(this.callbacks) this.callbacks.disableCb.call(this.callbacks.ctx);
+		}, cfg.lastTime*1000);
+	}
+
+	/**
+	 * Состояние компонента
+	 * @param state - [0-3] || 'next'/'prev'
+	 */
+	setState(state){
+		this.state = (typeof(state) === 'number') ? state :
+			(state === 'next') ? this.state+1 : this.state-1;
+
+		this.sprites.text.text = this.text['status'+this.state];
 	}
 }

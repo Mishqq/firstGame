@@ -1,15 +1,19 @@
 import GameFieldView from './timeScaleView';
+import {timeScaleConfig, timeScaleText} from './timeScaleConfig';
 
 export default class TimeScaleController {
 	constructor(cfgFromGameCtrl) {
 		if(cfgFromGameCtrl){
 			this.ctx = cfgFromGameCtrl.ctx ? cfgFromGameCtrl.ctx : undefined;
-			this.blockBetCb = cfgFromGameCtrl.blockBetCb ? cfgFromGameCtrl.blockBetCb : undefined;
+			this.disableCb = cfgFromGameCtrl.disableCb ? cfgFromGameCtrl.disableCb : undefined;
 		}
 
-		let time = 3;
+		let cbForView = {
+			disableCb: this.endTime,
+			ctx: this,
+		};
 
-		this._timeScale = new GameFieldView(time);
+		this._timeScale = new GameFieldView(cbForView, timeScaleConfig, timeScaleText);
 	}
 
 	get pixiSprite(){
@@ -22,5 +26,11 @@ export default class TimeScaleController {
 
 	pause(){
 		this._timeScale.pause();
+	}
+
+	endTime(){
+		this.disableCb ?
+			this.disableCb.call(this.ctx) :
+			console.log('chipClickEvent (ChipView)');
 	}
 }

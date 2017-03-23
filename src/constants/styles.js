@@ -25,6 +25,12 @@ const styles = {
 		fill: 'white',
 		stroke: 'black',
 		strokeThickness: 5
+	},
+	timeScale: {
+		font: "normal 36px Arial",
+		fontVariant: 'small-caps',
+		wordWrapWidth: 0,
+		fill: 'white',
 	}
 };
 
