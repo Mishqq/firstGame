@@ -28288,6 +28288,10 @@
 	
 	var _timeScaleController2 = _interopRequireDefault(_timeScaleController);
 	
+	var _infoPanelController = __webpack_require__(164);
+	
+	var _infoPanelController2 = _interopRequireDefault(_infoPanelController);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -28373,6 +28377,9 @@
 					// 	this._timeScale.pause();
 					// }, 3000);
 	
+	
+					_this.infoPanel = new _infoPanelController2.default();
+					stage.addChild(_this.infoPanel.pixiSprite);
 	
 					game.start();
 				});
@@ -28494,6 +28501,7 @@
 		}, {
 			key: 'disableChipsAndButtons',
 			value: function disableChipsAndButtons() {
+				// TODO: если в момент окончания времени есть плавающая фишка - скрывать
 				console.log('Вызываем методы блокировки фишек и кнопок ➠ ');
 				this.stage.interactive = false;
 	
@@ -28695,6 +28703,8 @@
 		return path + item;
 	});
 	
+	assets.push('./assets/fonts/info/info.xml');
+	
 	/**
 	 * Функция загрузки json-атласов.
 	 * Создаёт спрайты и загоняет их в модуль spritesStore
@@ -28705,7 +28715,6 @@
 		loader.add(assets);
 	
 		loader.load(function (loader, resources) {
-	
 			// Загоняем сырые данные из json-файлов в хранилище спрайтов (spritesStore) по группам
 			for (var key in _constants.constants.namesMap) {
 				var spriteGroup = _constants.constants.namesMap[key]; // anums, chips, bgNumbers...
@@ -29613,7 +29622,10 @@
 			big: { x: 200, y: 350 },
 			small: { x: 1200, y: 300 }
 		},
-		timeScale: { x: 725, y: 320 }
+		timeScale: { x: 725, y: 320 },
+		infoPanel: {
+			main: { x: 250, y: 120 }
+		}
 	};
 	
 	exports.defaultPositions = defaultPositions;
@@ -31188,6 +31200,189 @@
 	
 	exports.timeScaleConfig = timeScaleConfig;
 	exports.timeScaleText = timeScaleText;
+
+/***/ },
+/* 164 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _infoPanelView = __webpack_require__(165);
+	
+	var _infoPanelView2 = _interopRequireDefault(_infoPanelView);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var infoPanelController = function () {
+		function infoPanelController() {
+			_classCallCheck(this, infoPanelController);
+	
+			this._infoPanel = new _infoPanelView2.default();
+		}
+	
+		_createClass(infoPanelController, [{
+			key: 'pixiSprite',
+			get: function get() {
+				return this._infoPanel.sprite;
+			}
+		}]);
+	
+		return infoPanelController;
+	}();
+	
+	exports.default = infoPanelController;
+
+/***/ },
+/* 165 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	// views
+	
+	
+	var _pixi = __webpack_require__(1);
+	
+	var _pixi2 = _interopRequireDefault(_pixi);
+	
+	var _spritesStore = __webpack_require__(141);
+	
+	var _defaultPositions = __webpack_require__(148);
+	
+	var _styles = __webpack_require__(150);
+	
+	var _helpFunctions = __webpack_require__(156);
+	
+	var _limitsView = __webpack_require__(166);
+	
+	var _limitsView2 = _interopRequireDefault(_limitsView);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var infoPanelView = function () {
+		function infoPanelView(config) {
+			_classCallCheck(this, infoPanelView);
+	
+			// this.callback = (config.callback) ? config.callback : undefined;
+			// this.ctx = (config.ctx) ? config.ctx : this;
+	
+			// Контейнер для фишки с тенью и текстом
+			var spriteContainer = new _pixi2.default.Container();
+			this._spriteContainer = spriteContainer;
+	
+			spriteContainer.x = _defaultPositions.defaultPositions.infoPanel.main.x;
+			spriteContainer.y = _defaultPositions.defaultPositions.infoPanel.main.y;
+	
+			var bg = new _pixi2.default.Sprite.fromImage('./assets/images/bg_info.png');
+			spriteContainer.addChild(bg);
+			for (var i = 1; i <= 3; i += 1) {
+				var sep = new _pixi2.default.Sprite.fromImage('./assets/images/separator_vert.png');
+				sep.x = i * 337;
+				sep.y = 0;
+				spriteContainer.addChild(sep);
+			}
+	
+			this.panels = {};
+			this.panels.limitsPanel = new _limitsView2.default();
+	
+			spriteContainer.addChild(this.panels.limitsPanel.sprite);
+		}
+	
+		_createClass(infoPanelView, [{
+			key: 'chipTouchEnd',
+			value: function chipTouchEnd() {
+				this.callback ? this.callback.call(this.ctx) : console.log('infoPanelView');
+			}
+		}, {
+			key: 'sprite',
+			get: function get() {
+				return this._spriteContainer;
+			}
+		}, {
+			key: 'active',
+			set: function set(active) {
+				this._active = active;
+			}
+		}]);
+	
+		return infoPanelView;
+	}();
+	
+	exports.default = infoPanelView;
+
+/***/ },
+/* 166 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _pixi = __webpack_require__(1);
+	
+	var _pixi2 = _interopRequireDefault(_pixi);
+	
+	var _defaultPositions = __webpack_require__(148);
+	
+	var _styles = __webpack_require__(150);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var limitsView = function () {
+		function limitsView(config) {
+			_classCallCheck(this, limitsView);
+	
+			// this.callback = (config.callback) ? config.callback : undefined;
+			// this.ctx = (config.ctx) ? config.ctx : this;
+	
+			// Контейнер для фишки с тенью и текстом
+			var spriteContainer = new _pixi2.default.Container();
+			this._spriteContainer = spriteContainer;
+		}
+	
+		_createClass(limitsView, [{
+			key: 'chipTouchEnd',
+			value: function chipTouchEnd() {
+				this.callback ? this.callback.call(this.ctx) : console.log('limitsView');
+			}
+		}, {
+			key: 'sprite',
+			get: function get() {
+				return this._spriteContainer;
+			}
+		}, {
+			key: 'active',
+			set: function set(active) {
+				this._active = active;
+			}
+		}]);
+	
+		return limitsView;
+	}();
+	
+	exports.default = limitsView;
 
 /***/ }
 /******/ ]);

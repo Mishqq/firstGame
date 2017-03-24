@@ -16,7 +16,10 @@ const defaultPositions = {
 		big: {x: 200, y: 350},
 		small: {x: 1200, y: 300}
 	},
-	timeScale: {x: 725, y: 320}
+	timeScale: {x: 725, y: 320},
+	infoPanel: {
+		main: {x: 250, y: 120}
+	}
 };
 
 export {defaultPositions}

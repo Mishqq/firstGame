@@ -10,6 +10,8 @@ assets = assets.map((item)=>{
 	return path + item;
 });
 
+assets.push('./assets/fonts/info/info.xml');
+
 /**
  * Функция загрузки json-атласов.
  * Создаёт спрайты и загоняет их в модуль spritesStore
@@ -20,7 +22,6 @@ function assetLoader(callback){
 	loader.add(assets);
 
 	loader.load((loader, resources)=>{
-
 		// Загоняем сырые данные из json-файлов в хранилище спрайтов (spritesStore) по группам
 		for(let key in constants.namesMap){
 			let spriteGroup = constants.namesMap[key]; // anums, chips, bgNumbers...

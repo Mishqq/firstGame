@@ -15,6 +15,7 @@ import ChipController       from './../components/chip/chipController';
 import FloatChipController  from './../components/floatChip/floatChipController';
 import BetController        from './../components/bet/betController';
 import TimeScaleController  from './../components/timeScale/timeScaleController';
+import infoPanelController  from './../components/infoPanel/infoPanelController';
 
 
 export default class GameController {
@@ -95,6 +96,9 @@ export default class GameController {
 			// 	this._timeScale.pause();
 			// }, 3000);
 
+
+			this.infoPanel = new infoPanelController();
+			stage.addChild(this.infoPanel.pixiSprite);
 
 			game.start();
 		});
@@ -206,6 +210,7 @@ export default class GameController {
 	 * Метод лочит панель фишек и кнопок по истечению времени
 	 */
 	disableChipsAndButtons(){
+		// TODO: если в момент окончания времени есть плавающая фишка - скрывать
 		console.log('Вызываем методы блокировки фишек и кнопок ➠ ');
 		this.stage.interactive = false;
 
