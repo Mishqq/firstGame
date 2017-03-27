@@ -9,7 +9,8 @@ const constants = {
 		'buttons.json',
 		'chips.json',
 		'fields.json',
-		'timer.json'
+		'timer.json',
+		'info.xml'
 	],
 	namesMap: {
 		anums: {

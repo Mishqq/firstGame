@@ -2,10 +2,12 @@ import PIXI from 'pixi.js';
 import {spritesStore} from './../../spritesStore';
 import {defaultPositions} from './../../constants/defaultPositions';
 import {styles} from './../../constants/styles';
-import {_hf} from './../../servises/helpFunctions'
 
 // views
 import limitsView from './limitsView'
+import hotNumView from './hotNumbersView'
+import coldNumView from './coldNumbersView'
+import otherNumView from './otherNumbersView'
 
 export default class infoPanelView {
 	constructor(config) {
@@ -30,8 +32,17 @@ export default class infoPanelView {
 
 		this.panels = {};
 		this.panels.limitsPanel = new limitsView();
+		this.panels.hotNumPanel = new hotNumView();
+		this.panels.coldNumbers = new coldNumView();
+		this.panels.otherNumView = new otherNumView();
 
-		spriteContainer.addChild( this.panels.limitsPanel.sprite );
+		this.panels.limitsPanel.sprite.position = defaultPositions.infoPanel.limits;
+		this.panels.hotNumPanel.sprite.position = defaultPositions.infoPanel.hotNumbers;
+		this.panels.coldNumbers.sprite.position = defaultPositions.infoPanel.coldNumbers;
+		this.panels.otherNumView.sprite.position = defaultPositions.infoPanel.otherNumbers;
+
+		for(let key in this.panels)
+			spriteContainer.addChild( this.panels[key].sprite );
 	}
 
 	get sprite(){

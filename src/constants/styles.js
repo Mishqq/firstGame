@@ -31,6 +31,11 @@ const styles = {
 		fontVariant: 'small-caps',
 		wordWrapWidth: 0,
 		fill: 'white',
+	},
+	infoPanel: {
+		gradientText: {font: "24px info"},
+		whiteText: {font: "normal 24px Arial", fill: 'white'},
+		labelText: {font: "bold 18px Arial", fill: 'yellow', align: 'center'}
 	}
 };
 

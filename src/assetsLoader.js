@@ -3,14 +3,14 @@ import {spritesStore} from './spritesStore';
 import {constants} from './constants/constants';
 
 const loader = PIXI.loader;
-const path = constants.path.assets + 'images/';
+const path = constants.path.assets;
 let assets = constants.loadAssets;
 
 assets = assets.map((item)=>{
-	return path + item;
+	let str = new RegExp('xml');
+	let path2 = str.test(item) ? path + 'fonts/info/' :  path + 'images/';
+	return path2 + item;
 });
-
-assets.push('./assets/fonts/info/info.xml');
 
 /**
  * Функция загрузки json-атласов.

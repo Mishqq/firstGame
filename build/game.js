@@ -28696,14 +28696,14 @@
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	var loader = _pixi2.default.loader;
-	var path = _constants.constants.path.assets + 'images/';
+	var path = _constants.constants.path.assets;
 	var assets = _constants.constants.loadAssets;
 	
 	assets = assets.map(function (item) {
-		return path + item;
+		var str = new RegExp('xml');
+		var path2 = str.test(item) ? path + 'fonts/info/' : path + 'images/';
+		return path2 + item;
 	});
-	
-	assets.push('./assets/fonts/info/info.xml');
 	
 	/**
 	 * Функция загрузки json-атласов.
@@ -28762,7 +28762,7 @@
 		path: {
 			assets: './assets/'
 		},
-		loadAssets: ['anums.json', 'bg_numbers.json', 'blights.json', 'buttons.json', 'chips.json', 'fields.json', 'timer.json'],
+		loadAssets: ['anums.json', 'bg_numbers.json', 'blights.json', 'buttons.json', 'chips.json', 'fields.json', 'timer.json', 'info.xml'],
 		namesMap: {
 			anums: {
 				a1: 'a1',
@@ -29624,7 +29624,11 @@
 		},
 		timeScale: { x: 725, y: 320 },
 		infoPanel: {
-			main: { x: 250, y: 120 }
+			main: { x: 250, y: 120 },
+			limits: { x: 0, y: 0 }, // Относительно infoPanel.main
+			hotNumbers: { x: 340, y: 0 }, // Относительно infoPanel.main
+			coldNumbers: { x: 675, y: 0 }, // Относительно infoPanel.main
+			otherNumbers: { x: 1010, y: 0 } // Относительно infoPanel.main
 		}
 	};
 	
@@ -29768,6 +29772,11 @@
 			fontVariant: 'small-caps',
 			wordWrapWidth: 0,
 			fill: 'white'
+		},
+		infoPanel: {
+			gradientText: { font: "24px info" },
+			whiteText: { font: "normal 24px Arial", fill: 'white' },
+			labelText: { font: "bold 18px Arial", fill: 'yellow', align: 'center' }
 		}
 	};
 	
@@ -31265,11 +31274,21 @@
 	
 	var _styles = __webpack_require__(150);
 	
-	var _helpFunctions = __webpack_require__(156);
-	
 	var _limitsView = __webpack_require__(166);
 	
 	var _limitsView2 = _interopRequireDefault(_limitsView);
+	
+	var _hotNumbersView = __webpack_require__(168);
+	
+	var _hotNumbersView2 = _interopRequireDefault(_hotNumbersView);
+	
+	var _coldNumbersView = __webpack_require__(169);
+	
+	var _coldNumbersView2 = _interopRequireDefault(_coldNumbersView);
+	
+	var _otherNumbersView = __webpack_require__(170);
+	
+	var _otherNumbersView2 = _interopRequireDefault(_otherNumbersView);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -31300,8 +31319,18 @@
 	
 			this.panels = {};
 			this.panels.limitsPanel = new _limitsView2.default();
+			this.panels.hotNumPanel = new _hotNumbersView2.default();
+			this.panels.coldNumbers = new _coldNumbersView2.default();
+			this.panels.otherNumView = new _otherNumbersView2.default();
 	
-			spriteContainer.addChild(this.panels.limitsPanel.sprite);
+			this.panels.limitsPanel.sprite.position = _defaultPositions.defaultPositions.infoPanel.limits;
+			this.panels.hotNumPanel.sprite.position = _defaultPositions.defaultPositions.infoPanel.hotNumbers;
+			this.panels.coldNumbers.sprite.position = _defaultPositions.defaultPositions.infoPanel.coldNumbers;
+			this.panels.otherNumView.sprite.position = _defaultPositions.defaultPositions.infoPanel.otherNumbers;
+	
+			for (var key in this.panels) {
+				spriteContainer.addChild(this.panels[key].sprite);
+			}
 		}
 	
 		_createClass(infoPanelView, [{
@@ -31342,40 +31371,39 @@
 	
 	var _pixi2 = _interopRequireDefault(_pixi);
 	
-	var _defaultPositions = __webpack_require__(148);
-	
 	var _styles = __webpack_require__(150);
+	
+	var _blockTexts = __webpack_require__(167);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var limitsView = function () {
-		function limitsView(config) {
+		function limitsView() {
+			var _this = this;
+	
 			_classCallCheck(this, limitsView);
 	
-			// this.callback = (config.callback) ? config.callback : undefined;
-			// this.ctx = (config.ctx) ? config.ctx : this;
+			var texts = _blockTexts.blockTexts.limitBlock;
 	
 			// Контейнер для фишки с тенью и текстом
 			var spriteContainer = new _pixi2.default.Container();
 			this._spriteContainer = spriteContainer;
+	
+			texts.forEach(function (item) {
+				var newText = item.type === 'gradientText' ? new _pixi2.default.extras.BitmapText(item.text, _styles.styles.infoPanel[item.type]) : new _pixi2.default.Text(item.text, _styles.styles.infoPanel[item.type]);
+	
+				newText.position = { x: item.x || 0, y: item.y || 0 };
+	
+				_this._spriteContainer.addChild(newText);
+			});
 		}
 	
 		_createClass(limitsView, [{
-			key: 'chipTouchEnd',
-			value: function chipTouchEnd() {
-				this.callback ? this.callback.call(this.ctx) : console.log('limitsView');
-			}
-		}, {
 			key: 'sprite',
 			get: function get() {
 				return this._spriteContainer;
-			}
-		}, {
-			key: 'active',
-			set: function set(active) {
-				this._active = active;
 			}
 		}]);
 	
@@ -31383,6 +31411,263 @@
 	}();
 	
 	exports.default = limitsView;
+
+/***/ },
+/* 167 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	var blockTexts = {
+		limitBlock: [{ type: 'labelText', text: 'ЛИМИТЫ СТОЛА', x: 110, y: 10 }, { type: 'gradientText', text: 'CASINO ROULETTE', x: 70, y: 40 }, { type: 'gradientText', text: 'MAX:', x: 25, y: 95 }, { type: 'gradientText', text: 'MIN:', x: 25, y: 140 }, { type: 'whiteText', text: '30 000', x: 240, y: 95 }, { type: 'whiteText', text: '10', x: 285, y: 140 }],
+		hotNumbers: [{ type: 'labelText', text: 'ЗА ПОСЛЕДНИЕ 100 ИГР', x: 60, y: 10 }, { type: 'gradientText', text: 'ГОРЯЧИЕ НОМЕРА', x: 70, y: 40 }],
+		coldNumbers: [{ type: 'labelText', text: 'ЗА ПОСЛЕДНИЕ 100 ИГР', x: 60, y: 10 }, { type: 'gradientText', text: 'ХОЛОДНЫЕ НОМЕРА', x: 50, y: 40 }],
+		otherNumbers: [{ type: 'labelText', text: 'ЗА ПОСЛЕДНИЕ 50 ИГР', x: 60, y: 10 }, { type: 'gradientText', text: 'RED', x: 60, y: 40 }, { type: 'gradientText', text: 'BLACK', x: 210, y: 40 }, { type: 'gradientText', text: 'ODD', x: 30, y: 120 }, { type: 'gradientText', text: '0', x: 150, y: 120 }, { type: 'gradientText', text: 'EVEN', x: 240, y: 120 }]
+	};
+	
+	exports.blockTexts = blockTexts;
+
+/***/ },
+/* 168 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _pixi = __webpack_require__(1);
+	
+	var _pixi2 = _interopRequireDefault(_pixi);
+	
+	var _styles = __webpack_require__(150);
+	
+	var _blockTexts = __webpack_require__(167);
+	
+	var _spritesStore = __webpack_require__(141);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var hotNumView = function () {
+		function hotNumView() {
+			var _this = this;
+	
+			_classCallCheck(this, hotNumView);
+	
+			var texts = _blockTexts.blockTexts.hotNumbers;
+	
+			this.colorMap = {
+				bgRed: [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36],
+				bgBlack: [2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35]
+			};
+	
+			// Контейнер для фишки с тенью и текстом
+			var spriteContainer = new _pixi2.default.Container();
+			this._spriteContainer = spriteContainer;
+	
+			texts.forEach(function (item) {
+				var newText = item.type === 'gradientText' ? new _pixi2.default.extras.BitmapText(item.text, _styles.styles.infoPanel[item.type]) : new _pixi2.default.Text(item.text, _styles.styles.infoPanel[item.type]);
+	
+				newText.position = { x: item.x || 0, y: item.y || 0 };
+	
+				_this._spriteContainer.addChild(newText);
+			});
+	
+			var arr = [{ number: 34, amount: 37 }, { number: 17, amount: 19 }, { number: 23, amount: 47 }, { number: 15, amount: 98 }];
+	
+			this.createNumbers(arr);
+	
+			this.numbers.forEach(function (item) {
+				_this._spriteContainer.addChild(item);
+			});
+		}
+	
+		_createClass(hotNumView, [{
+			key: 'createNumbers',
+	
+	
+			/**
+	   * Метод создаёт массив PIXI-контейнеров с числами
+	   * @param numbers
+	   */
+			value: function createNumbers(numbers) {
+				var _this2 = this;
+	
+				if (!this.numbers) this.numbers = [];
+	
+				numbers.sort(function (a, b) {
+					return a.amount < b.amount;
+				});
+	
+				numbers.forEach(function (num, idx) {
+					var item = _this2.createNumber(num);
+					item.position = { x: idx * 75 + 20, y: 80 };
+					_this2.numbers.push(item);
+				});
+			}
+	
+			/**
+	   * Метод создает PIXI-контейнер с полученными данными и возвращает его
+	   * @param obj
+	   * @returns {PIXI.Container}
+	   */
+	
+		}, {
+			key: 'createNumber',
+			value: function createNumber(obj) {
+				var color = void 0;
+				for (var key in this.colorMap) {
+					if (~this.colorMap[key].indexOf(obj.number)) color = key;
+				}var numCnt = new _pixi2.default.Container(),
+				    bg = new _pixi2.default.Sprite(_spritesStore.spritesStore.bgNumbers[color]),
+				    text1 = new _pixi2.default.Text(obj.number, { font: 'normal 30px Arial', fill: 'white' }),
+				    text2 = new _pixi2.default.Text(obj.amount, { font: 'normal 26px Arial', fill: 'white' });
+	
+				text1.position = { x: 15, y: 15 };
+				text2.position = { x: 25, y: 70 };
+	
+				numCnt.addChild(bg);
+				numCnt.addChild(text1);
+				numCnt.addChild(text2);
+	
+				return numCnt;
+			}
+		}, {
+			key: 'updateNumber',
+			value: function updateNumber() {}
+		}, {
+			key: 'sprite',
+			get: function get() {
+				return this._spriteContainer;
+			}
+		}]);
+	
+		return hotNumView;
+	}();
+	
+	exports.default = hotNumView;
+
+/***/ },
+/* 169 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _pixi = __webpack_require__(1);
+	
+	var _pixi2 = _interopRequireDefault(_pixi);
+	
+	var _styles = __webpack_require__(150);
+	
+	var _blockTexts = __webpack_require__(167);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var coldNumView = function () {
+		function coldNumView() {
+			var _this = this;
+	
+			_classCallCheck(this, coldNumView);
+	
+			var texts = _blockTexts.blockTexts.coldNumbers;
+	
+			// Контейнер для фишки с тенью и текстом
+			var spriteContainer = new _pixi2.default.Container();
+			this._spriteContainer = spriteContainer;
+	
+			texts.forEach(function (item) {
+				var newText = item.type === 'gradientText' ? new _pixi2.default.extras.BitmapText(item.text, _styles.styles.infoPanel[item.type]) : new _pixi2.default.Text(item.text, _styles.styles.infoPanel[item.type]);
+	
+				newText.position = { x: item.x || 0, y: item.y || 0 };
+	
+				_this._spriteContainer.addChild(newText);
+			});
+		}
+	
+		_createClass(coldNumView, [{
+			key: 'sprite',
+			get: function get() {
+				return this._spriteContainer;
+			}
+		}]);
+	
+		return coldNumView;
+	}();
+	
+	exports.default = coldNumView;
+
+/***/ },
+/* 170 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _pixi = __webpack_require__(1);
+	
+	var _pixi2 = _interopRequireDefault(_pixi);
+	
+	var _styles = __webpack_require__(150);
+	
+	var _blockTexts = __webpack_require__(167);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var otherNumView = function () {
+		function otherNumView() {
+			var _this = this;
+	
+			_classCallCheck(this, otherNumView);
+	
+			var texts = _blockTexts.blockTexts.otherNumbers;
+	
+			// Контейнер для фишки с тенью и текстом
+			var spriteContainer = new _pixi2.default.Container();
+			this._spriteContainer = spriteContainer;
+	
+			texts.forEach(function (item) {
+				var newText = item.type === 'gradientText' ? new _pixi2.default.extras.BitmapText(item.text, _styles.styles.infoPanel[item.type]) : new _pixi2.default.Text(item.text, _styles.styles.infoPanel[item.type]);
+	
+				newText.position = { x: item.x || 0, y: item.y || 0 };
+	
+				_this._spriteContainer.addChild(newText);
+			});
+		}
+	
+		_createClass(otherNumView, [{
+			key: 'sprite',
+			get: function get() {
+				return this._spriteContainer;
+			}
+		}]);
+	
+		return otherNumView;
+	}();
+	
+	exports.default = otherNumView;
 
 /***/ }
 /******/ ]);
