@@ -35,7 +35,9 @@ const styles = {
 	infoPanel: {
 		gradientText: {font: "24px info"},
 		whiteText: {font: "normal 24px Arial", fill: 'white'},
-		labelText: {font: "bold 18px Arial", fill: 'yellow', align: 'center'}
+		labelText: {font: "bold 18px Arial", fill: 'yellow', align: 'center'},
+		number: {font: 'normal 30px Arial', fill: 'white'},
+		amount: {font: 'normal 26px Arial', fill: 'white'}
 	}
 };
 

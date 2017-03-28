@@ -1,4 +1,4 @@
-import PIXI from 'pixi.js';
+import {_p, _pxC, _pxS, _pxT, _pxG, _pxEx} from './../../constants/PIXIabbr';
 import {defaultPositions} from './../../constants/defaultPositions';
 import {clickAreas, pointMap} from './gameFieldCellMap';
 import {styles} from './../../constants/styles';
@@ -10,7 +10,7 @@ export default class GameFieldView {
 		this.cbCtx = (config.ctx) ? config.ctx : this;
 
 		// Контейнер для фишки с тенью и текстом
-		let spriteContainer = new PIXI.Container();
+		let spriteContainer = new _pxC();
 		this.pixiContainer = spriteContainer;
 
 		spriteContainer.x = defaultPositions.fields.big.x;
@@ -29,7 +29,7 @@ export default class GameFieldView {
 			spriteContainer.on(event, this.hoverAreas, this);
 		});
 
-		let sprite = new PIXI.Sprite.fromImage( './assets/images/table.png' );
+		let sprite = new _pxS.fromImage( './assets/images/table.png' );
 
 		spriteContainer.addChild(sprite);
 
@@ -120,7 +120,7 @@ export default class GameFieldView {
 	 * ================================= Подсветка нумерованых ячеек кольцами =============================
 	 */
 	drawCircle(obj, key){
-		let ringSprite = new PIXI.Sprite.fromImage( './assets/images/ring.png' );
+		let ringSprite = new _pxS.fromImage( './assets/images/ring.png' );
 		ringSprite.anchor.set(0.5);
 		ringSprite.x = obj.x;
 		ringSprite.y = obj.y;
@@ -157,7 +157,7 @@ export default class GameFieldView {
 	 * @param key
 	 */
 	drawGreenSquare(obj, key){
-		let graphics = new PIXI.Graphics();
+		let graphics = new _pxG();
 		graphics.beginFill(0xABEE23);
 		graphics.lineStyle(0);
 		graphics.drawRect(obj.x, obj.y, obj.w, obj.h);
@@ -213,7 +213,7 @@ export default class GameFieldView {
 	 * Добавление графики (прямоугольника) на сцену
 	 */
 	drawRect(area){
-		let graphics = new PIXI.Graphics();
+		let graphics = new _pxG();
 
 		graphics.beginFill(0xFFFFFF);
 		graphics.alpha = 0.60;
@@ -233,7 +233,7 @@ export default class GameFieldView {
 			}
 
 
-			let text = new PIXI.Text(str, styles.filedClickAreaTextStyle);
+			let text = new _pxT(str, styles.filedClickAreaTextStyle);
 			text.rotation = -0.5;
 
 			text.anchor.set(0.50);

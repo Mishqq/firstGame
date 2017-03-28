@@ -1,4 +1,4 @@
-import PIXI from 'pixi.js';
+import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
 import {spritesStore} from './../../spritesStore';
 import {styles} from './../../constants/styles';
 
@@ -8,7 +8,7 @@ export default class FloatChipView {
 		this.cbCtx = (config.ctx) ? config.ctx : this;
 
 		// Контейнер для плавающей фишки
-		this._floatChipsContainer = new PIXI.Container();
+		this._floatChipsContainer = new _pxC();
 		this._floatChipsContainer.x = 50;
 		this._floatChipsContainer.y = 50;
 		this._floatChipsContainer.visible = false;
@@ -19,14 +19,14 @@ export default class FloatChipView {
 		});
 
 		['chipSm0', 'chipSm1', 'chipSm2', 'chipSm3', 'chipSm4'].forEach((chipType)=>{
-			let floatChipSprite = new PIXI.Sprite( spritesStore.chips[chipType] );
+			let floatChipSprite = new _pxS( spritesStore.chips[chipType] );
 			// floatChipSprite.visible = false;
 			floatChipSprite.anchor.set(0.5);
 			this._floatChipsContainer.addChild(floatChipSprite);
 		});
 
 		// Значение на фишке
-		let chipValueText = new PIXI.Text(';)', styles.floatChipTextStyle);
+		let chipValueText = new _pxT(';)', styles.floatChipTextStyle);
 		chipValueText.visible = false;
 		this._floatChipsContainer.addChild(chipValueText);
 		chipValueText.anchor.x = 0.5;

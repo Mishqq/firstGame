@@ -97,7 +97,25 @@ export default class GameController {
 			// }, 3000);
 
 
-			this.infoPanel = new infoPanelController();
+
+			let infoPanelFishData = {
+				limitsPanel: {max: 500, min: 50},
+				hotNumPanel: [
+					{number: 12, amount: 1},
+					{number: 12, amount: 2},
+					{number: 12, amount: 3},
+					{number: 12, amount: 4}
+				],
+				coldNumPanel: [
+					{number: 7, amount: 1},
+					{number: 7, amount: 2},
+					{number: 7, amount: 3},
+					{number: 7, amount: 4}
+				],
+				otherNumPanel: {red: 12, black: 12, odd: 12, even: 12, zero: 12}
+			};
+
+			this.infoPanel = new infoPanelController(infoPanelFishData);
 			stage.addChild(this.infoPanel.pixiSprite);
 
 			game.start();

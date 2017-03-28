@@ -1,4 +1,4 @@
-import PIXI from 'pixi.js';
+import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
 import {spritesStore} from './../../spritesStore';
 import {defaultPositions} from './../../constants/defaultPositions';
 import {styles} from './../../constants/styles';
@@ -9,7 +9,7 @@ export default class ButtonView {
 		this.cbCtx = (config.ctx) ? config.ctx : this;
 
 		// Контейнер для фишки с тенью и текстом
-		let spriteContainer = new PIXI.Container();
+		let spriteContainer = new _pxC();
 		this._spriteContainer = spriteContainer;
 
 		spriteContainer.interactive = true;
@@ -99,11 +99,11 @@ export default class ButtonView {
 	squareBtnCreate(btnSquareType){
 		let type = (btnSquareType === 'btnCancel') ? 'cn' : 'cl';
 
-		let stateDef = new PIXI.Sprite( spritesStore.buttons['btnAction'] ),
-			stateSel = new PIXI.Sprite( spritesStore.buttons['btnActionSel'] ),
-			icoDef = new PIXI.Sprite( spritesStore.buttons[type === 'cn' ? 'icoCancel' : 'icoClear'] ),
-			icoDis = new PIXI.Sprite( spritesStore.buttons[type === 'cn' ? 'icoCancelDis' : 'icoClearDis'] ),
-			text = new PIXI.Text( type === 'cn' ? 'Отменить' : 'Очистить', styles.buttonStyle );
+		let stateDef = new _pxS( spritesStore.buttons['btnAction'] ),
+			stateSel = new _pxS( spritesStore.buttons['btnActionSel'] ),
+			icoDef = new _pxS( spritesStore.buttons[type === 'cn' ? 'icoCancel' : 'icoClear'] ),
+			icoDis = new _pxS( spritesStore.buttons[type === 'cn' ? 'icoCancelDis' : 'icoClearDis'] ),
+			text = new _pxT( type === 'cn' ? 'Отменить' : 'Очистить', styles.buttonStyle );
 
 		stateSel.visible = false;
 		icoDis.visible = false;
@@ -127,9 +127,9 @@ export default class ButtonView {
 	roundBtnCreate(btnSquareType){
 		let type = (btnSquareType === 'btnRepeat') ? 'rpt' : 'x2';
 
-		let stateDef = new PIXI.Sprite( spritesStore.buttons[type === 'rpt' ? 'btnRepeat' : 'btnX2'] ),
-			stateSel = new PIXI.Sprite( spritesStore.buttons[type === 'rpt' ? 'btnRepeatSel' : 'btnX2Sel'] ),
-			stateDis = new PIXI.Sprite( spritesStore.buttons[type === 'rpt' ? 'btnRepeatDis' : 'btnX2Dis'] );
+		let stateDef = new _pxS( spritesStore.buttons[type === 'rpt' ? 'btnRepeat' : 'btnX2'] ),
+			stateSel = new _pxS( spritesStore.buttons[type === 'rpt' ? 'btnRepeatSel' : 'btnX2Sel'] ),
+			stateDis = new _pxS( spritesStore.buttons[type === 'rpt' ? 'btnRepeatDis' : 'btnX2Dis'] );
 
 		stateSel.visible = false;
 		stateDis.visible = false;

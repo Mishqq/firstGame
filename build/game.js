@@ -28378,7 +28378,14 @@
 					// }, 3000);
 	
 	
-					_this.infoPanel = new _infoPanelController2.default();
+					var infoPanelFishData = {
+						limitsPanel: { max: 500, min: 50 },
+						hotNumPanel: [{ number: 12, amount: 1 }, { number: 12, amount: 2 }, { number: 12, amount: 3 }, { number: 12, amount: 4 }],
+						coldNumPanel: [{ number: 7, amount: 1 }, { number: 7, amount: 2 }, { number: 7, amount: 3 }, { number: 7, amount: 4 }],
+						otherNumPanel: { red: 12, black: 12, odd: 12, even: 12, zero: 12 }
+					};
+	
+					_this.infoPanel = new _infoPanelController2.default(infoPanelFishData);
 					stage.addChild(_this.infoPanel.pixiSprite);
 	
 					game.start();
@@ -29298,17 +29305,13 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _pixi = __webpack_require__(1);
-	
-	var _pixi2 = _interopRequireDefault(_pixi);
+	var _PIXIabbr = __webpack_require__(172);
 	
 	var _defaultPositions = __webpack_require__(148);
 	
 	var _gameFieldCellMap = __webpack_require__(149);
 	
 	var _styles = __webpack_require__(150);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -29323,7 +29326,7 @@
 			this.cbCtx = config.ctx ? config.ctx : this;
 	
 			// Контейнер для фишки с тенью и текстом
-			var spriteContainer = new _pixi2.default.Container();
+			var spriteContainer = new _PIXIabbr._pxC();
 			this.pixiContainer = spriteContainer;
 	
 			spriteContainer.x = _defaultPositions.defaultPositions.fields.big.x;
@@ -29342,7 +29345,7 @@
 				spriteContainer.on(event, _this.hoverAreas, _this);
 			});
 	
-			var sprite = new _pixi2.default.Sprite.fromImage('./assets/images/table.png');
+			var sprite = new _PIXIabbr._pxS.fromImage('./assets/images/table.png');
 	
 			spriteContainer.addChild(sprite);
 	
@@ -29441,7 +29444,7 @@
 		}, {
 			key: 'drawCircle',
 			value: function drawCircle(obj, key) {
-				var ringSprite = new _pixi2.default.Sprite.fromImage('./assets/images/ring.png');
+				var ringSprite = new _PIXIabbr._pxS.fromImage('./assets/images/ring.png');
 				ringSprite.anchor.set(0.5);
 				ringSprite.x = obj.x;
 				ringSprite.y = obj.y;
@@ -29485,7 +29488,7 @@
 		}, {
 			key: 'drawGreenSquare',
 			value: function drawGreenSquare(obj, key) {
-				var graphics = new _pixi2.default.Graphics();
+				var graphics = new _PIXIabbr._pxG();
 				graphics.beginFill(0xABEE23);
 				graphics.lineStyle(0);
 				graphics.drawRect(obj.x, obj.y, obj.w, obj.h);
@@ -29548,7 +29551,7 @@
 		}, {
 			key: 'drawRect',
 			value: function drawRect(area) {
-				var graphics = new _pixi2.default.Graphics();
+				var graphics = new _PIXIabbr._pxG();
 	
 				graphics.beginFill(0xFFFFFF);
 				graphics.alpha = 0.60;
@@ -29569,7 +29572,7 @@
 						});
 					}
 	
-					var text = new _pixi2.default.Text(str, _styles.styles.filedClickAreaTextStyle);
+					var text = new _PIXIabbr._pxT(str, _styles.styles.filedClickAreaTextStyle);
 					text.rotation = -0.5;
 	
 					text.anchor.set(0.50);
@@ -29625,10 +29628,10 @@
 		timeScale: { x: 725, y: 320 },
 		infoPanel: {
 			main: { x: 250, y: 120 },
-			limits: { x: 0, y: 0 }, // Относительно infoPanel.main
-			hotNumbers: { x: 340, y: 0 }, // Относительно infoPanel.main
-			coldNumbers: { x: 675, y: 0 }, // Относительно infoPanel.main
-			otherNumbers: { x: 1010, y: 0 } // Относительно infoPanel.main
+			limitsPanel: { x: 0, y: 0 }, // Относительно infoPanel.main
+			hotNumPanel: { x: 340, y: 0 }, // Относительно infoPanel.main
+			coldNumPanel: { x: 675, y: 0 }, // Относительно infoPanel.main
+			otherNumPanel: { x: 1010, y: 0 } // Относительно infoPanel.main
 		}
 	};
 	
@@ -29776,7 +29779,9 @@
 		infoPanel: {
 			gradientText: { font: "24px info" },
 			whiteText: { font: "normal 24px Arial", fill: 'white' },
-			labelText: { font: "bold 18px Arial", fill: 'yellow', align: 'center' }
+			labelText: { font: "bold 18px Arial", fill: 'yellow', align: 'center' },
+			number: { font: 'normal 30px Arial', fill: 'white' },
+			amount: { font: 'normal 26px Arial', fill: 'white' }
 		}
 	};
 	
@@ -29906,17 +29911,13 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _pixi = __webpack_require__(1);
-	
-	var _pixi2 = _interopRequireDefault(_pixi);
+	var _PIXIabbr = __webpack_require__(172);
 	
 	var _spritesStore = __webpack_require__(141);
 	
 	var _defaultPositions = __webpack_require__(148);
 	
 	var _styles = __webpack_require__(150);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -29930,7 +29931,7 @@
 			this.cbCtx = config.ctx ? config.ctx : this;
 	
 			// Контейнер для фишки с тенью и текстом
-			var spriteContainer = new _pixi2.default.Container();
+			var spriteContainer = new _PIXIabbr._pxC();
 			this._spriteContainer = spriteContainer;
 	
 			spriteContainer.interactive = true;
@@ -30026,11 +30027,11 @@
 	
 				var type = btnSquareType === 'btnCancel' ? 'cn' : 'cl';
 	
-				var stateDef = new _pixi2.default.Sprite(_spritesStore.spritesStore.buttons['btnAction']),
-				    stateSel = new _pixi2.default.Sprite(_spritesStore.spritesStore.buttons['btnActionSel']),
-				    icoDef = new _pixi2.default.Sprite(_spritesStore.spritesStore.buttons[type === 'cn' ? 'icoCancel' : 'icoClear']),
-				    icoDis = new _pixi2.default.Sprite(_spritesStore.spritesStore.buttons[type === 'cn' ? 'icoCancelDis' : 'icoClearDis']),
-				    text = new _pixi2.default.Text(type === 'cn' ? 'Отменить' : 'Очистить', _styles.styles.buttonStyle);
+				var stateDef = new _PIXIabbr._pxS(_spritesStore.spritesStore.buttons['btnAction']),
+				    stateSel = new _PIXIabbr._pxS(_spritesStore.spritesStore.buttons['btnActionSel']),
+				    icoDef = new _PIXIabbr._pxS(_spritesStore.spritesStore.buttons[type === 'cn' ? 'icoCancel' : 'icoClear']),
+				    icoDis = new _PIXIabbr._pxS(_spritesStore.spritesStore.buttons[type === 'cn' ? 'icoCancelDis' : 'icoClearDis']),
+				    text = new _PIXIabbr._pxT(type === 'cn' ? 'Отменить' : 'Очистить', _styles.styles.buttonStyle);
 	
 				stateSel.visible = false;
 				icoDis.visible = false;
@@ -30059,9 +30060,9 @@
 	
 				var type = btnSquareType === 'btnRepeat' ? 'rpt' : 'x2';
 	
-				var stateDef = new _pixi2.default.Sprite(_spritesStore.spritesStore.buttons[type === 'rpt' ? 'btnRepeat' : 'btnX2']),
-				    stateSel = new _pixi2.default.Sprite(_spritesStore.spritesStore.buttons[type === 'rpt' ? 'btnRepeatSel' : 'btnX2Sel']),
-				    stateDis = new _pixi2.default.Sprite(_spritesStore.spritesStore.buttons[type === 'rpt' ? 'btnRepeatDis' : 'btnX2Dis']);
+				var stateDef = new _PIXIabbr._pxS(_spritesStore.spritesStore.buttons[type === 'rpt' ? 'btnRepeat' : 'btnX2']),
+				    stateSel = new _PIXIabbr._pxS(_spritesStore.spritesStore.buttons[type === 'rpt' ? 'btnRepeatSel' : 'btnX2Sel']),
+				    stateDis = new _PIXIabbr._pxS(_spritesStore.spritesStore.buttons[type === 'rpt' ? 'btnRepeatDis' : 'btnX2Dis']);
 	
 				stateSel.visible = false;
 				stateDis.visible = false;
@@ -30218,9 +30219,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _pixi = __webpack_require__(1);
-	
-	var _pixi2 = _interopRequireDefault(_pixi);
+	var _PIXIabbr = __webpack_require__(172);
 	
 	var _spritesStore = __webpack_require__(141);
 	
@@ -30231,8 +30230,6 @@
 	var _styles = __webpack_require__(150);
 	
 	var _helpFunctions = __webpack_require__(156);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -30247,7 +30244,7 @@
 			this.cbCtx = config.ctx ? config.ctx : this;
 	
 			// Контейнер для фишки с тенью и текстом
-			var spriteContainer = new _pixi2.default.Container();
+			var spriteContainer = new _PIXIabbr._pxC();
 			this._spriteContainer = spriteContainer;
 			// Opt-in to interactivity
 			spriteContainer.interactive = true;
@@ -30257,18 +30254,18 @@
 			spriteContainer.x = _defaultPositions.defaultPositions.chips[chipType].x;
 			spriteContainer.y = _defaultPositions.defaultPositions.chips[chipType].y;
 	
-			var sprite = new _pixi2.default.Sprite(_spritesStore.spritesStore.chips[chipType]);
+			var sprite = new _PIXIabbr._pxS(_spritesStore.spritesStore.chips[chipType]);
 	
 			sprite.anchor.set(0.5);
 	
 			// Тень под фишкой
-			var shadow = new _pixi2.default.Sprite(_spritesStore.spritesStore.chips.chipShadow);
+			var shadow = new _PIXIabbr._pxS(_spritesStore.spritesStore.chips.chipShadow);
 			shadow.anchor.set(0.5);
 	
 			// Значение ставки на фишке
 			this.chipValue = _chipValues.chipValues[chipType];
 			this.chipType = chipType;
-			var chipValueText = new _pixi2.default.Text(_helpFunctions._hf.formatChipValue(this.chipValue), _styles.styles.chipTextStyle);
+			var chipValueText = new _PIXIabbr._pxT(_helpFunctions._hf.formatChipValue(this.chipValue), _styles.styles.chipTextStyle);
 			chipValueText.anchor.set(0.5);
 	
 			['touchend', 'mouseup', 'pointerup'].forEach(function (event) {
@@ -30510,15 +30507,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _pixi = __webpack_require__(1);
-	
-	var _pixi2 = _interopRequireDefault(_pixi);
+	var _PIXIabbr = __webpack_require__(172);
 	
 	var _spritesStore = __webpack_require__(141);
 	
 	var _styles = __webpack_require__(150);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -30532,7 +30525,7 @@
 			this.cbCtx = config.ctx ? config.ctx : this;
 	
 			// Контейнер для плавающей фишки
-			this._floatChipsContainer = new _pixi2.default.Container();
+			this._floatChipsContainer = new _PIXIabbr._pxC();
 			this._floatChipsContainer.x = 50;
 			this._floatChipsContainer.y = 50;
 			this._floatChipsContainer.visible = false;
@@ -30543,14 +30536,14 @@
 			});
 	
 			['chipSm0', 'chipSm1', 'chipSm2', 'chipSm3', 'chipSm4'].forEach(function (chipType) {
-				var floatChipSprite = new _pixi2.default.Sprite(_spritesStore.spritesStore.chips[chipType]);
+				var floatChipSprite = new _PIXIabbr._pxS(_spritesStore.spritesStore.chips[chipType]);
 				// floatChipSprite.visible = false;
 				floatChipSprite.anchor.set(0.5);
 				_this._floatChipsContainer.addChild(floatChipSprite);
 			});
 	
 			// Значение на фишке
-			var chipValueText = new _pixi2.default.Text(';)', _styles.styles.floatChipTextStyle);
+			var chipValueText = new _PIXIabbr._pxT(';)', _styles.styles.floatChipTextStyle);
 			chipValueText.visible = false;
 			this._floatChipsContainer.addChild(chipValueText);
 			chipValueText.anchor.x = 0.5;
@@ -30754,9 +30747,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _pixi = __webpack_require__(1);
-	
-	var _pixi2 = _interopRequireDefault(_pixi);
+	var _PIXIabbr = __webpack_require__(172);
 	
 	var _spritesStore = __webpack_require__(141);
 	
@@ -30767,8 +30758,6 @@
 	var _helpFunctions = __webpack_require__(156);
 	
 	var _touchEvents = __webpack_require__(143);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -30789,16 +30778,16 @@
 			this.updateBetModel = config.updateBetModel ? config.updateBetModel : undefined;
 			this.cbCtx = config.ctx ? config.ctx : this;
 	
-			this._betContainer = new _pixi2.default.Container();
+			this._betContainer = new _PIXIabbr._pxC();
 			this._betContainer.x = config.pos.x;
 			this._betContainer.y = config.pos.y;
 	
 			this._betContainer.interactive = true;
 	
-			var betSprite = new _pixi2.default.Sprite(_spritesStore.spritesStore.chips[chipType]);
+			var betSprite = new _PIXIabbr._pxS(_spritesStore.spritesStore.chips[chipType]);
 			betSprite.anchor.set(0.5);
 	
-			var chipValueText = new _pixi2.default.Text(_helpFunctions._hf.formatChipValue(value), _styles.styles.chipSmTextStyle);
+			var chipValueText = new _PIXIabbr._pxT(_helpFunctions._hf.formatChipValue(value), _styles.styles.chipSmTextStyle);
 			chipValueText.anchor.set(0.5);
 	
 			['touchstart', 'mousedown', 'pointerdown'].forEach(function (event) {
@@ -30864,7 +30853,7 @@
 				var count = 0;
 				sortChipSmTypeArr.forEach(function (chipSmType, idx) {
 					for (var i = 0; i < betSprites[chipSmType]; i += 1) {
-						var newSprite = new _pixi2.default.Sprite(_spritesStore.spritesStore.chips[chipSmType]);
+						var newSprite = new _PIXIabbr._pxS(_spritesStore.spritesStore.chips[chipSmType]);
 						newSprite.anchor.set(0.5);
 						newSprite.y -= count * 5;
 						spriteContainer.addChild(newSprite);
@@ -30873,7 +30862,7 @@
 				});
 	
 				if (spriteContainer.children.length) {
-					var chipValueText = new _pixi2.default.Text(_helpFunctions._hf.formatChipValue(this._summ), _styles.styles.chipSmTextStyle);
+					var chipValueText = new _PIXIabbr._pxT(_helpFunctions._hf.formatChipValue(this._summ), _styles.styles.chipSmTextStyle);
 					chipValueText.anchor.set(0.5, 0.6);
 	
 					spriteContainer.children[spriteContainer.children.length - 1].addChild(chipValueText);
@@ -31032,17 +31021,13 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _pixi = __webpack_require__(1);
-	
-	var _pixi2 = _interopRequireDefault(_pixi);
+	var _PIXIabbr = __webpack_require__(172);
 	
 	var _defaultPositions = __webpack_require__(148);
 	
 	var _styles = __webpack_require__(150);
 	
 	var _spritesStore = __webpack_require__(141);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -31059,7 +31044,7 @@
 			this.state = 0;
 	
 			// Контейнер для фишки с тенью и текстом
-			var spriteContainer = new _pixi2.default.Container();
+			var spriteContainer = new _PIXIabbr._pxC();
 			this.pixiContainer = spriteContainer;
 	
 			spriteContainer.x = _defaultPositions.defaultPositions.timeScale.x;
@@ -31068,12 +31053,12 @@
 			this.sprites = {};
 	
 			['timerBack', 'timerYellow', 'timerRed'].forEach(function (item) {
-				_this.sprites[item] = new _pixi2.default.Sprite(_spritesStore.spritesStore.timer[item]);
+				_this.sprites[item] = new _PIXIabbr._pxS(_spritesStore.spritesStore.timer[item]);
 				if (item === 'timerRed') _this.sprites[item].visible = false;
 				spriteContainer.addChild(_this.sprites[item]);
 			});
 	
-			var pixiText = new _pixi2.default.Text(statusText['status' + this.state], _styles.styles.timeScale);
+			var pixiText = new _PIXIabbr._pxT(statusText['status' + this.state], _styles.styles.timeScale);
 			pixiText.anchor.set(0.5);
 			pixiText.x = spriteContainer.width / 2;
 			pixiText.y = -30;
@@ -31226,18 +31211,25 @@
 	
 	var _infoPanelView2 = _interopRequireDefault(_infoPanelView);
 	
+	var _infoPanelData = __webpack_require__(171);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var infoPanelController = function () {
-		function infoPanelController() {
+		function infoPanelController(dataFromGameCtrl) {
 			_classCallCheck(this, infoPanelController);
 	
-			this._infoPanel = new _infoPanelView2.default();
+			this._infoPanel = new _infoPanelView2.default(dataFromGameCtrl || _infoPanelData.defaultPanelData);
 		}
 	
 		_createClass(infoPanelController, [{
+			key: 'updateInfoPanelView',
+			value: function updateInfoPanelView(data) {
+				this._infoPanel.update(data);
+			}
+		}, {
 			key: 'pixiSprite',
 			get: function get() {
 				return this._infoPanel.sprite;
@@ -31264,15 +31256,9 @@
 	// views
 	
 	
-	var _pixi = __webpack_require__(1);
-	
-	var _pixi2 = _interopRequireDefault(_pixi);
-	
-	var _spritesStore = __webpack_require__(141);
+	var _PIXIabbr = __webpack_require__(172);
 	
 	var _defaultPositions = __webpack_require__(148);
-	
-	var _styles = __webpack_require__(150);
 	
 	var _limitsView = __webpack_require__(166);
 	
@@ -31295,58 +31281,55 @@
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var infoPanelView = function () {
-		function infoPanelView(config) {
+		function infoPanelView(dataFromController) {
 			_classCallCheck(this, infoPanelView);
 	
-			// this.callback = (config.callback) ? config.callback : undefined;
-			// this.ctx = (config.ctx) ? config.ctx : this;
-	
 			// Контейнер для фишки с тенью и текстом
-			var spriteContainer = new _pixi2.default.Container();
+			var spriteContainer = new _PIXIabbr._pxC();
 			this._spriteContainer = spriteContainer;
 	
 			spriteContainer.x = _defaultPositions.defaultPositions.infoPanel.main.x;
 			spriteContainer.y = _defaultPositions.defaultPositions.infoPanel.main.y;
 	
-			var bg = new _pixi2.default.Sprite.fromImage('./assets/images/bg_info.png');
+			var bg = new _PIXIabbr._pxS.fromImage('./assets/images/bg_info.png');
+	
 			spriteContainer.addChild(bg);
 			for (var i = 1; i <= 3; i += 1) {
-				var sep = new _pixi2.default.Sprite.fromImage('./assets/images/separator_vert.png');
-				sep.x = i * 337;
-				sep.y = 0;
+				var sep = new _PIXIabbr._pxS.fromImage('./assets/images/separator_vert.png');
+				sep.position = { x: i * 337, y: 0 };
 				spriteContainer.addChild(sep);
 			}
 	
-			this.panels = {};
-			this.panels.limitsPanel = new _limitsView2.default();
-			this.panels.hotNumPanel = new _hotNumbersView2.default();
-			this.panels.coldNumbers = new _coldNumbersView2.default();
-			this.panels.otherNumView = new _otherNumbersView2.default();
+			this.panels = {
+				limitsPanel: new _limitsView2.default(dataFromController.limitsPanel),
 	
-			this.panels.limitsPanel.sprite.position = _defaultPositions.defaultPositions.infoPanel.limits;
-			this.panels.hotNumPanel.sprite.position = _defaultPositions.defaultPositions.infoPanel.hotNumbers;
-			this.panels.coldNumbers.sprite.position = _defaultPositions.defaultPositions.infoPanel.coldNumbers;
-			this.panels.otherNumView.sprite.position = _defaultPositions.defaultPositions.infoPanel.otherNumbers;
+				hotNumPanel: new _hotNumbersView2.default(dataFromController.hotNumPanel),
 	
-			for (var key in this.panels) {
+				coldNumPanel: new _coldNumbersView2.default(dataFromController.coldNumPanel),
+	
+				otherNumPanel: new _otherNumbersView2.default(dataFromController.otherNumPanel)
+			};
+	
+			// Позиция каждой панели
+			for (var panel in this.panels) {
+				this.panels[panel].sprite.position = _defaultPositions.defaultPositions.infoPanel[panel];
+			}for (var key in this.panels) {
 				spriteContainer.addChild(this.panels[key].sprite);
 			}
 		}
 	
 		_createClass(infoPanelView, [{
-			key: 'chipTouchEnd',
-			value: function chipTouchEnd() {
-				this.callback ? this.callback.call(this.ctx) : console.log('infoPanelView');
+			key: 'update',
+			value: function update(data) {
+				// TODO: добавить метод updateLimits для лимитов
+				for (var panel in data) {
+					this.panels[panel].updateView(data[panel]);
+				}
 			}
 		}, {
 			key: 'sprite',
 			get: function get() {
 				return this._spriteContainer;
-			}
-		}, {
-			key: 'active',
-			set: function set(active) {
-				this._active = active;
 			}
 		}]);
 	
@@ -31367,32 +31350,29 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _pixi = __webpack_require__(1);
-	
-	var _pixi2 = _interopRequireDefault(_pixi);
+	var _PIXIabbr = __webpack_require__(172);
 	
 	var _styles = __webpack_require__(150);
 	
-	var _blockTexts = __webpack_require__(167);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	var _infoPanelData = __webpack_require__(171);
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var limitsView = function () {
-		function limitsView() {
+	var limitsPanel = function () {
+		function limitsPanel() {
 			var _this = this;
 	
-			_classCallCheck(this, limitsView);
+			_classCallCheck(this, limitsPanel);
 	
-			var texts = _blockTexts.blockTexts.limitBlock;
+			var texts = _infoPanelData.blockTexts.limitBlock;
 	
 			// Контейнер для фишки с тенью и текстом
-			var spriteContainer = new _pixi2.default.Container();
-			this._spriteContainer = spriteContainer;
+			this._spriteContainer = new _PIXIabbr._pxC();
+	
+			this.drawLine();
 	
 			texts.forEach(function (item) {
-				var newText = item.type === 'gradientText' ? new _pixi2.default.extras.BitmapText(item.text, _styles.styles.infoPanel[item.type]) : new _pixi2.default.Text(item.text, _styles.styles.infoPanel[item.type]);
+				var newText = item.type === 'gradientText' ? new _PIXIabbr._pxEx.BitmapText(item.text, _styles.styles.infoPanel[item.type]) : new _PIXIabbr._pxT(item.text, _styles.styles.infoPanel[item.type]);
 	
 				newText.position = { x: item.x || 0, y: item.y || 0 };
 	
@@ -31400,37 +31380,28 @@
 			});
 		}
 	
-		_createClass(limitsView, [{
+		_createClass(limitsPanel, [{
+			key: 'drawLine',
+			value: function drawLine() {
+				var line = new _PIXIabbr._pxG();
+				line.lineStyle(1, 0xEEEE3A, 0.75).moveTo(20, 130).lineTo(320, 130);
+	
+				this._spriteContainer.addChild(line);
+			}
+		}, {
 			key: 'sprite',
 			get: function get() {
 				return this._spriteContainer;
 			}
 		}]);
 	
-		return limitsView;
+		return limitsPanel;
 	}();
 	
-	exports.default = limitsView;
+	exports.default = limitsPanel;
 
 /***/ },
-/* 167 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	var blockTexts = {
-		limitBlock: [{ type: 'labelText', text: 'ЛИМИТЫ СТОЛА', x: 110, y: 10 }, { type: 'gradientText', text: 'CASINO ROULETTE', x: 70, y: 40 }, { type: 'gradientText', text: 'MAX:', x: 25, y: 95 }, { type: 'gradientText', text: 'MIN:', x: 25, y: 140 }, { type: 'whiteText', text: '30 000', x: 240, y: 95 }, { type: 'whiteText', text: '10', x: 285, y: 140 }],
-		hotNumbers: [{ type: 'labelText', text: 'ЗА ПОСЛЕДНИЕ 100 ИГР', x: 60, y: 10 }, { type: 'gradientText', text: 'ГОРЯЧИЕ НОМЕРА', x: 70, y: 40 }],
-		coldNumbers: [{ type: 'labelText', text: 'ЗА ПОСЛЕДНИЕ 100 ИГР', x: 60, y: 10 }, { type: 'gradientText', text: 'ХОЛОДНЫЕ НОМЕРА', x: 50, y: 40 }],
-		otherNumbers: [{ type: 'labelText', text: 'ЗА ПОСЛЕДНИЕ 50 ИГР', x: 60, y: 10 }, { type: 'gradientText', text: 'RED', x: 60, y: 40 }, { type: 'gradientText', text: 'BLACK', x: 210, y: 40 }, { type: 'gradientText', text: 'ODD', x: 30, y: 120 }, { type: 'gradientText', text: '0', x: 150, y: 120 }, { type: 'gradientText', text: 'EVEN', x: 240, y: 120 }]
-	};
-	
-	exports.blockTexts = blockTexts;
-
-/***/ },
+/* 167 */,
 /* 168 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -31442,55 +31413,43 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _pixi = __webpack_require__(1);
-	
-	var _pixi2 = _interopRequireDefault(_pixi);
+	var _PIXIabbr = __webpack_require__(172);
 	
 	var _styles = __webpack_require__(150);
 	
-	var _blockTexts = __webpack_require__(167);
+	var _infoPanelData = __webpack_require__(171);
 	
 	var _spritesStore = __webpack_require__(141);
 	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var hotNumView = function () {
-		function hotNumView() {
+	var hotNumPanel = function () {
+		function hotNumPanel(numbers) {
 			var _this = this;
 	
-			_classCallCheck(this, hotNumView);
+			_classCallCheck(this, hotNumPanel);
 	
-			var texts = _blockTexts.blockTexts.hotNumbers;
+			this.numbers = numbers;
 	
-			this.colorMap = {
-				bgRed: [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36],
-				bgBlack: [2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35]
-			};
+			// Текст для этого блока
+			var texts = _infoPanelData.blockTexts.hotNumbers;
 	
 			// Контейнер для фишки с тенью и текстом
-			var spriteContainer = new _pixi2.default.Container();
-			this._spriteContainer = spriteContainer;
+			this._spriteContainer = new _PIXIabbr._pxC();
 	
+			// Добавление текста в ячейке
 			texts.forEach(function (item) {
-				var newText = item.type === 'gradientText' ? new _pixi2.default.extras.BitmapText(item.text, _styles.styles.infoPanel[item.type]) : new _pixi2.default.Text(item.text, _styles.styles.infoPanel[item.type]);
+				var newText = item.type === 'gradientText' ? new _PIXIabbr._pxEx.BitmapText(item.text, _styles.styles.infoPanel[item.type]) : new _PIXIabbr._pxT(item.text, _styles.styles.infoPanel[item.type]);
 	
 				newText.position = { x: item.x || 0, y: item.y || 0 };
 	
 				_this._spriteContainer.addChild(newText);
 			});
 	
-			var arr = [{ number: 34, amount: 37 }, { number: 17, amount: 19 }, { number: 23, amount: 47 }, { number: 15, amount: 98 }];
-	
-			this.createNumbers(arr);
-	
-			this.numbers.forEach(function (item) {
-				_this._spriteContainer.addChild(item);
-			});
+			this.createNumbers(this.numbers);
 		}
 	
-		_createClass(hotNumView, [{
+		_createClass(hotNumPanel, [{
 			key: 'createNumbers',
 	
 	
@@ -31501,7 +31460,10 @@
 			value: function createNumbers(numbers) {
 				var _this2 = this;
 	
-				if (!this.numbers) this.numbers = [];
+				if (!numbers || !numbers.length) return false;
+	
+				if (!this.numberSprites) this.numberSprites = [];
+				if (this.numberSprites.length) this.deleteNumbers();
 	
 				numbers.sort(function (a, b) {
 					return a.amount < b.amount;
@@ -31510,7 +31472,11 @@
 				numbers.forEach(function (num, idx) {
 					var item = _this2.createNumber(num);
 					item.position = { x: idx * 75 + 20, y: 80 };
-					_this2.numbers.push(item);
+					_this2.numberSprites.push(item);
+				});
+	
+				this.numberSprites.forEach(function (item) {
+					_this2._spriteContainer.addChild(item);
 				});
 			}
 	
@@ -31524,25 +31490,69 @@
 			key: 'createNumber',
 			value: function createNumber(obj) {
 				var color = void 0;
-				for (var key in this.colorMap) {
-					if (~this.colorMap[key].indexOf(obj.number)) color = key;
-				}var numCnt = new _pixi2.default.Container(),
-				    bg = new _pixi2.default.Sprite(_spritesStore.spritesStore.bgNumbers[color]),
-				    text1 = new _pixi2.default.Text(obj.number, { font: 'normal 30px Arial', fill: 'white' }),
-				    text2 = new _pixi2.default.Text(obj.amount, { font: 'normal 26px Arial', fill: 'white' });
+				for (var key in _infoPanelData.colorNumMap) {
+					if (~_infoPanelData.colorNumMap[key].indexOf(obj.number)) color = key;
+				}var numCnt = new _PIXIabbr._pxC(),
+				    bg = new _PIXIabbr._pxS(_spritesStore.spritesStore.bgNumbers[color]),
+				    num = new _PIXIabbr._pxT(obj.number, _styles.styles.infoPanel.number),
+				    amount = new _PIXIabbr._pxT(obj.amount, _styles.styles.infoPanel.amount);
 	
-				text1.position = { x: 15, y: 15 };
-				text2.position = { x: 25, y: 70 };
+				num.position = { x: 15, y: 15 };
+				amount.position = { x: 25, y: 70 };
 	
 				numCnt.addChild(bg);
-				numCnt.addChild(text1);
-				numCnt.addChild(text2);
+				numCnt.addChild(num);
+				numCnt.addChild(amount);
 	
 				return numCnt;
 			}
+	
+			/**
+	   * Метод апдейтит горячие номера. Может принмать как массив объектов так и один объект (номер)
+	   * @param param
+	   */
+	
 		}, {
-			key: 'updateNumber',
-			value: function updateNumber() {}
+			key: 'updateView',
+			value: function updateView(param) {
+				var _this3 = this;
+	
+				var str = Object.prototype.toString.call(param);
+				var type = str.substr(8, str.length - 9).toLowerCase();
+	
+				if (type === 'array') {
+					param.forEach(function (item) {
+						_this3.numbers.push(item);
+					});
+				} else if (type === 'object') {
+					this.numbers.push(param);
+				}
+	
+				this.numbers.sort(function (a, b) {
+					return a.amount < b.amount;
+				});
+				this.numbers.length = 4;
+	
+				this.createNumbers(this.numbers);
+			}
+	
+			/**
+	   * И общего контейнера удаляем pixi-контейнеры номеров
+	   */
+	
+		}, {
+			key: 'deleteNumbers',
+			value: function deleteNumbers() {
+				var _this4 = this;
+	
+				this.numberSprites.forEach(function (item) {
+					_this4._spriteContainer.children.forEach(function (item2) {
+						if (item2 === item) _this4._spriteContainer.removeChild(item);
+					});
+				});
+	
+				this.numberSprites.length = 0;
+			}
 		}, {
 			key: 'sprite',
 			get: function get() {
@@ -31550,10 +31560,10 @@
 			}
 		}]);
 	
-		return hotNumView;
+		return hotNumPanel;
 	}();
 	
-	exports.default = hotNumView;
+	exports.default = hotNumPanel;
 
 /***/ },
 /* 169 */
@@ -31567,50 +31577,157 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _pixi = __webpack_require__(1);
-	
-	var _pixi2 = _interopRequireDefault(_pixi);
+	var _PIXIabbr = __webpack_require__(172);
 	
 	var _styles = __webpack_require__(150);
 	
-	var _blockTexts = __webpack_require__(167);
+	var _infoPanelData = __webpack_require__(171);
 	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	var _spritesStore = __webpack_require__(141);
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var coldNumView = function () {
-		function coldNumView() {
+	var coldNumPanel = function () {
+		function coldNumPanel(numbers) {
 			var _this = this;
 	
-			_classCallCheck(this, coldNumView);
+			_classCallCheck(this, coldNumPanel);
 	
-			var texts = _blockTexts.blockTexts.coldNumbers;
+			this.numbers = numbers;
+	
+			// Текст для этого блока
+			var texts = _infoPanelData.blockTexts.coldNumbers;
 	
 			// Контейнер для фишки с тенью и текстом
-			var spriteContainer = new _pixi2.default.Container();
-			this._spriteContainer = spriteContainer;
+			this._spriteContainer = new _PIXIabbr._pxC();
 	
+			// Добавление текста в ячейке
 			texts.forEach(function (item) {
-				var newText = item.type === 'gradientText' ? new _pixi2.default.extras.BitmapText(item.text, _styles.styles.infoPanel[item.type]) : new _pixi2.default.Text(item.text, _styles.styles.infoPanel[item.type]);
+				var newText = item.type === 'gradientText' ? new _PIXIabbr._pxEx.BitmapText(item.text, _styles.styles.infoPanel[item.type]) : new _PIXIabbr._pxT(item.text, _styles.styles.infoPanel[item.type]);
 	
 				newText.position = { x: item.x || 0, y: item.y || 0 };
 	
 				_this._spriteContainer.addChild(newText);
 			});
+	
+			this.createNumbers(this.numbers);
 		}
 	
-		_createClass(coldNumView, [{
+		_createClass(coldNumPanel, [{
+			key: 'createNumbers',
+	
+	
+			/**
+	   * Метод создаёт массив PIXI-контейнеров с числами
+	   * @param numbers
+	   */
+			value: function createNumbers(numbers) {
+				var _this2 = this;
+	
+				if (!numbers || !numbers.length) return false;
+	
+				if (!this.numberSprites) this.numberSprites = [];
+				if (this.numberSprites.length) this.deleteNumbers();
+	
+				numbers.sort(function (a, b) {
+					return a.amount > b.amount;
+				});
+	
+				numbers.forEach(function (num, idx) {
+					var item = _this2.createNumber(num);
+					item.position = { x: idx * 75 + 20, y: 80 };
+					_this2.numberSprites.push(item);
+				});
+	
+				this.numberSprites.forEach(function (item) {
+					_this2._spriteContainer.addChild(item);
+				});
+			}
+	
+			/**
+	   * Метод создает PIXI-контейнер с полученными данными и возвращает его
+	   * @param obj
+	   * @returns {PIXI.Container}
+	   */
+	
+		}, {
+			key: 'createNumber',
+			value: function createNumber(obj) {
+				var color = void 0;
+				for (var key in _infoPanelData.colorNumMap) {
+					if (~_infoPanelData.colorNumMap[key].indexOf(obj.number)) color = key;
+				}var numCnt = new _PIXIabbr._pxC(),
+				    bg = new _PIXIabbr._pxS(_spritesStore.spritesStore.bgNumbers[color]),
+				    num = new _PIXIabbr._pxT(obj.number, _styles.styles.infoPanel.number),
+				    amount = new _PIXIabbr._pxT(obj.amount, _styles.styles.infoPanel.amount);
+	
+				num.position = { x: 15, y: 15 };
+				amount.position = { x: 25, y: 70 };
+	
+				numCnt.addChild(bg);
+				numCnt.addChild(num);
+				numCnt.addChild(amount);
+	
+				return numCnt;
+			}
+	
+			/**
+	   * Метод апдейтит горячие номера. Может принмать как массив объектов так и один объект (номер)
+	   * @param param
+	   */
+	
+		}, {
+			key: 'updateView',
+			value: function updateView(param) {
+				var _this3 = this;
+	
+				var str = Object.prototype.toString.call(param);
+				var type = str.substr(8, str.length - 9).toLowerCase();
+	
+				if (type === 'array') {
+					param.forEach(function (item) {
+						_this3.numbers.push(item);
+					});
+				} else if (type === 'object') {
+					this.numbers.push(param);
+				}
+	
+				this.numbers.sort(function (a, b) {
+					return a.amount > b.amount;
+				});
+				this.numbers.length = 4;
+	
+				this.createNumbers(this.numbers);
+			}
+	
+			/**
+	   * И общего контейнера удаляем pixi-контейнеры номеров
+	   */
+	
+		}, {
+			key: 'deleteNumbers',
+			value: function deleteNumbers() {
+				var _this4 = this;
+	
+				this.numberSprites.forEach(function (item) {
+					_this4._spriteContainer.children.forEach(function (item2) {
+						if (item2 === item) _this4._spriteContainer.removeChild(item);
+					});
+				});
+	
+				this.numberSprites.length = 0;
+			}
+		}, {
 			key: 'sprite',
 			get: function get() {
 				return this._spriteContainer;
 			}
 		}]);
 	
-		return coldNumView;
+		return coldNumPanel;
 	}();
 	
-	exports.default = coldNumView;
+	exports.default = coldNumPanel;
 
 /***/ },
 /* 170 */
@@ -31624,32 +31741,46 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _pixi = __webpack_require__(1);
+	var _PIXIabbr = __webpack_require__(172);
 	
-	var _pixi2 = _interopRequireDefault(_pixi);
+	var _spritesStore = __webpack_require__(141);
 	
 	var _styles = __webpack_require__(150);
 	
-	var _blockTexts = __webpack_require__(167);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	var _infoPanelData = __webpack_require__(171);
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var otherNumView = function () {
-		function otherNumView() {
+	var otherNumPanel = function () {
+		function otherNumPanel(numbers) {
 			var _this = this;
 	
-			_classCallCheck(this, otherNumView);
+			_classCallCheck(this, otherNumPanel);
 	
-			var texts = _blockTexts.blockTexts.otherNumbers;
+			// Позиции цифр в последнем блоке
+			this.numbersPos = {
+				red: { x: 70, y: 72 },
+				black: { x: 250, y: 72 },
+				odd: { x: 50, y: 155 },
+				even: { x: 260, y: 155 },
+				zero: { x: 150, y: 155 }
+			};
+	
+			this.numbers = numbers || { red: 0, black: 0, odd: 0, even: 0, zero: 0 };
+	
+			this.numbersSprites = {};
+	
+			var texts = _infoPanelData.blockTexts.otherNumbers;
 	
 			// Контейнер для фишки с тенью и текстом
-			var spriteContainer = new _pixi2.default.Container();
-			this._spriteContainer = spriteContainer;
+			this._spriteContainer = new _PIXIabbr._pxC();
+	
+			this.drawLine();
+			this.drawRhombus();
+			this.drawNumbers();
 	
 			texts.forEach(function (item) {
-				var newText = item.type === 'gradientText' ? new _pixi2.default.extras.BitmapText(item.text, _styles.styles.infoPanel[item.type]) : new _pixi2.default.Text(item.text, _styles.styles.infoPanel[item.type]);
+				var newText = item.type === 'gradientText' ? new _PIXIabbr._pxEx.BitmapText(item.text, _styles.styles.infoPanel[item.type]) : new _PIXIabbr._pxT(item.text, _styles.styles.infoPanel[item.type]);
 	
 				newText.position = { x: item.x || 0, y: item.y || 0 };
 	
@@ -31657,17 +31788,134 @@
 			});
 		}
 	
-		_createClass(otherNumView, [{
+		_createClass(otherNumPanel, [{
+			key: 'drawNumbers',
+	
+	
+			/**
+	   * Отрисовка цифр. Спрайты и значения храним в объектах
+	   */
+			value: function drawNumbers() {
+				for (var key in this.numbers) {
+					var num = this.numbers[key] + '%';
+	
+					if (!this.numbersSprites[key]) {
+						this.numbersSprites[key] = new _PIXIabbr._pxT(num, _styles.styles.infoPanel.whiteText);
+						this.numbersSprites[key].position = this.numbersPos[key];
+						this._spriteContainer.addChild(this.numbersSprites[key]);
+					} else {
+						this.numbersSprites[key].text = num;
+					}
+				}
+			}
+	
+			/**
+	   * Обновление данных
+	   * @param obj
+	   */
+	
+		}, {
+			key: 'updateView',
+			value: function updateView(obj) {
+				for (var key in obj) {
+					this.numbers[key] = obj[key] || 0;
+				}this.drawNumbers();
+			}
+		}, {
+			key: 'drawLine',
+			value: function drawLine() {
+				var line = new _PIXIabbr._pxG();
+				line.lineStyle(1, 0xEEEE3A, 0.75).moveTo(20, 110).lineTo(320, 110);
+	
+				this._spriteContainer.addChild(line);
+			}
+		}, {
+			key: 'drawRhombus',
+			value: function drawRhombus() {
+				var redR = new _PIXIabbr._pxS(_spritesStore.spritesStore.bgNumbers.icoRed);
+				redR.position = { x: 20, y: 75 };
+	
+				var blackR = new _PIXIabbr._pxS(_spritesStore.spritesStore.bgNumbers.icoBlack);
+				blackR.position = { x: 200, y: 75 };
+				this._spriteContainer.addChild(redR);
+				this._spriteContainer.addChild(blackR);
+			}
+		}, {
 			key: 'sprite',
 			get: function get() {
 				return this._spriteContainer;
 			}
 		}]);
 	
-		return otherNumView;
+		return otherNumPanel;
 	}();
 	
-	exports.default = otherNumView;
+	exports.default = otherNumPanel;
+
+/***/ },
+/* 171 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	var defaultPanelData = {
+		limitsPanel: { max: 30000, min: 10 },
+		hotNumPanel: [{ number: 34, amount: 37 }, { number: 17, amount: 19 }, { number: 23, amount: 47 }, { number: 15, amount: 98 }],
+		coldNumPanel: [{ number: 33, amount: 7 }, { number: 16, amount: 2 }, { number: 22, amount: 5 }, { number: 14, amount: 8 }],
+		otherNumPanel: { red: 12, black: 38, odd: 10, even: 39, zero: 1 }
+	};
+	
+	var colorNumMap = {
+		bgRed: [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36],
+		bgBlack: [2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35]
+	};
+	
+	var blockTexts = {
+		limitBlock: [{ type: 'labelText', text: 'ЛИМИТЫ СТОЛА', x: 110, y: 10 }, { type: 'gradientText', text: 'CASINO ROULETTE', x: 70, y: 40 }, { type: 'gradientText', text: 'MAX:', x: 25, y: 95 }, { type: 'gradientText', text: 'MIN:', x: 25, y: 140 }, { type: 'whiteText', text: '30 000', x: 240, y: 95 }, { type: 'whiteText', text: '10', x: 285, y: 140 }],
+		hotNumbers: [{ type: 'labelText', text: 'ЗА ПОСЛЕДНИЕ 100 ИГР', x: 60, y: 10 }, { type: 'gradientText', text: 'ГОРЯЧИЕ НОМЕРА', x: 70, y: 40 }],
+		coldNumbers: [{ type: 'labelText', text: 'ЗА ПОСЛЕДНИЕ 100 ИГР', x: 60, y: 10 }, { type: 'gradientText', text: 'ХОЛОДНЫЕ НОМЕРА', x: 50, y: 40 }],
+		otherNumbers: [{ type: 'labelText', text: 'ЗА ПОСЛЕДНИЕ 50 ИГР', x: 60, y: 10 }, { type: 'gradientText', text: 'RED', x: 60, y: 40 }, { type: 'gradientText', text: 'BLACK', x: 210, y: 40 }, { type: 'gradientText', text: 'ODD', x: 30, y: 120 }, { type: 'gradientText', text: '0', x: 150, y: 120 }, { type: 'gradientText', text: 'EVEN', x: 240, y: 120 }]
+	};
+	
+	exports.blockTexts = blockTexts;
+	exports.colorNumMap = colorNumMap;
+	exports.defaultPanelData = defaultPanelData;
+
+/***/ },
+/* 172 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports._pxEx = exports._pxG = exports._pxTr = exports._pxT = exports._pxS = exports._pxC = exports._p = undefined;
+	
+	var _pixi = __webpack_require__(1);
+	
+	var _pixi2 = _interopRequireDefault(_pixi);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var _p = _pixi2.default,
+	    _pxC = _p.Container,
+	    _pxS = _p.Sprite,
+	    _pxT = _p.Text,
+	    _pxTr = _p.Texture,
+	    _pxG = _p.Graphics,
+	    _pxEx = _p.extras;
+	
+	exports._p = _p;
+	exports._pxC = _pxC;
+	exports._pxS = _pxS;
+	exports._pxT = _pxT;
+	exports._pxTr = _pxTr;
+	exports._pxG = _pxG;
+	exports._pxEx = _pxEx;
 
 /***/ }
 /******/ ]);

@@ -1,4 +1,4 @@
-import PIXI from 'pixi.js';
+import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
 import {spritesStore} from './../../spritesStore';
 import {defaultPositions} from './../../constants/defaultPositions';
 import {chipValues} from './../../constants/chipValues';
@@ -12,7 +12,7 @@ export default class ChipView {
 		this.cbCtx = (config.ctx) ? config.ctx : this;
 
 		// Контейнер для фишки с тенью и текстом
-		let spriteContainer = new PIXI.Container();
+		let spriteContainer = new _pxC();
 		this._spriteContainer = spriteContainer;
 		// Opt-in to interactivity
 		spriteContainer.interactive = true;
@@ -23,19 +23,19 @@ export default class ChipView {
 		spriteContainer.x = defaultPositions.chips[chipType].x;
 		spriteContainer.y = defaultPositions.chips[chipType].y;
 
-		let sprite = new PIXI.Sprite( spritesStore.chips[chipType] );
+		let sprite = new _pxS( spritesStore.chips[chipType] );
 
 
 		sprite.anchor.set(0.5);
 
 		// Тень под фишкой
-		let shadow = new PIXI.Sprite( spritesStore.chips.chipShadow );
+		let shadow = new _pxS( spritesStore.chips.chipShadow );
 		shadow.anchor.set(0.5);
 
 		// Значение ставки на фишке
 		this.chipValue = chipValues[chipType];
 		this.chipType = chipType;
-		let chipValueText = new PIXI.Text( _hf.formatChipValue(this.chipValue), styles.chipTextStyle );
+		let chipValueText = new _pxT( _hf.formatChipValue(this.chipValue), styles.chipTextStyle );
 		chipValueText.anchor.set(0.5);
 
 		['touchend', 'mouseup', 'pointerup'].forEach((event)=>{

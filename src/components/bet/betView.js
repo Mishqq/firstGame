@@ -1,4 +1,4 @@
-import PIXI from 'pixi.js';
+import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
 import {spritesStore} from './../../spritesStore';
 import {styles} from './../../constants/styles';
 import {smallChipTypes} from './../../constants/chipValues';
@@ -19,16 +19,16 @@ export default class BetView {
 		this.updateBetModel = (config.updateBetModel) ? config.updateBetModel : undefined;
 		this.cbCtx = (config.ctx) ? config.ctx : this;
 
-		this._betContainer = new PIXI.Container();
+		this._betContainer = new _pxC();
 		this._betContainer.x = config.pos.x;
 		this._betContainer.y = config.pos.y;
 
 		this._betContainer.interactive = true;
 
-		let betSprite = new PIXI.Sprite( spritesStore.chips[chipType] );
+		let betSprite = new _pxS( spritesStore.chips[chipType] );
 		betSprite.anchor.set(0.5);
 
-		let chipValueText = new PIXI.Text( _hf.formatChipValue(value), styles.chipSmTextStyle );
+		let chipValueText = new _pxT( _hf.formatChipValue(value), styles.chipSmTextStyle );
 		chipValueText.anchor.set(0.5);
 
 		['touchstart', 'mousedown', 'pointerdown'].forEach((event)=>{
@@ -99,7 +99,7 @@ export default class BetView {
 		let count=0;
 		sortChipSmTypeArr.forEach((chipSmType, idx)=>{
 			for(let i=0; i<betSprites[chipSmType]; i+=1){
-				let newSprite = new PIXI.Sprite( spritesStore.chips[chipSmType] );
+				let newSprite = new _pxS( spritesStore.chips[chipSmType] );
 				newSprite.anchor.set(0.5);
 				newSprite.y -= count*5;
 				spriteContainer.addChild(newSprite);
@@ -108,7 +108,7 @@ export default class BetView {
 		});
 
 		if(spriteContainer.children.length){
-			let chipValueText = new PIXI.Text( _hf.formatChipValue(this._summ), styles.chipSmTextStyle );
+			let chipValueText = new _pxT( _hf.formatChipValue(this._summ), styles.chipSmTextStyle );
 			chipValueText.anchor.set(0.5, 0.6);
 
 			spriteContainer.children[ spriteContainer.children.length-1 ].addChild(chipValueText);

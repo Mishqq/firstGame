@@ -19,10 +19,10 @@ const defaultPositions = {
 	timeScale: {x: 725, y: 320},
 	infoPanel: {
 		main: {x: 250, y: 120},
-		limits: {x: 0, y: 0}, // Относительно infoPanel.main
-		hotNumbers: {x: 340, y: 0}, // Относительно infoPanel.main
-		coldNumbers: {x: 675, y: 0}, // Относительно infoPanel.main
-		otherNumbers: {x: 1010, y: 0} // Относительно infoPanel.main
+		limitsPanel: {x: 0, y: 0}, // Относительно infoPanel.main
+		hotNumPanel: {x: 340, y: 0}, // Относительно infoPanel.main
+		coldNumPanel: {x: 675, y: 0}, // Относительно infoPanel.main
+		otherNumPanel: {x: 1010, y: 0} // Относительно infoPanel.main
 	}
 };
 

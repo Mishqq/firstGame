@@ -1,43 +1,30 @@
-import PIXI from 'pixi.js';
+import {_pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
 import {styles} from './../../constants/styles';
-import {blockTexts} from './blockTexts';
+import {blockTexts, colorNumMap} from './infoPanelData';
 import {spritesStore} from './../../spritesStore';
 
-export default class hotNumView {
-	constructor() {
+export default class hotNumPanel {
+	constructor(numbers) {
+		this.numbers = numbers;
+
+		// Текст для этого блока
 		let texts = blockTexts.hotNumbers;
 
-		this.colorMap = {
-			bgRed: [1,3,5,7,9, 12,14,16,18, 19,21,23,25,27, 30,32,34,36],
-			bgBlack: [2,4,6,8, 10,11,13,15,17, 20,22,24,26, 28,29,31,33,35],
-		};
-
 		// Контейнер для фишки с тенью и текстом
-		let spriteContainer = new PIXI.Container();
-		this._spriteContainer = spriteContainer;
+		this._spriteContainer = new _pxC();
 
+		// Добавление текста в ячейке
 		texts.forEach((item) => {
 			let newText = item.type === 'gradientText' ?
-				new PIXI.extras.BitmapText(item.text, styles.infoPanel[item.type]) :
-				new PIXI.Text(item.text, styles.infoPanel[item.type]);
+				new _pxEx.BitmapText(item.text, styles.infoPanel[item.type]) :
+				new _pxT(item.text, styles.infoPanel[item.type]);
 
 			newText.position = {x: item.x || 0, y: item.y || 0};
 
 			this._spriteContainer.addChild(newText);
 		});
 
-		let arr = [
-			{number: 34, amount: 37},
-			{number: 17, amount: 19},
-			{number: 23, amount: 47},
-			{number: 15, amount: 98}
-			];
-
-		this.createNumbers(arr);
-
-		this.numbers.forEach((item) => {
-			this._spriteContainer.addChild(item);
-		});
+		this.createNumbers(this.numbers);
 	}
 
 	get sprite(){
@@ -50,14 +37,21 @@ export default class hotNumView {
 	 * @param numbers
 	 */
 	createNumbers(numbers){
-		if(!this.numbers) this.numbers = [];
+		if(!numbers || !numbers.length) return false;
+
+		if(!this.numberSprites) this.numberSprites = [];
+		if(this.numberSprites.length) this.deleteNumbers();
 
 		numbers.sort((a, b) => {return a.amount < b.amount});
 
 		numbers.forEach((num, idx) => {
 			let item = this.createNumber(num);
 			item.position = {x: idx*75+20, y: 80};
-			this.numbers.push(item);
+			this.numberSprites.push(item);
+		});
+
+		this.numberSprites.forEach((item) => {
+			this._spriteContainer.addChild(item);
 		});
 	}
 
@@ -68,25 +62,54 @@ export default class hotNumView {
 	 */
 	createNumber(obj){
 		let color;
-		for(let key in this.colorMap)
-			if(~this.colorMap[key].indexOf(obj.number)) color = key;
+		for(let key in colorNumMap)
+			if(~colorNumMap[key].indexOf(obj.number)) color = key;
 
-		let numCnt = new PIXI.Container(),
-			bg = new PIXI.Sprite( spritesStore.bgNumbers[color] ),
-			text1 = new PIXI.Text(obj.number, {font: 'normal 30px Arial', fill: 'white'}),
-			text2 = new PIXI.Text(obj.amount, {font: 'normal 26px Arial', fill: 'white'});
+		let numCnt = new _pxC(),
+			bg = new _pxS( spritesStore.bgNumbers[color] ),
+			num = new _pxT(obj.number, styles.infoPanel.number),
+			amount = new _pxT(obj.amount, styles.infoPanel.amount);
 
-		text1.position = {x: 15, y: 15};
-		text2.position = {x: 25, y: 70};
+		num.position = {x: 15, y: 15};
+		amount.position = {x: 25, y: 70};
 
 		numCnt.addChild(bg);
-		numCnt.addChild(text1);
-		numCnt.addChild(text2);
+		numCnt.addChild(num);
+		numCnt.addChild(amount);
 
 		return numCnt;
 	}
 
-	updateNumber(){
+	/**
+	 * Метод апдейтит горячие номера. Может принмать как массив объектов так и один объект (номер)
+	 * @param param
+	 */
+	updateView(param){
+		let str = Object.prototype.toString.call(param);
+		let type = str.substr(8, str.length-9).toLowerCase();
 
+		if(type === 'array'){
+			param.forEach((item) => {this.numbers.push(item)});
+		} else if(type === 'object'){
+			this.numbers.push(param);
+		}
+
+		this.numbers.sort((a, b) => {return a.amount < b.amount});
+		this.numbers.length = 4;
+
+		this.createNumbers(this.numbers);
+	}
+
+	/**
+	 * И общего контейнера удаляем pixi-контейнеры номеров
+	 */
+	deleteNumbers(){
+		this.numberSprites.forEach((item) => {
+			this._spriteContainer.children.forEach((item2) => {
+				if(item2 === item) this._spriteContainer.removeChild(item);
+			});
+		});
+
+		this.numberSprites.length = 0;
 	}
 }

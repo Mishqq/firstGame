@@ -1,4 +1,4 @@
-import PIXI from 'pixi.js';
+import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
 import {defaultPositions} from './../../constants/defaultPositions';
 import {styles} from './../../constants/styles';
 import {spritesStore} from './../../spritesStore';
@@ -12,7 +12,7 @@ export default class TimeScaleView {
 		this.state = 0;
 
 		// Контейнер для фишки с тенью и текстом
-		let spriteContainer = new PIXI.Container();
+		let spriteContainer = new _pxC();
 		this.pixiContainer = spriteContainer;
 
 		spriteContainer.x = defaultPositions.timeScale.x;
@@ -21,12 +21,12 @@ export default class TimeScaleView {
 		this.sprites = {};
 
 		['timerBack', 'timerYellow', 'timerRed'].forEach((item) => {
-			this.sprites[item] = new PIXI.Sprite( spritesStore.timer[item] );
+			this.sprites[item] = new _pxS( spritesStore.timer[item] );
 			if(item === 'timerRed') this.sprites[item].visible = false;
 			spriteContainer.addChild( this.sprites[item] );
 		});
 
-		let pixiText = new PIXI.Text(statusText['status' + this.state], styles.timeScale);
+		let pixiText = new _pxT(statusText['status' + this.state], styles.timeScale);
 		pixiText.anchor.set(0.5);
 		pixiText.x = spriteContainer.width/2;
 		pixiText.y = -30;

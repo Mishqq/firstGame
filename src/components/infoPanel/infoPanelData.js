@@ -1,3 +1,25 @@
+let defaultPanelData = {
+	limitsPanel: {max: 30000, min: 10},
+	hotNumPanel: [
+		{number: 34, amount: 37},
+		{number: 17, amount: 19},
+		{number: 23, amount: 47},
+		{number: 15, amount: 98}
+	],
+	coldNumPanel: [
+		{number: 33, amount: 7},
+		{number: 16, amount: 2},
+		{number: 22, amount: 5},
+		{number: 14, amount: 8}
+	],
+	otherNumPanel: {red: 12, black: 38, odd: 10, even: 39, zero: 1}
+};
+
+const colorNumMap = {
+	bgRed: [1,3,5,7,9, 12,14,16,18, 19,21,23,25,27, 30,32,34,36],
+	bgBlack: [2,4,6,8, 10,11,13,15,17, 20,22,24,26, 28,29,31,33,35],
+};
+
 const blockTexts = {
 	limitBlock: [
 		{type: 'labelText',     text: 'ЛИМИТЫ СТОЛА',       x: 110, y: 10},
@@ -25,4 +47,4 @@ const blockTexts = {
 	]
 };
 
-export {blockTexts};
+export {blockTexts, colorNumMap, defaultPanelData};
