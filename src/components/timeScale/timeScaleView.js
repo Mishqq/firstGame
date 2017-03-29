@@ -72,10 +72,13 @@ export default class TimeScaleView {
 				yellowLine.visible = false;
 			}
 
-			if(redLine.width - deltaX <= 0 || !this.isRun){
+			if(redLine.width - deltaX <= 0){
 				if(redLine.width - deltaX) redLine.width = 0;
 				clearTimeout(this.timerId);
 				this.lastTimeCb();
+				return false;
+			} else if(!this.isRun){
+				console.log('Пауза ➠ ');
 				return false;
 			}
 

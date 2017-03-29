@@ -92,9 +92,9 @@ export default class GameController {
 			});
 			stage.addChild(this._timeScale.pixiSprite);
 			this._timeScale.start();
-			// setTimeout(() => {
-			// 	this._timeScale.pause();
-			// }, 3000);
+			setTimeout(() => {
+				this._timeScale.pause();
+			}, 1500);
 
 
 

@@ -28373,10 +28373,9 @@
 					});
 					stage.addChild(_this._timeScale.pixiSprite);
 					_this._timeScale.start();
-					// setTimeout(() => {
-					// 	this._timeScale.pause();
-					// }, 3000);
-	
+					setTimeout(function () {
+						_this._timeScale.pause();
+					}, 1500);
 	
 					var infoPanelFishData = {
 						limitsPanel: { max: 30000, min: 50 },
@@ -31163,10 +31162,13 @@
 						yellowLine.visible = false;
 					}
 	
-					if (redLine.width - deltaX <= 0 || !_this2.isRun) {
+					if (redLine.width - deltaX <= 0) {
 						if (redLine.width - deltaX) redLine.width = 0;
 						clearTimeout(_this2.timerId);
 						_this2.lastTimeCb();
+						return false;
+					} else if (!_this2.isRun) {
+						console.log('Пауза ➠ ');
 						return false;
 					}
 	
