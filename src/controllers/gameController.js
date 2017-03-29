@@ -99,17 +99,17 @@ export default class GameController {
 
 
 			let infoPanelFishData = {
-				limitsPanel: {max: 500, min: 50},
+				limitsPanel: {max: 30000, min: 50},
 				hotNumPanel: [
 					{number: 12, amount: 1},
-					{number: 12, amount: 2},
+					{number: 'doubleZero', amount: 2},
 					{number: 12, amount: 3},
 					{number: 12, amount: 4}
 				],
 				coldNumPanel: [
 					{number: 7, amount: 1},
 					{number: 7, amount: 2},
-					{number: 7, amount: 3},
+					{number: 'zero', amount: 3},
 					{number: 7, amount: 4}
 				],
 				otherNumPanel: {red: 12, black: 12, odd: 12, even: 12, zero: 12}

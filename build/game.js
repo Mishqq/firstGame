@@ -28268,27 +28268,27 @@
 	
 	var _gameFieldController2 = _interopRequireDefault(_gameFieldController);
 	
-	var _buttonPanelController = __webpack_require__(151);
+	var _buttonPanelController = __webpack_require__(152);
 	
 	var _buttonPanelController2 = _interopRequireDefault(_buttonPanelController);
 	
-	var _chipController = __webpack_require__(153);
+	var _chipController = __webpack_require__(154);
 	
 	var _chipController2 = _interopRequireDefault(_chipController);
 	
-	var _floatChipController = __webpack_require__(157);
+	var _floatChipController = __webpack_require__(158);
 	
 	var _floatChipController2 = _interopRequireDefault(_floatChipController);
 	
-	var _betController = __webpack_require__(159);
+	var _betController = __webpack_require__(160);
 	
 	var _betController2 = _interopRequireDefault(_betController);
 	
-	var _timeScaleController = __webpack_require__(161);
+	var _timeScaleController = __webpack_require__(162);
 	
 	var _timeScaleController2 = _interopRequireDefault(_timeScaleController);
 	
-	var _infoPanelController = __webpack_require__(164);
+	var _infoPanelController = __webpack_require__(165);
 	
 	var _infoPanelController2 = _interopRequireDefault(_infoPanelController);
 	
@@ -28379,9 +28379,9 @@
 	
 	
 					var infoPanelFishData = {
-						limitsPanel: { max: 500, min: 50 },
-						hotNumPanel: [{ number: 12, amount: 1 }, { number: 12, amount: 2 }, { number: 12, amount: 3 }, { number: 12, amount: 4 }],
-						coldNumPanel: [{ number: 7, amount: 1 }, { number: 7, amount: 2 }, { number: 7, amount: 3 }, { number: 7, amount: 4 }],
+						limitsPanel: { max: 30000, min: 50 },
+						hotNumPanel: [{ number: 12, amount: 1 }, { number: 'doubleZero', amount: 2 }, { number: 12, amount: 3 }, { number: 12, amount: 4 }],
+						coldNumPanel: [{ number: 7, amount: 1 }, { number: 7, amount: 2 }, { number: 'zero', amount: 3 }, { number: 7, amount: 4 }],
 						otherNumPanel: { red: 12, black: 12, odd: 12, even: 12, zero: 12 }
 					};
 	
@@ -29152,9 +29152,9 @@
 	
 	var _gameFieldView2 = _interopRequireDefault(_gameFieldView);
 	
-	var _gameFieldCellMap = __webpack_require__(149);
+	var _gameFieldCellMap = __webpack_require__(150);
 	
-	var _defaultPositions = __webpack_require__(148);
+	var _defaultPositions = __webpack_require__(149);
 	
 	var _betStore = __webpack_require__(144);
 	
@@ -29305,13 +29305,13 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(172);
+	var _PIXIabbr = __webpack_require__(148);
 	
-	var _defaultPositions = __webpack_require__(148);
+	var _defaultPositions = __webpack_require__(149);
 	
-	var _gameFieldCellMap = __webpack_require__(149);
+	var _gameFieldCellMap = __webpack_require__(150);
 	
-	var _styles = __webpack_require__(150);
+	var _styles = __webpack_require__(151);
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -29600,6 +29600,39 @@
 
 /***/ },
 /* 148 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports._pxEx = exports._pxG = exports._pxTr = exports._pxT = exports._pxS = exports._pxC = exports._p = undefined;
+	
+	var _pixi = __webpack_require__(1);
+	
+	var _pixi2 = _interopRequireDefault(_pixi);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var _p = _pixi2.default,
+	    _pxC = _p.Container,
+	    _pxS = _p.Sprite,
+	    _pxT = _p.Text,
+	    _pxTr = _p.Texture,
+	    _pxG = _p.Graphics,
+	    _pxEx = _p.extras;
+	
+	exports._p = _p;
+	exports._pxC = _pxC;
+	exports._pxS = _pxS;
+	exports._pxT = _pxT;
+	exports._pxTr = _pxTr;
+	exports._pxG = _pxG;
+	exports._pxEx = _pxEx;
+
+/***/ },
+/* 149 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -29638,7 +29671,7 @@
 	exports.defaultPositions = defaultPositions;
 
 /***/ },
-/* 149 */
+/* 150 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -29734,7 +29767,7 @@
 	exports.pointMap = pointMap;
 
 /***/ },
-/* 150 */
+/* 151 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -29780,7 +29813,7 @@
 			gradientText: { font: "24px info" },
 			whiteText: { font: "normal 24px Arial", fill: 'white' },
 			labelText: { font: "bold 18px Arial", fill: 'yellow', align: 'center' },
-			number: { font: 'normal 30px Arial', fill: 'white' },
+			number: { font: 'normal 30px Arial', fill: 'white', align: 'center' },
 			amount: { font: 'normal 26px Arial', fill: 'white' }
 		}
 	};
@@ -29788,7 +29821,7 @@
 	exports.styles = styles;
 
 /***/ },
-/* 151 */
+/* 152 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29799,7 +29832,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _buttonPanelView = __webpack_require__(152);
+	var _buttonPanelView = __webpack_require__(153);
 	
 	var _buttonPanelView2 = _interopRequireDefault(_buttonPanelView);
 	
@@ -29900,7 +29933,7 @@
 	exports.default = ButtonController;
 
 /***/ },
-/* 152 */
+/* 153 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29911,13 +29944,13 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(172);
+	var _PIXIabbr = __webpack_require__(148);
 	
 	var _spritesStore = __webpack_require__(141);
 	
-	var _defaultPositions = __webpack_require__(148);
+	var _defaultPositions = __webpack_require__(149);
 	
-	var _styles = __webpack_require__(150);
+	var _styles = __webpack_require__(151);
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -30087,7 +30120,7 @@
 	exports.default = ButtonView;
 
 /***/ },
-/* 153 */
+/* 154 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -30098,11 +30131,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _chipView = __webpack_require__(154);
+	var _chipView = __webpack_require__(155);
 	
 	var _chipView2 = _interopRequireDefault(_chipView);
 	
-	var _chipValues = __webpack_require__(155);
+	var _chipValues = __webpack_require__(156);
 	
 	var _betStore = __webpack_require__(144);
 	
@@ -30208,7 +30241,7 @@
 	exports.default = ChipController;
 
 /***/ },
-/* 154 */
+/* 155 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -30219,17 +30252,17 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(172);
+	var _PIXIabbr = __webpack_require__(148);
 	
 	var _spritesStore = __webpack_require__(141);
 	
-	var _defaultPositions = __webpack_require__(148);
+	var _defaultPositions = __webpack_require__(149);
 	
-	var _chipValues = __webpack_require__(155);
+	var _chipValues = __webpack_require__(156);
 	
-	var _styles = __webpack_require__(150);
+	var _styles = __webpack_require__(151);
 	
-	var _helpFunctions = __webpack_require__(156);
+	var _helpFunctions = __webpack_require__(157);
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -30355,7 +30388,7 @@
 	exports.default = ChipView;
 
 /***/ },
-/* 155 */
+/* 156 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -30390,13 +30423,13 @@
 	exports.floatChipTypes = floatChipTypes;
 
 /***/ },
-/* 156 */
+/* 157 */
 /***/ function(module, exports) {
 
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-	  value: true
+		value: true
 	});
 	/**
 	 * Проверка принадлежности по координатам
@@ -30404,7 +30437,7 @@
 	 * @param bounds - {x, y, width, height}
 	 */
 	function isPosInBounds(pos, bounds) {
-	  return pos.x >= bounds.x && pos.x <= bounds.x + bounds.width && pos.y >= bounds.y && pos.y <= bounds.y + bounds.height;
+		return pos.x >= bounds.x && pos.x <= bounds.x + bounds.width && pos.y >= bounds.y && pos.y <= bounds.y + bounds.height;
 	}
 	
 	/**
@@ -30413,19 +30446,45 @@
 	 * @returns {string}
 	 */
 	function formatChipValue(value) {
-	  var str = value >= 1000 ? value / 1000 + 'K' : value;
-	  return str;
+		var str = value >= 1000 ? value / 1000 + 'K' : value;
+		return str;
+	}
+	
+	/**
+	 * Преобразовываем число в формат x xxx xxx xxx
+	 * @param num
+	 * @returns {*}
+	 */
+	function formatLimit(num) {
+		var numArr = num.toString().split('');
+	
+		if (numArr.length < 4) {
+			return num;
+		} else {
+			numArr.reverse();
+			var cnt = 0;
+			for (var i = 0; i < numArr.length; i++) {
+				if ((i + 1 - cnt) % 3 === 0) {
+					numArr.splice(i + 1, 0, ' ');
+					i++;
+					cnt++;
+				}
+			}
+			var finalCut = numArr.reverse().join('');
+			return finalCut;
+		}
 	}
 	
 	var _hf = {
-	  isPosInBounds: isPosInBounds,
-	  formatChipValue: formatChipValue
+		isPosInBounds: isPosInBounds,
+		formatChipValue: formatChipValue,
+		formatLimit: formatLimit
 	};
 	
 	exports._hf = _hf;
 
 /***/ },
-/* 157 */
+/* 158 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -30436,11 +30495,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _floatChipView = __webpack_require__(158);
+	var _floatChipView = __webpack_require__(159);
 	
 	var _floatChipView2 = _interopRequireDefault(_floatChipView);
 	
-	var _chipValues = __webpack_require__(155);
+	var _chipValues = __webpack_require__(156);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -30496,7 +30555,7 @@
 	exports.default = FloatChipController;
 
 /***/ },
-/* 158 */
+/* 159 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -30507,11 +30566,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(172);
+	var _PIXIabbr = __webpack_require__(148);
 	
 	var _spritesStore = __webpack_require__(141);
 	
-	var _styles = __webpack_require__(150);
+	var _styles = __webpack_require__(151);
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -30633,7 +30692,7 @@
 	exports.default = FloatChipView;
 
 /***/ },
-/* 159 */
+/* 160 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -30644,7 +30703,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _betView = __webpack_require__(160);
+	var _betView = __webpack_require__(161);
 	
 	var _betView2 = _interopRequireDefault(_betView);
 	
@@ -30736,7 +30795,7 @@
 	exports.default = BetController;
 
 /***/ },
-/* 160 */
+/* 161 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -30747,15 +30806,15 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(172);
+	var _PIXIabbr = __webpack_require__(148);
 	
 	var _spritesStore = __webpack_require__(141);
 	
-	var _styles = __webpack_require__(150);
+	var _styles = __webpack_require__(151);
 	
-	var _chipValues = __webpack_require__(155);
+	var _chipValues = __webpack_require__(156);
 	
-	var _helpFunctions = __webpack_require__(156);
+	var _helpFunctions = __webpack_require__(157);
 	
 	var _touchEvents = __webpack_require__(143);
 	
@@ -30944,7 +31003,7 @@
 	exports.default = BetView;
 
 /***/ },
-/* 161 */
+/* 162 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -30955,11 +31014,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _timeScaleView = __webpack_require__(162);
+	var _timeScaleView = __webpack_require__(163);
 	
 	var _timeScaleView2 = _interopRequireDefault(_timeScaleView);
 	
-	var _timeScaleConfig = __webpack_require__(163);
+	var _timeScaleConfig = __webpack_require__(164);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -31010,7 +31069,7 @@
 	exports.default = TimeScaleController;
 
 /***/ },
-/* 162 */
+/* 163 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -31021,11 +31080,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(172);
+	var _PIXIabbr = __webpack_require__(148);
 	
-	var _defaultPositions = __webpack_require__(148);
+	var _defaultPositions = __webpack_require__(149);
 	
-	var _styles = __webpack_require__(150);
+	var _styles = __webpack_require__(151);
 	
 	var _spritesStore = __webpack_require__(141);
 	
@@ -31170,7 +31229,7 @@
 	exports.default = TimeScaleView;
 
 /***/ },
-/* 163 */
+/* 164 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -31196,7 +31255,7 @@
 	exports.timeScaleText = timeScaleText;
 
 /***/ },
-/* 164 */
+/* 165 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -31207,11 +31266,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _infoPanelView = __webpack_require__(165);
+	var _infoPanelView = __webpack_require__(166);
 	
 	var _infoPanelView2 = _interopRequireDefault(_infoPanelView);
 	
-	var _infoPanelData = __webpack_require__(171);
+	var _infoPanelData = __webpack_require__(168);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -31242,7 +31301,7 @@
 	exports.default = infoPanelController;
 
 /***/ },
-/* 165 */
+/* 166 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -31256,23 +31315,23 @@
 	// views
 	
 	
-	var _PIXIabbr = __webpack_require__(172);
+	var _PIXIabbr = __webpack_require__(148);
 	
-	var _defaultPositions = __webpack_require__(148);
+	var _defaultPositions = __webpack_require__(149);
 	
-	var _limitsView = __webpack_require__(166);
+	var _limitsView = __webpack_require__(167);
 	
 	var _limitsView2 = _interopRequireDefault(_limitsView);
 	
-	var _hotNumbersView = __webpack_require__(168);
+	var _hotNumbersView = __webpack_require__(169);
 	
 	var _hotNumbersView2 = _interopRequireDefault(_hotNumbersView);
 	
-	var _coldNumbersView = __webpack_require__(169);
+	var _coldNumbersView = __webpack_require__(170);
 	
 	var _coldNumbersView2 = _interopRequireDefault(_coldNumbersView);
 	
-	var _otherNumbersView = __webpack_require__(170);
+	var _otherNumbersView = __webpack_require__(171);
 	
 	var _otherNumbersView2 = _interopRequireDefault(_otherNumbersView);
 	
@@ -31321,7 +31380,6 @@
 		_createClass(infoPanelView, [{
 			key: 'update',
 			value: function update(data) {
-				// TODO: добавить метод updateLimits для лимитов
 				for (var panel in data) {
 					this.panels[panel].updateView(data[panel]);
 				}
@@ -31339,7 +31397,7 @@
 	exports.default = infoPanelView;
 
 /***/ },
-/* 166 */
+/* 167 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -31350,21 +31408,35 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(172);
+	var _PIXIabbr = __webpack_require__(148);
 	
-	var _styles = __webpack_require__(150);
+	var _styles = __webpack_require__(151);
 	
-	var _infoPanelData = __webpack_require__(171);
+	var _helpFunctions = __webpack_require__(157);
+	
+	var _infoPanelData = __webpack_require__(168);
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var limitsPanel = function () {
-		function limitsPanel() {
+		function limitsPanel(limits) {
 			var _this = this;
 	
 			_classCallCheck(this, limitsPanel);
 	
 			var texts = _infoPanelData.blockTexts.limitBlock;
+	
+			this.limits = limits || _infoPanelData.defaultPanelData.limitsPanel;
+	
+			this.limSprts = {};
+			var style = { font: "normal 24px Arial", fill: 'white' };
+			for (var key in this.limits) {
+				this.limSprts[key] = new _PIXIabbr._pxT(_helpFunctions._hf.formatLimit(this.limits[key]), style);
+			}this.limSprts.max.anchor.set(1, 0.5);
+			this.limSprts.min.anchor.set(1, 0.5);
+	
+			this.limSprts.max.position = { x: 310, y: 105 };
+			this.limSprts.min.position = { x: 310, y: 155 };
 	
 			// Контейнер для фишки с тенью и текстом
 			this._spriteContainer = new _PIXIabbr._pxC();
@@ -31378,6 +31450,10 @@
 	
 				_this._spriteContainer.addChild(newText);
 			});
+	
+			for (var _key in this.limSprts) {
+				this._spriteContainer.addChild(this.limSprts[_key]);
+			}
 		}
 	
 		_createClass(limitsPanel, [{
@@ -31387,6 +31463,12 @@
 				line.lineStyle(1, 0xEEEE3A, 0.75).moveTo(20, 130).lineTo(320, 130);
 	
 				this._spriteContainer.addChild(line);
+			}
+		}, {
+			key: 'updateView',
+			value: function updateView(newLimits) {
+				if (newLimits && newLimits.max) this.limSprts.max.text = _helpFunctions._hf.formatLimit(newLimits.max);
+				if (newLimits && newLimits.min) this.limSprts.min.text = _helpFunctions._hf.formatLimit(newLimits.min);
 			}
 		}, {
 			key: 'sprite',
@@ -31401,8 +31483,40 @@
 	exports.default = limitsPanel;
 
 /***/ },
-/* 167 */,
 /* 168 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	var defaultPanelData = {
+		limitsPanel: { max: 30000, min: 10 },
+		hotNumPanel: [{ number: 34, amount: 37 }, { number: 17, amount: 19 }, { number: 23, amount: 47 }, { number: 15, amount: 98 }],
+		coldNumPanel: [{ number: 33, amount: 7 }, { number: 16, amount: 2 }, { number: 22, amount: 5 }, { number: 14, amount: 8 }],
+		otherNumPanel: { red: 12, black: 38, odd: 10, even: 39, zero: 1 }
+	};
+	
+	var colorNumMap = {
+		bgRed: [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36],
+		bgBlack: [2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35],
+		bgZero: ['zero', 'doubleZero']
+	};
+	
+	var blockTexts = {
+		limitBlock: [{ type: 'labelText', text: 'ЛИМИТЫ СТОЛА', x: 110, y: 10 }, { type: 'gradientText', text: 'CASINO ROULETTE', x: 70, y: 40 }, { type: 'gradientText', text: 'MAX:', x: 25, y: 95 }, { type: 'gradientText', text: 'MIN:', x: 25, y: 140 }],
+		hotNumbers: [{ type: 'labelText', text: 'ЗА ПОСЛЕДНИЕ 100 ИГР', x: 60, y: 10 }, { type: 'gradientText', text: 'ГОРЯЧИЕ НОМЕРА', x: 70, y: 40 }],
+		coldNumbers: [{ type: 'labelText', text: 'ЗА ПОСЛЕДНИЕ 100 ИГР', x: 60, y: 10 }, { type: 'gradientText', text: 'ХОЛОДНЫЕ НОМЕРА', x: 50, y: 40 }],
+		otherNumbers: [{ type: 'labelText', text: 'ЗА ПОСЛЕДНИЕ 50 ИГР', x: 60, y: 10 }, { type: 'gradientText', text: 'RED', x: 60, y: 40 }, { type: 'gradientText', text: 'BLACK', x: 210, y: 40 }, { type: 'gradientText', text: 'ODD', x: 30, y: 120 }, { type: 'gradientText', text: '0', x: 150, y: 120 }, { type: 'gradientText', text: 'EVEN', x: 240, y: 120 }]
+	};
+	
+	exports.blockTexts = blockTexts;
+	exports.colorNumMap = colorNumMap;
+	exports.defaultPanelData = defaultPanelData;
+
+/***/ },
+/* 169 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -31413,11 +31527,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(172);
+	var _PIXIabbr = __webpack_require__(148);
 	
-	var _styles = __webpack_require__(150);
+	var _styles = __webpack_require__(151);
 	
-	var _infoPanelData = __webpack_require__(171);
+	var _infoPanelData = __webpack_require__(168);
 	
 	var _spritesStore = __webpack_require__(141);
 	
@@ -31492,13 +31606,18 @@
 				var color = void 0;
 				for (var key in _infoPanelData.colorNumMap) {
 					if (~_infoPanelData.colorNumMap[key].indexOf(obj.number)) color = key;
-				}var numCnt = new _PIXIabbr._pxC(),
+				}if (obj.number === 'zero') obj.number = '0';
+				if (obj.number === 'doubleZero') obj.number = '00';
+	
+				var numCnt = new _PIXIabbr._pxC(),
 				    bg = new _PIXIabbr._pxS(_spritesStore.spritesStore.bgNumbers[color]),
 				    num = new _PIXIabbr._pxT(obj.number, _styles.styles.infoPanel.number),
 				    amount = new _PIXIabbr._pxT(obj.amount, _styles.styles.infoPanel.amount);
 	
-				num.position = { x: 15, y: 15 };
-				amount.position = { x: 25, y: 70 };
+				num.position = { x: 33, y: 33 };
+				num.anchor.set(0.5);
+				amount.position = { x: 35, y: 85 };
+				amount.anchor.set(0.5);
 	
 				numCnt.addChild(bg);
 				numCnt.addChild(num);
@@ -31566,7 +31685,7 @@
 	exports.default = hotNumPanel;
 
 /***/ },
-/* 169 */
+/* 170 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -31577,11 +31696,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(172);
+	var _PIXIabbr = __webpack_require__(148);
 	
-	var _styles = __webpack_require__(150);
+	var _styles = __webpack_require__(151);
 	
-	var _infoPanelData = __webpack_require__(171);
+	var _infoPanelData = __webpack_require__(168);
 	
 	var _spritesStore = __webpack_require__(141);
 	
@@ -31656,13 +31775,18 @@
 				var color = void 0;
 				for (var key in _infoPanelData.colorNumMap) {
 					if (~_infoPanelData.colorNumMap[key].indexOf(obj.number)) color = key;
-				}var numCnt = new _PIXIabbr._pxC(),
+				}if (obj.number === 'zero') obj.number = '0';
+				if (obj.number === 'doubleZero') obj.number = '00';
+	
+				var numCnt = new _PIXIabbr._pxC(),
 				    bg = new _PIXIabbr._pxS(_spritesStore.spritesStore.bgNumbers[color]),
 				    num = new _PIXIabbr._pxT(obj.number, _styles.styles.infoPanel.number),
 				    amount = new _PIXIabbr._pxT(obj.amount, _styles.styles.infoPanel.amount);
 	
-				num.position = { x: 15, y: 15 };
-				amount.position = { x: 25, y: 70 };
+				num.position = { x: 33, y: 33 };
+				num.anchor.set(0.5);
+				amount.position = { x: 35, y: 85 };
+				amount.anchor.set(0.5);
 	
 				numCnt.addChild(bg);
 				numCnt.addChild(num);
@@ -31730,7 +31854,7 @@
 	exports.default = coldNumPanel;
 
 /***/ },
-/* 170 */
+/* 171 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -31741,13 +31865,13 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(172);
+	var _PIXIabbr = __webpack_require__(148);
 	
 	var _spritesStore = __webpack_require__(141);
 	
-	var _styles = __webpack_require__(150);
+	var _styles = __webpack_require__(151);
 	
-	var _infoPanelData = __webpack_require__(171);
+	var _infoPanelData = __webpack_require__(168);
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
@@ -31851,71 +31975,6 @@
 	}();
 	
 	exports.default = otherNumPanel;
-
-/***/ },
-/* 171 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	var defaultPanelData = {
-		limitsPanel: { max: 30000, min: 10 },
-		hotNumPanel: [{ number: 34, amount: 37 }, { number: 17, amount: 19 }, { number: 23, amount: 47 }, { number: 15, amount: 98 }],
-		coldNumPanel: [{ number: 33, amount: 7 }, { number: 16, amount: 2 }, { number: 22, amount: 5 }, { number: 14, amount: 8 }],
-		otherNumPanel: { red: 12, black: 38, odd: 10, even: 39, zero: 1 }
-	};
-	
-	var colorNumMap = {
-		bgRed: [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36],
-		bgBlack: [2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35]
-	};
-	
-	var blockTexts = {
-		limitBlock: [{ type: 'labelText', text: 'ЛИМИТЫ СТОЛА', x: 110, y: 10 }, { type: 'gradientText', text: 'CASINO ROULETTE', x: 70, y: 40 }, { type: 'gradientText', text: 'MAX:', x: 25, y: 95 }, { type: 'gradientText', text: 'MIN:', x: 25, y: 140 }, { type: 'whiteText', text: '30 000', x: 240, y: 95 }, { type: 'whiteText', text: '10', x: 285, y: 140 }],
-		hotNumbers: [{ type: 'labelText', text: 'ЗА ПОСЛЕДНИЕ 100 ИГР', x: 60, y: 10 }, { type: 'gradientText', text: 'ГОРЯЧИЕ НОМЕРА', x: 70, y: 40 }],
-		coldNumbers: [{ type: 'labelText', text: 'ЗА ПОСЛЕДНИЕ 100 ИГР', x: 60, y: 10 }, { type: 'gradientText', text: 'ХОЛОДНЫЕ НОМЕРА', x: 50, y: 40 }],
-		otherNumbers: [{ type: 'labelText', text: 'ЗА ПОСЛЕДНИЕ 50 ИГР', x: 60, y: 10 }, { type: 'gradientText', text: 'RED', x: 60, y: 40 }, { type: 'gradientText', text: 'BLACK', x: 210, y: 40 }, { type: 'gradientText', text: 'ODD', x: 30, y: 120 }, { type: 'gradientText', text: '0', x: 150, y: 120 }, { type: 'gradientText', text: 'EVEN', x: 240, y: 120 }]
-	};
-	
-	exports.blockTexts = blockTexts;
-	exports.colorNumMap = colorNumMap;
-	exports.defaultPanelData = defaultPanelData;
-
-/***/ },
-/* 172 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	exports._pxEx = exports._pxG = exports._pxTr = exports._pxT = exports._pxS = exports._pxC = exports._p = undefined;
-	
-	var _pixi = __webpack_require__(1);
-	
-	var _pixi2 = _interopRequireDefault(_pixi);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var _p = _pixi2.default,
-	    _pxC = _p.Container,
-	    _pxS = _p.Sprite,
-	    _pxT = _p.Text,
-	    _pxTr = _p.Texture,
-	    _pxG = _p.Graphics,
-	    _pxEx = _p.extras;
-	
-	exports._p = _p;
-	exports._pxC = _pxC;
-	exports._pxS = _pxS;
-	exports._pxT = _pxT;
-	exports._pxTr = _pxTr;
-	exports._pxG = _pxG;
-	exports._pxEx = _pxEx;
 
 /***/ }
 /******/ ]);

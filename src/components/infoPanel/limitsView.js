@@ -1,11 +1,25 @@
 import {_pxC, _pxT, _pxEx, _pxG} from './../../constants/PIXIabbr';
 import {styles} from './../../constants/styles';
-import {blockTexts} from './infoPanelData';
+import {_hf} from './../../servises/helpFunctions';
+import {blockTexts, defaultPanelData} from './infoPanelData';
 
 
 export default class limitsPanel {
-	constructor() {
+	constructor(limits) {
 		let texts = blockTexts.limitBlock;
+
+		this.limits = limits || defaultPanelData.limitsPanel;
+
+		this.limSprts = {};
+		let style = {font: "normal 24px Arial", fill: 'white'};
+		for(let key in this.limits)
+			this.limSprts[key] = new _pxT(_hf.formatLimit(this.limits[key]), style)
+
+		this.limSprts.max.anchor.set(1, 0.5);
+		this.limSprts.min.anchor.set(1, 0.5);
+
+		this.limSprts.max.position = {x: 310, y: 105};
+		this.limSprts.min.position = {x: 310, y: 155};
 
 		// Контейнер для фишки с тенью и текстом
 		this._spriteContainer = new _pxC();
@@ -21,6 +35,9 @@ export default class limitsPanel {
 
 			this._spriteContainer.addChild(newText);
 		});
+
+		for(let key in this.limSprts)
+			this._spriteContainer.addChild(this.limSprts[key]);
 	}
 
 	get sprite(){
@@ -32,5 +49,10 @@ export default class limitsPanel {
 		line.lineStyle(1, 0xEEEE3A, 0.75).moveTo(20, 130).lineTo(320, 130);
 
 		this._spriteContainer.addChild(line);
+	}
+
+	updateView(newLimits){
+		if(newLimits && newLimits.max) this.limSprts.max.text = _hf.formatLimit(newLimits.max);
+		if(newLimits && newLimits.min) this.limSprts.min.text = _hf.formatLimit(newLimits.min);
 	}
 }

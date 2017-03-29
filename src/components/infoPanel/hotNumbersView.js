@@ -65,13 +65,18 @@ export default class hotNumPanel {
 		for(let key in colorNumMap)
 			if(~colorNumMap[key].indexOf(obj.number)) color = key;
 
+		if(obj.number === 'zero') obj.number = '0';
+		if(obj.number === 'doubleZero') obj.number = '00';
+
 		let numCnt = new _pxC(),
 			bg = new _pxS( spritesStore.bgNumbers[color] ),
 			num = new _pxT(obj.number, styles.infoPanel.number),
 			amount = new _pxT(obj.amount, styles.infoPanel.amount);
 
-		num.position = {x: 15, y: 15};
-		amount.position = {x: 25, y: 70};
+		num.position = {x: 33, y: 33};
+		num.anchor.set(0.5);
+		amount.position = {x: 35, y: 85};
+		amount.anchor.set(0.5);
 
 		numCnt.addChild(bg);
 		numCnt.addChild(num);

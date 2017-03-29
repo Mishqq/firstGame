@@ -48,7 +48,6 @@ export default class infoPanelView {
 	}
 
 	update(data){
-		// TODO: добавить метод updateLimits для лимитов
 		for(let panel in data){
 			this.panels[panel].updateView( data[panel] );
 		}

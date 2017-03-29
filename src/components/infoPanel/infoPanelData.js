@@ -18,6 +18,7 @@ let defaultPanelData = {
 const colorNumMap = {
 	bgRed: [1,3,5,7,9, 12,14,16,18, 19,21,23,25,27, 30,32,34,36],
 	bgBlack: [2,4,6,8, 10,11,13,15,17, 20,22,24,26, 28,29,31,33,35],
+	bgZero: ['zero', 'doubleZero']
 };
 
 const blockTexts = {
@@ -25,9 +26,7 @@ const blockTexts = {
 		{type: 'labelText',     text: 'ЛИМИТЫ СТОЛА',       x: 110, y: 10},
 		{type: 'gradientText',  text: 'CASINO ROULETTE',    x: 70,  y: 40},
 		{type: 'gradientText',  text: 'MAX:',               x: 25,  y: 95},
-		{type: 'gradientText',  text: 'MIN:',               x: 25,  y: 140},
-		{type: 'whiteText',     text: '30 000',             x: 240, y: 95},
-		{type: 'whiteText',     text: '10',                 x: 285, y: 140}
+		{type: 'gradientText',  text: 'MIN:',               x: 25,  y: 140}
 	],
 	hotNumbers: [
 		{type: 'labelText',     text: 'ЗА ПОСЛЕДНИЕ 100 ИГР',   x: 60, y: 10},
