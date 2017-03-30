@@ -23,6 +23,9 @@ const defaultPositions = {
 		hotNumPanel: {x: 340, y: 0}, // Относительно infoPanel.main
 		coldNumPanel: {x: 675, y: 0}, // Относительно infoPanel.main
 		otherNumPanel: {x: 1010, y: 0} // Относительно infoPanel.main
+	},
+	betPanel: {
+		x: 50, y: 50
 	}
 };
 

@@ -16,6 +16,7 @@ import FloatChipController  from './../components/floatChip/floatChipController'
 import BetController        from './../components/bet/betController';
 import TimeScaleController  from './../components/timeScale/timeScaleController';
 import infoPanelController  from './../components/infoPanel/infoPanelController';
+import betPanelController  from './../components/betPanel/betPanelController';
 
 
 export default class GameController {
@@ -114,9 +115,12 @@ export default class GameController {
 				],
 				otherNumPanel: {red: 12, black: 12, odd: 12, even: 12, zero: 12}
 			};
-
 			this.infoPanel = new infoPanelController(infoPanelFishData);
 			stage.addChild(this.infoPanel.pixiSprite);
+
+
+			this.betPanelCtrl = new betPanelController();
+			stage.addChild(this.betPanelCtrl.pixiSprite);
 
 			game.start();
 		});

@@ -28292,6 +28292,10 @@
 	
 	var _infoPanelController2 = _interopRequireDefault(_infoPanelController);
 	
+	var _betPanelController = __webpack_require__(172);
+	
+	var _betPanelController2 = _interopRequireDefault(_betPanelController);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -28383,9 +28387,11 @@
 						coldNumPanel: [{ number: 7, amount: 1 }, { number: 7, amount: 2 }, { number: 'zero', amount: 3 }, { number: 7, amount: 4 }],
 						otherNumPanel: { red: 12, black: 12, odd: 12, even: 12, zero: 12 }
 					};
-	
 					_this.infoPanel = new _infoPanelController2.default(infoPanelFishData);
 					stage.addChild(_this.infoPanel.pixiSprite);
+	
+					_this.betPanelCtrl = new _betPanelController2.default();
+					stage.addChild(_this.betPanelCtrl.pixiSprite);
 	
 					game.start();
 				});
@@ -29664,6 +29670,9 @@
 			hotNumPanel: { x: 340, y: 0 }, // Относительно infoPanel.main
 			coldNumPanel: { x: 675, y: 0 }, // Относительно infoPanel.main
 			otherNumPanel: { x: 1010, y: 0 } // Относительно infoPanel.main
+		},
+		betPanel: {
+			x: 50, y: 50
 		}
 	};
 	
@@ -29814,6 +29823,12 @@
 			labelText: { font: "bold 18px Arial", fill: 'yellow', align: 'center' },
 			number: { font: 'normal 30px Arial', fill: 'white', align: 'center' },
 			amount: { font: 'normal 26px Arial', fill: 'white' }
+		},
+		betPanel: {
+			font: "normal 24px Arial",
+			fontVariant: 'small-caps',
+			wordWrapWidth: 0,
+			fill: 'white'
 		}
 	};
 	
@@ -31977,6 +31992,179 @@
 	}();
 	
 	exports.default = otherNumPanel;
+
+/***/ },
+/* 172 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _betPanelView = __webpack_require__(173);
+	
+	var _betPanelView2 = _interopRequireDefault(_betPanelView);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var betPanelController = function () {
+		function betPanelController(cfgFromGameCtrl) {
+			_classCallCheck(this, betPanelController);
+	
+			// Конфиг, пришедший от контроллера выше
+			this._cfg = cfgFromGameCtrl;
+	
+			this.betPanel = new _betPanelView2.default();
+		}
+	
+		_createClass(betPanelController, [{
+			key: 'updateInfoPanelView',
+			value: function updateInfoPanelView(newData) {
+				this.betPanel.updateNumbers(newData);
+			}
+		}, {
+			key: 'pixiSprite',
+			get: function get() {
+				return this.betPanel.getPixiSprite;
+			}
+		}]);
+	
+		return betPanelController;
+	}();
+	
+	exports.default = betPanelController;
+
+/***/ },
+/* 173 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _PIXIabbr = __webpack_require__(148);
+	
+	var _betPanelData = __webpack_require__(174);
+	
+	var _spritesStore = __webpack_require__(141);
+	
+	var _defaultPositions = __webpack_require__(149);
+	
+	var _styles = __webpack_require__(151);
+	
+	var _helpFunctions = __webpack_require__(157);
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var ButtonView = function () {
+		function ButtonView(values) {
+			_classCallCheck(this, ButtonView);
+	
+			// Контейнер для фишки с тенью и текстом
+			var spriteContainer = new _PIXIabbr._pxC();
+			this._spriteContainer = spriteContainer;
+	
+			spriteContainer.position = _defaultPositions.defaultPositions.betPanel;
+	
+			var textSprites = {};
+			for (var key in _betPanelData.betPanelText) {
+				textSprites[key] = new _PIXIabbr._pxT(_betPanelData.betPanelText[key].text, _styles.styles.betPanel);
+				textSprites[key].position = _betPanelData.betPanelText[key].pos;
+				spriteContainer.addChild(textSprites[key]);
+			}
+	
+			this.numSprites = {};
+			var fieldSprites = {};
+			for (var _key in _betPanelData.fields) {
+				fieldSprites[_key] = new _PIXIabbr._pxS(_spritesStore.spritesStore.fields[_key]);
+				fieldSprites[_key].position = _betPanelData.fields[_key];
+	
+				this.numSprites[_key] = new _PIXIabbr._pxT(_helpFunctions._hf.formatLimit(0), _styles.styles.betPanel);
+				this.numSprites[_key].anchor.set(0, 0.5);
+				this.numSprites[_key].position = _betPanelData.numbers[_key];
+				fieldSprites[_key].addChild(this.numSprites[_key]);
+	
+				spriteContainer.addChild(fieldSprites[_key]);
+			}
+		}
+	
+		_createClass(ButtonView, [{
+			key: 'updateNumbers',
+	
+	
+			/**
+	   * newData - {fldBet, fldWin, fldBalance}
+	   * @param newData
+	   */
+			value: function updateNumbers(newData) {
+				for (var key in newData) {
+					this.numSprites[key].text = _helpFunctions._hf.formatLimit(newData[key]);
+				}
+			}
+		}, {
+			key: 'getPixiSprite',
+			get: function get() {
+				return this._spriteContainer;
+			}
+		}]);
+	
+		return ButtonView;
+	}();
+	
+	exports.default = ButtonView;
+
+/***/ },
+/* 174 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	var texts = {
+		bet: {
+			text: 'СТАВКА',
+			pos: { x: 0, y: 0 }
+		},
+		win: {
+			text: 'ВЫИГРЫШ',
+			pos: { x: 370, y: 0 }
+		},
+		balance: {
+			text: 'БАЛАНС',
+			pos: { x: 1450, y: 0 }
+		}
+	};
+	
+	var fields = {
+		fldBet: { x: 120, y: -10 },
+		fldWin: { x: 530, y: -10 },
+		fldBalance: { x: 1560, y: -22 }
+	};
+	
+	/**
+	 * Позиции данных задаются относительно спрайтов полей
+	 */
+	var numbers = {
+		fldBet: { x: 20, y: 22 },
+		fldWin: { x: 20, y: 22 },
+		fldBalance: { x: 30, y: 34 }
+	};
+	
+	exports.betPanelText = texts;
+	exports.fields = fields;
+	exports.numbers = numbers;
 
 /***/ }
 /******/ ]);

@@ -38,6 +38,12 @@ const styles = {
 		labelText: {font: "bold 18px Arial", fill: 'yellow', align: 'center'},
 		number: {font: 'normal 30px Arial', fill: 'white', align: 'center'},
 		amount: {font: 'normal 26px Arial', fill: 'white'}
+	},
+	betPanel: {
+		font: "normal 24px Arial",
+		fontVariant: 'small-caps',
+		wordWrapWidth: 0,
+		fill: 'white',
 	}
 };
 
