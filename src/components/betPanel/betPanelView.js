@@ -5,7 +5,7 @@ import {defaultPositions} from './../../constants/defaultPositions';
 import {styles} from './../../constants/styles';
 import {_hf} from './../../servises/helpFunctions';
 
-export default class ButtonView {
+export default class betPanelView {
 	constructor(values) {
 		// Контейнер для фишки с тенью и текстом
 		let spriteContainer = new _pxC();

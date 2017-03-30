@@ -16,7 +16,8 @@ import FloatChipController  from './../components/floatChip/floatChipController'
 import BetController        from './../components/bet/betController';
 import TimeScaleController  from './../components/timeScale/timeScaleController';
 import infoPanelController  from './../components/infoPanel/infoPanelController';
-import betPanelController  from './../components/betPanel/betPanelController';
+import betPanelController   from './../components/betPanel/betPanelController';
+import historyController    from './../components/history/historyController';
 
 
 export default class GameController {
@@ -121,6 +122,15 @@ export default class GameController {
 
 			this.betPanelCtrl = new betPanelController();
 			stage.addChild(this.betPanelCtrl.pixiSprite);
+
+
+			this.historyCtrl = new historyController({
+				rollTime: 5,
+				viewResultTime: 3,
+				rollCb: ()=>{console.log('lol ➠ ')},
+				ctx: this
+			});
+			stage.addChild(this.historyCtrl.pixiSprite);
 
 			game.start();
 		});
