@@ -15,12 +15,4 @@ export default class historyController {
 	play(){
 		this.historyView.rollPlay();
 	}
-
-	stop(){
-		this.historyView.rollStop();
-	}
-
-	newNumber(){
-		this.play();
-	}
 }

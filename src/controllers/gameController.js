@@ -94,10 +94,6 @@ export default class GameController {
 			});
 			stage.addChild(this._timeScale.pixiSprite);
 			this._timeScale.start();
-			setTimeout(() => {
-				this._timeScale.pause();
-			}, 1500);
-
 
 
 			let infoPanelFishData = {
@@ -125,12 +121,15 @@ export default class GameController {
 
 
 			this.historyCtrl = new historyController({
-				rollTime: 5,
-				viewResultTime: 3,
-				rollCb: ()=>{console.log('lol ➠ ')},
+				rollTime: 6,
+				rollCb: this.rollNumber,
 				ctx: this
 			});
 			stage.addChild(this.historyCtrl.pixiSprite);
+
+			setTimeout(() => {
+				this.historyCtrl.play();
+			}, 10000);
 
 			game.start();
 		});
@@ -255,6 +254,10 @@ export default class GameController {
 		}
 	}
 
+
+	rollNumber(number){
+		console.log('number ➠ ', number);
+	}
 
 
 

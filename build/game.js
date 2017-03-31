@@ -28381,9 +28381,6 @@
 					});
 					stage.addChild(_this._timeScale.pixiSprite);
 					_this._timeScale.start();
-					setTimeout(function () {
-						_this._timeScale.pause();
-					}, 1500);
 	
 					var infoPanelFishData = {
 						limitsPanel: { max: 30000, min: 50 },
@@ -28398,14 +28395,15 @@
 					stage.addChild(_this.betPanelCtrl.pixiSprite);
 	
 					_this.historyCtrl = new _historyController2.default({
-						rollTime: 5,
-						viewResultTime: 3,
-						rollCb: function rollCb() {
-							console.log('lol ➠ ');
-						},
+						rollTime: 6,
+						rollCb: _this.rollNumber,
 						ctx: _this
 					});
 					stage.addChild(_this.historyCtrl.pixiSprite);
+	
+					setTimeout(function () {
+						_this.historyCtrl.play();
+					}, 10000);
 	
 					game.start();
 				});
@@ -28538,6 +28536,11 @@
 				for (var key in _betStore.betStore.betsCtrl) {
 					_betStore.betStore.betsCtrl[key].disableMove();
 				}
+			}
+		}, {
+			key: 'rollNumber',
+			value: function rollNumber(number) {
+				console.log('number ➠ ', number);
 			}
 	
 			/**
@@ -29842,6 +29845,10 @@
 			fontVariant: 'small-caps',
 			wordWrapWidth: 0,
 			fill: 'white'
+		},
+		historyPanel: {
+			small: { font: 'normal 30px Arial', fill: 'white', align: 'center' },
+			big: { font: "bold 96px Arial", fontVariant: 'small-caps', wordWrapWidth: 0, fill: 'white' }
 		}
 	};
 	
@@ -30451,13 +30458,17 @@
 
 /***/ },
 /* 157 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
+	exports._hf = undefined;
+	
+	var _PIXIabbr = __webpack_require__(148);
+	
 	/**
 	 * Проверка принадлежности по координатам
 	 * @param pos - {x, y}
@@ -30502,10 +30513,53 @@
 		}
 	}
 	
+	/**
+	 * Определение цвета подложки для цифры
+	 * @param map
+	 * @param num
+	 * @returns {*}
+	 */
+	function colorType(map, num) {
+		var color = void 0;
+		for (var key in map) {
+			if (~map[key].indexOf(num)) color = key;
+		}if (num === 'zero' || num === 0) num = '0';
+		if (num === 'doubleZero') num = '00';
+	
+		return color;
+	}
+	
+	/**
+	 * Добавляет текстуру текста к спрайту
+	 * @param sprite - спрайт, к которому добавляем текст
+	 * @param pos - {x, y}, положение текста в спрайте
+	 * @param text - сам текст
+	 * @param style - стиль текста
+	 */
+	function addTextToSprite(sprite, pos, text, style) {
+		var textSprt = new _PIXIabbr._pxT(text, style);
+		textSprt.anchor.set(0.5, 0.5);
+		textSprt.position = pos;
+	
+		sprite.addChild(textSprt);
+	}
+	
+	/**
+	 * Возвращаем случайный элемент массива
+	 * @param arr
+	 * @returns {number}
+	 */
+	function randEl(arr) {
+		return arr[Math.floor(Math.random() * arr.length)];
+	}
+	
 	var _hf = {
 		isPosInBounds: isPosInBounds,
 		formatChipValue: formatChipValue,
-		formatLimit: formatLimit
+		formatLimit: formatLimit,
+		colorType: colorType,
+		addTextToSprite: addTextToSprite,
+		randEl: randEl
 	};
 	
 	exports._hf = _hf;
@@ -32215,16 +32269,6 @@
 				this.historyView.rollPlay();
 			}
 		}, {
-			key: 'stop',
-			value: function stop() {
-				this.historyView.rollStop();
-			}
-		}, {
-			key: 'newNumber',
-			value: function newNumber() {
-				this.play();
-			}
-		}, {
 			key: 'pixiSprite',
 			get: function get() {
 				return this.historyView.getPixiSprite;
@@ -32268,15 +32312,20 @@
 		function historyView(config) {
 			_classCallCheck(this, historyView);
 	
+			this.rolledNum = undefined;
+	
+			this._hisSprites = {
+				rollNumAnimation: undefined,
+				rollNumSprite: undefined,
+				numTape: []
+			};
+	
 			this.cbCtx = config.ctx ? config.ctx : this;
 			this.rollCb = config.rollCb ? config.rollCb : function () {
 				console.log('lolec ➠ ');
 			};
-			this.rollTime = config.rollTime ? config.rollTime : 2.5;
-			this.viewResultTime = config.viewResultTime ? config.viewResultTime : 1.5;
 	
-			this.hTape = [];
-			this.hTapeSprites = [];
+			this.rollTime = config.rollTime ? config.rollTime : 2.5;
 	
 			// Контейнер для фишки с тенью и текстом
 			var spriteContainer = new _PIXIabbr._pxC();
@@ -32287,7 +32336,7 @@
 			this.createRollField();
 			this.rollPlay();
 	
-			spriteContainer.addChild(this.rollAnm);
+			spriteContainer.addChild(this._hisSprites.rollNumAnimation);
 		}
 	
 		_createClass(historyView, [{
@@ -32298,62 +32347,79 @@
 	   * Поле с анимацией
 	   */
 			value: function createRollField() {
-				var arrForAnimation = [];
+				var _a = this._hisSprites,
+				    arrForAnimation = [];
 				for (var key in _spritesStore.spritesStore.anums) {
 					arrForAnimation.push(_spritesStore.spritesStore.anums[key]);
-				}this.rollAnm = new _PIXIabbr._pxEx.MovieClip(arrForAnimation);
-				this.rollAnm.animationSpeed = 0.25;
+				}_a.rollNumAnimation = new _PIXIabbr._pxEx.MovieClip(arrForAnimation);
+				_a.rollNumAnimation.animationSpeed = 0.25;
 			}
+	
+			/**
+	   * Состояние рола числа.
+	   * Если это не первый рол - добалвяем в ленту число предыдущего рола
+	   */
+	
 		}, {
 			key: 'rollPlay',
 			value: function rollPlay() {
 				var _this = this;
 	
-				this.rollAnm.play();
+				var _a = this._hisSprites;
+	
+				if (this.rolledNum) {
+					this.addNum(this.rolledNum);
+					this.rolledNum = undefined;
+					_a.rollNumAnimation.visible = true;
+					this._spriteContainer.removeChild(_a.rollNumSprite);
+				}
+	
+				_a.rollNumAnimation.play();
 	
 				setTimeout(function () {
-					_this.viewRollResult();
-					_this.rollStop();
+					_this.viewRollResult(_helpFunctions._hf.randEl(_historyData.rollNumbers));
+					_a.rollNumAnimation.gotoAndStop(0);
+	
+					_this.rollCb.call(_this.cbCtx, _this.rolledNum);
 				}, this.rollTime * 1000);
 			}
-		}, {
-			key: 'rollStop',
-			value: function rollStop() {
-				this.rollAnm.gotoAndStop(0);
-			}
+	
+			/**
+	   * Показываем нароленное число
+	   * @param num
+	   */
+	
 		}, {
 			key: 'viewRollResult',
-			value: function viewRollResult() {}
+			value: function viewRollResult(num) {
+				var _a = this._hisSprites;
+				_a.rollNumSprite = new _PIXIabbr._pxS(_spritesStore.spritesStore.bgNumbers[_helpFunctions._hf.colorType(_historyData.colorBigNumMap, num)]);
+	
+				num = num === 'zero' ? '0' : num === 'doubleZero' ? '00' : num;
+				_helpFunctions._hf.addTextToSprite(_a.rollNumSprite, { x: 84, y: 84 }, num, _styles.styles.historyPanel.big);
+	
+				_a.rollNumAnimation.visible = false;
+	
+				this._spriteContainer.addChild(_a.rollNumSprite);
+	
+				this.rolledNum = num;
+			}
 		}, {
 			key: 'addNum',
 			value: function addNum(num) {
-				this.hTape.push(num);
+				var _hs = this._hisSprites;
 	
-				var color = void 0;
-				for (var key in _historyData.colorNumMap) {
-					if (~_historyData.colorNumMap[key].indexOf(num)) color = key;
-				}if (num === 'zero' || num === 0) num = '0';
-				if (num === 'doubleZero') num = '00';
-	
-				var newNum = new _PIXIabbr._pxS(_spritesStore.spritesStore.bgNumbers[color]);
-				this.hTapeSprites.unshift(newNum);
+				var newNum = new _PIXIabbr._pxS(_spritesStore.spritesStore.bgNumbers[_helpFunctions._hf.colorType(_historyData.colorNumMap, num)]);
+				_hs.numTape.unshift(newNum);
 				this._spriteContainer.addChildAt(newNum, 0);
-				newNum.addChild(this.addNumText(num));
+	
+				_helpFunctions._hf.addTextToSprite(newNum, { x: 32, y: 32 }, num, _styles.styles.historyPanel.small);
 	
 				// Сдвигаем все вниз
-				this.hTapeSprites.forEach(function (item, idx) {
+				_hs.numTape.forEach(function (item, idx) {
 					var newY = 170 + 65 * idx;
 					var tween = new TweenLite(item, 1, { y: newY });
 				});
-			}
-		}, {
-			key: 'addNumText',
-			value: function addNumText(num) {
-				var numText = new _PIXIabbr._pxT(num, _styles.styles.infoPanel.number);
-				numText.anchor.set(0.5, 0.5);
-				numText.position = { x: 32, y: 32 };
-	
-				return numText;
 			}
 		}, {
 			key: 'getPixiSprite',
@@ -32382,7 +32448,17 @@
 		bgZero: ['zero', 'doubleZero', 0]
 	};
 	
+	var colorBigNumMap = {
+		bgBigRed: [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36],
+		bgBigBlack: [2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35],
+		bgBigZero: ['zero', 'doubleZero', 0]
+	};
+	
+	var rollNumbers = ['zero', 'doubleZero', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35];
+	
 	exports.colorNumMap = colorNumMap;
+	exports.colorBigNumMap = colorBigNumMap;
+	exports.rollNumbers = rollNumbers;
 
 /***/ },
 /* 178 */

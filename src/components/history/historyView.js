@@ -1,20 +1,25 @@
 import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
 import {spritesStore} from './../../spritesStore';
 import {defaultPositions} from './../../constants/defaultPositions';
-import {colorNumMap} from './historyData';
+import {colorNumMap, colorBigNumMap, rollNumbers} from './historyData';
 import {styles} from './../../constants/styles';
 import {_hf} from './../../servises/helpFunctions';
 import {TweenMax, Power2, TimelineLite} from "gsap";
 
 export default class historyView {
 	constructor(config) {
+		this.rolledNum = undefined;
+
+		this._hisSprites = {
+			rollNumAnimation: undefined,
+			rollNumSprite: undefined,
+			numTape: []
+		};
+
 		this.cbCtx = (config.ctx) ? config.ctx : this;
 		this.rollCb = (config.rollCb) ? config.rollCb : ()=>{console.log('lolec ➠ ')};
-		this.rollTime = (config.rollTime) ? config.rollTime : 2.5;
-		this.viewResultTime = (config.viewResultTime) ? config.viewResultTime : 1.5;
 
-		this.hTape = [];
-		this.hTapeSprites = [];
+		this.rollTime = (config.rollTime) ? config.rollTime : 2.5;
 
 		// Контейнер для фишки с тенью и текстом
 		let spriteContainer = new _pxC();
@@ -25,7 +30,7 @@ export default class historyView {
 		this.createRollField();
 		this.rollPlay();
 
-		spriteContainer.addChild( this.rollAnm );
+		spriteContainer.addChild( this._hisSprites.rollNumAnimation );
 	}
 
 	get getPixiSprite(){
@@ -36,55 +41,71 @@ export default class historyView {
 	 * Поле с анимацией
 	 */
 	createRollField(){
-		let arrForAnimation = [];
+		let _a = this._hisSprites,
+			arrForAnimation = [];
 		for(let key in spritesStore.anums)
 			arrForAnimation.push( spritesStore.anums[key] );
-		this.rollAnm = new _pxEx.MovieClip(arrForAnimation);
-		this.rollAnm.animationSpeed = 0.25;
+
+		_a.rollNumAnimation = new _pxEx.MovieClip(arrForAnimation);
+		_a.rollNumAnimation.animationSpeed = 0.25;
 	}
+
+	/**
+	 * Состояние рола числа.
+	 * Если это не первый рол - добалвяем в ленту число предыдущего рола
+	 */
 	rollPlay(){
-		this.rollAnm.play();
+		let _a = this._hisSprites;
+
+		if(this.rolledNum){
+			this.addNum(this.rolledNum);
+			this.rolledNum = undefined;
+			_a.rollNumAnimation.visible = true;
+			this._spriteContainer.removeChild(_a.rollNumSprite);
+		}
+
+		_a.rollNumAnimation.play();
 
 		setTimeout(() => {
-			this.viewRollResult();
-			this.rollStop();
+			this.viewRollResult( _hf.randEl(rollNumbers) );
+			_a.rollNumAnimation.gotoAndStop(0);
+
+			this.rollCb.call(this.cbCtx, this.rolledNum)
 		}, this.rollTime * 1000)
 	}
-	rollStop(){
-		this.rollAnm.gotoAndStop(0);
+
+	/**
+	 * Показываем нароленное число
+	 * @param num
+	 */
+	viewRollResult(num){
+		let _a = this._hisSprites;
+		_a.rollNumSprite = new _pxS(spritesStore.bgNumbers[ _hf.colorType(colorBigNumMap, num) ]);
+
+		num = (num === 'zero') ? '0' : (num === 'doubleZero') ? '00' : num;
+		_hf.addTextToSprite(_a.rollNumSprite, {x: 84, y: 84}, num, styles.historyPanel.big);
+
+		_a.rollNumAnimation.visible = false;
+
+		this._spriteContainer.addChild(_a.rollNumSprite);
+
+		this.rolledNum = num;
 	}
 
-	viewRollResult(){
-
-	}
 
 	addNum(num){
-		this.hTape.push(num);
+		let _hs = this._hisSprites;
 
-		let color;
-		for(let key in colorNumMap)
-			if(~colorNumMap[key].indexOf(num)) color = key;
-
-		if(num === 'zero' || num === 0) num = '0';
-		if(num === 'doubleZero') num = '00';
-
-		let newNum = new _pxS(spritesStore.bgNumbers[color]);
-		this.hTapeSprites.unshift(newNum);
+		let newNum = new _pxS(spritesStore.bgNumbers[ _hf.colorType(colorNumMap, num) ]);
+		_hs.numTape.unshift(newNum);
 		this._spriteContainer.addChildAt( newNum, 0 );
-		newNum.addChild( this.addNumText(num) );
+
+		_hf.addTextToSprite(newNum, {x: 32, y: 32}, num, styles.historyPanel.small);
 
 		// Сдвигаем все вниз
-		this.hTapeSprites.forEach((item, idx) => {
+		_hs.numTape.forEach((item, idx) => {
 			let newY = 170 + 65*idx;
 			let tween = new TweenLite(item, 1, {y: newY});
 		});
-	}
-
-	addNumText(num){
-		let numText = new _pxT(num, styles.infoPanel.number);
-		numText.anchor.set(0.5, 0.5);
-		numText.position = {x: 32, y: 32};
-
-		return numText;
 	}
 }

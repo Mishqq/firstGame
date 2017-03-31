@@ -1,3 +1,5 @@
+import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../src/constants/PIXIabbr';
+
 /**
  * Проверка принадлежности по координатам
  * @param pos - {x, y}
@@ -43,10 +45,57 @@ function formatLimit(num){
 	}
 }
 
+
+/**
+ * Определение цвета подложки для цифры
+ * @param map
+ * @param num
+ * @returns {*}
+ */
+function colorType(map, num){
+	let color;
+	for(let key in map)
+		if(~map[key].indexOf(num)) color = key;
+
+	if(num === 'zero' || num === 0) num = '0';
+	if(num === 'doubleZero') num = '00';
+
+	return color;
+}
+
+
+/**
+ * Добавляет текстуру текста к спрайту
+ * @param sprite - спрайт, к которому добавляем текст
+ * @param pos - {x, y}, положение текста в спрайте
+ * @param text - сам текст
+ * @param style - стиль текста
+ */
+function addTextToSprite(sprite, pos, text, style){
+	let textSprt = new _pxT(text, style);
+	textSprt.anchor.set(0.5, 0.5);
+	textSprt.position = pos;
+
+	sprite.addChild(textSprt);
+}
+
+/**
+ * Возвращаем случайный элемент массива
+ * @param arr
+ * @returns {number}
+ */
+function randEl(arr){
+	return arr[Math.floor(Math.random() * arr.length)];
+}
+
+
 let _hf = {
 	isPosInBounds,
 	formatChipValue,
-	formatLimit
+	formatLimit,
+	colorType,
+	addTextToSprite,
+	randEl
 };
 
 export {_hf};
