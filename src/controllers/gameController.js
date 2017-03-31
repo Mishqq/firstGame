@@ -256,7 +256,11 @@ export default class GameController {
 
 
 	rollNumber(number){
-		console.log('number ➠ ', number);
+		this.gameField.showWinNum(number);
+
+		setTimeout(() => {
+			this.gameField.hideWinNum();
+		}, 3000)
 	}
 
 

@@ -1,7 +1,8 @@
 import {_p, _pxC, _pxS, _pxT, _pxG, _pxEx} from './../../constants/PIXIabbr';
 import {defaultPositions} from './../../constants/defaultPositions';
-import {clickAreas, pointMap} from './gameFieldCellMap';
+import {clickAreas, pointMap, winHintPos} from './gameFieldCellMap';
 import {styles} from './../../constants/styles';
+import {TweenMax, Power2, TimelineLite} from "gsap";
 
 export default class GameFieldView {
 	constructor(config) {
@@ -34,6 +35,8 @@ export default class GameFieldView {
 		spriteContainer.addChild(sprite);
 
 		this.drawHints();
+
+		this.drawWinHints();
 
 		// this.devModeInteractiveAreas();
 	}
@@ -186,6 +189,47 @@ export default class GameFieldView {
 	}
 
 
+	/**
+	 * Отрисовка графики выйгрышных номеров
+	 */
+	drawWinHints(){
+		this.winNumHints = {};
+
+		for(let key in winHintPos){
+			let graphics = new _pxG();
+
+			graphics.alpha = 1;
+			graphics.lineStyle(8, 0xFFEF50);
+
+			let {x,y,w,h} = winHintPos[key];
+
+			graphics.drawRect(x, y, w, h);
+			graphics.visible = false;
+
+			this.pixiContainer.addChild(graphics);
+
+			this.winNumHints[key] = graphics;
+		}
+	}
+
+	showWinHunHint(key){
+		this.activeWinHint = this.winNumHints[key];
+		this.winNumHints[key].visible = true;
+
+		// let tween = new TweenMax(this.winNumHints[key], 0.5, {alpha: 0.3, repeat: 20});
+		let tween = new TweenMax(this.winNumHints[key], 0.3, {alpha: 0.4, repeat: 20, yoyo: true});
+	}
+
+	hideWinHint(){
+		if(this.activeWinHint){
+			this.activeWinHint.visible = false;
+			this.activeWinHint = undefined;
+		} else {
+			for(let key in this.winNumHints){
+				this.winNumHints[key].visible = false;
+			}
+		}
+	}
 
 
 	/**

@@ -42,6 +42,16 @@ export default class GameFieldController {
 		this._gameFieldBig.hideHints();
 	}
 
+
+
+	showWinNum(num){
+		this._gameFieldBig.showWinHunHint(num);
+	}
+	hideWinNum(){
+		this._gameFieldBig.hideWinHint();
+	}
+
+
 	/**
 	 * Определение ячеек по клику на игровое поле
 	 * @param pos

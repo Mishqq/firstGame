@@ -28540,7 +28540,13 @@
 		}, {
 			key: 'rollNumber',
 			value: function rollNumber(number) {
-				console.log('number ➠ ', number);
+				var _this2 = this;
+	
+				this.gameField.showWinNum(number);
+	
+				setTimeout(function () {
+					_this2.gameField.hideWinNum();
+				}, 3000);
 			}
 	
 			/**
@@ -29224,6 +29230,16 @@
 			value: function hideHints() {
 				this._gameFieldBig.hideHints();
 			}
+		}, {
+			key: 'showWinNum',
+			value: function showWinNum(num) {
+				this._gameFieldBig.showWinHunHint(num);
+			}
+		}, {
+			key: 'hideWinNum',
+			value: function hideWinNum() {
+				this._gameFieldBig.hideWinHint();
+			}
 	
 			/**
 	   * Определение ячеек по клику на игровое поле
@@ -29335,6 +29351,8 @@
 	
 	var _styles = __webpack_require__(151);
 	
+	var _gsap = __webpack_require__(178);
+	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var GameFieldView = function () {
@@ -29372,6 +29390,8 @@
 			spriteContainer.addChild(sprite);
 	
 			this.drawHints();
+	
+			this.drawWinHints();
 	
 			// this.devModeInteractiveAreas();
 		}
@@ -29542,6 +29562,58 @@
 				this.greenSquare.forEach(function (item) {
 					item.visible = true;
 				});
+			}
+	
+			/**
+	   * Отрисовка графики выйгрышных номеров
+	   */
+	
+		}, {
+			key: 'drawWinHints',
+			value: function drawWinHints() {
+				this.winNumHints = {};
+	
+				for (var key in _gameFieldCellMap.winHintPos) {
+					var graphics = new _PIXIabbr._pxG();
+	
+					graphics.alpha = 1;
+					graphics.lineStyle(8, 0xFFEF50);
+	
+					var _winHintPos$key = _gameFieldCellMap.winHintPos[key],
+					    x = _winHintPos$key.x,
+					    y = _winHintPos$key.y,
+					    w = _winHintPos$key.w,
+					    h = _winHintPos$key.h;
+	
+	
+					graphics.drawRect(x, y, w, h);
+					graphics.visible = false;
+	
+					this.pixiContainer.addChild(graphics);
+	
+					this.winNumHints[key] = graphics;
+				}
+			}
+		}, {
+			key: 'showWinHunHint',
+			value: function showWinHunHint(key) {
+				this.activeWinHint = this.winNumHints[key];
+				this.winNumHints[key].visible = true;
+	
+				// let tween = new TweenMax(this.winNumHints[key], 0.5, {alpha: 0.3, repeat: 20});
+				var tween = new _gsap.TweenMax(this.winNumHints[key], 0.3, { alpha: 0.4, repeat: 20, yoyo: true });
+			}
+		}, {
+			key: 'hideWinHint',
+			value: function hideWinHint() {
+				if (this.activeWinHint) {
+					this.activeWinHint.visible = false;
+					this.activeWinHint = undefined;
+				} else {
+					for (var key in this.winNumHints) {
+						this.winNumHints[key].visible = false;
+					}
+				}
 			}
 	
 			/**
@@ -29787,8 +29859,18 @@
 	pointMap.doubleZero = { x: 0, y: 0, w: 105, h: 158 };
 	pointMap.zero = { x: 0, y: 158, w: 105, h: 158 };
 	
+	var winHintPos = {};
+	for (var _i = 0; _i < 12; _i += 1) {
+		for (var _j = 3; _j > 0; _j -= 1) {
+			winHintPos[_j + _i * 3] = { x: 105 * (_i + 1), y: 315 - 105 * _j, w: 105, h: 105 };
+		}
+	}
+	winHintPos['zero'] = { x: 0, y: 157, w: 105, h: 157 };
+	winHintPos['doubleZero'] = { x: 0, y: 0, w: 105, h: 157 };
+	
 	exports.clickAreas = clickAreas;
 	exports.pointMap = pointMap;
+	exports.winHintPos = winHintPos;
 
 /***/ },
 /* 151 */

@@ -93,4 +93,14 @@ for(let i=0; i<12; i+=1){
 pointMap.doubleZero = {x:0, y:0, w:105, h:158};
 pointMap.zero       = {x:0, y:158, w:105, h:158};
 
-export {clickAreas, pointMap};
+
+let winHintPos = {};
+for(let i=0; i<12; i+=1){
+	for(let j=3; j>0; j-=1){
+		winHintPos[j + i*3] = {x:105*(i+1), y:315-105*j, w:105, h:105}
+	}
+}
+winHintPos['zero'] = {x:0, y:157, w:105, h:157};
+winHintPos['doubleZero'] = {x:0, y:0, w:105, h:157};
+
+export {clickAreas, pointMap, winHintPos};
