@@ -1,11 +1,13 @@
 import PIXI from 'pixi.js';
 import plugins from './../plugins';
-import config  from './../config';
 import Game from './../Game';
-import {assetLoader} from './../assetsLoader'
+import assetLoader from './../assetsLoader'
 import {_tevStore, _tev} from './../servises/touchEvents'
+import presets from './../constants/presets'
 
 import {betStore} from '../servises/betStore';
+
+import GameStore from '../servises/gameStore';
 
 // Components
 import Background           from './../components/background/background';
@@ -22,12 +24,15 @@ import historyController    from './../components/history/historyController';
 
 export default class GameController {
 	constructor(){
-		this.game = new Game(config);
+		this.game = new Game(presets.settings.game);
 	}
 
 	init(){
 		let game = this.game,
 			stage = game.stage;
+
+		this.gameStore = new GameStore();
+		console.log('this.gameStore ➠ ', this.gameStore);
 
 		this.stage = stage;
 
@@ -116,7 +121,7 @@ export default class GameController {
 			stage.addChild(this.infoPanel.pixiSprite);
 
 
-			this.betPanelCtrl = new betPanelController();
+			this.betPanelCtrl = new betPanelController(presets.data.betPanel);
 			stage.addChild(this.betPanelCtrl.pixiSprite);
 
 

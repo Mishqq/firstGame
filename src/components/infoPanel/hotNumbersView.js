@@ -1,6 +1,5 @@
 import {_pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
-import {styles} from './../../constants/styles';
-import {blockTexts, colorNumMap} from './infoPanelData';
+import presets from './../../constants/presets';
 import {spritesStore} from './../../spritesStore';
 
 export default class hotNumPanel {
@@ -8,7 +7,7 @@ export default class hotNumPanel {
 		this.numbers = numbers;
 
 		// Текст для этого блока
-		let texts = blockTexts.hotNumbers;
+		let texts = presets.texts.infoPanel.hotNumbers;
 
 		// Контейнер для фишки с тенью и текстом
 		this._spriteContainer = new _pxC();
@@ -16,8 +15,8 @@ export default class hotNumPanel {
 		// Добавление текста в ячейке
 		texts.forEach((item) => {
 			let newText = item.type === 'gradientText' ?
-				new _pxEx.BitmapText(item.text, styles.infoPanel[item.type]) :
-				new _pxT(item.text, styles.infoPanel[item.type]);
+				new _pxEx.BitmapText(item.text, presets.textStyles.infoPanel[item.type]) :
+				new _pxT(item.text, presets.textStyles.infoPanel[item.type]);
 
 			newText.position = {x: item.x || 0, y: item.y || 0};
 
@@ -61,17 +60,18 @@ export default class hotNumPanel {
 	 * @returns {PIXI.Container}
 	 */
 	createNumber(obj){
-		let color;
-		for(let key in colorNumMap)
-			if(~colorNumMap[key].indexOf(obj.number)) color = key;
+		let color,
+			map = presets.data.colorNumMap;
+		for(let key in map)
+			if(~map[key].indexOf(obj.number)) color = key;
 
 		if(obj.number === 'zero') obj.number = '0';
 		if(obj.number === 'doubleZero') obj.number = '00';
 
 		let numCnt = new _pxC(),
 			bg = new _pxS( spritesStore.bgNumbers[color] ),
-			num = new _pxT(obj.number, styles.infoPanel.number),
-			amount = new _pxT(obj.amount, styles.infoPanel.amount);
+			num = new _pxT(obj.number, presets.textStyles.infoPanel.number),
+			amount = new _pxT(obj.amount, presets.textStyles.infoPanel.amount);
 
 		num.position = {x: 33, y: 33};
 		num.anchor.set(0.5);

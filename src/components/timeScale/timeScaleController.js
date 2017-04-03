@@ -1,5 +1,5 @@
 import GameFieldView from './timeScaleView';
-import {timeScaleConfig, timeScaleText} from './timeScaleConfig';
+import presets from './../../constants/presets';
 
 export default class TimeScaleController {
 	constructor(cfgFromGameCtrl) {
@@ -13,7 +13,7 @@ export default class TimeScaleController {
 			ctx: this,
 		};
 
-		this._timeScale = new GameFieldView(cbForView, timeScaleConfig, timeScaleText);
+		this._timeScale = new GameFieldView(cbForView, presets.settings.timeScale, presets.texts.timeScale);
 	}
 
 	get pixiSprite(){

@@ -1,7 +1,6 @@
 import ChipView from './chipView';
-import {chipValues} from './../../constants/chipValues';
+import presets from './../../constants/presets';
 import {betStore} from './../../servises/betStore'
-import {_tevStore, _tev} from './../../servises/touchEvents'
 
 //TODO: Переделатю вьюху: класс контейнера должен быть один, а не по количеству фишек
 
@@ -61,8 +60,8 @@ export default class ChipController {
 	 */
 	returnChipType(price){
 		let chipType;
-		for(let key in chipValues)
-			if(chipValues[key] === price) chipType = key;
+		for(let key in presets.data.chipValues)
+			if(presets.data.chipValues[key] === price) chipType = key;
 		return chipType;
 	}
 

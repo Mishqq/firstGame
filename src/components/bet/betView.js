@@ -1,9 +1,17 @@
 import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
 import {spritesStore} from './../../spritesStore';
-import {styles} from './../../constants/styles';
-import {smallChipTypes} from './../../constants/chipValues';
+import presets from './../../constants/presets';
 import {_hf} from './../../servises/helpFunctions'
 import {_tevStore, _tev} from './../../servises/touchEvents'
+
+let smallChipTypes = {
+	chipSm0: presets.data.chipValues.chip0,
+	chipSm1: presets.data.chipValues.chip1,
+	chipSm2: presets.data.chipValues.chip2,
+	chipSm3: presets.data.chipValues.chip3,
+	chipSm4: presets.data.chipValues.chip4
+};
+
 
 export default class BetView {
 	constructor(config, value) {
@@ -28,7 +36,7 @@ export default class BetView {
 		let betSprite = new _pxS( spritesStore.chips[chipType] );
 		betSprite.anchor.set(0.5);
 
-		let chipValueText = new _pxT( _hf.formatChipValue(value), styles.chipSmTextStyle );
+		let chipValueText = new _pxT( _hf.formatChipValue(value), presets.textStyles.chipSmTextStyle );
 		chipValueText.anchor.set(0.5);
 
 		['touchstart', 'mousedown', 'pointerdown'].forEach((event)=>{
@@ -108,7 +116,7 @@ export default class BetView {
 		});
 
 		if(spriteContainer.children.length){
-			let chipValueText = new _pxT( _hf.formatChipValue(this._summ), styles.chipSmTextStyle );
+			let chipValueText = new _pxT( _hf.formatChipValue(this._summ), presets.textStyles.chipSmTextStyle );
 			chipValueText.anchor.set(0.5, 0.6);
 
 			spriteContainer.children[ spriteContainer.children.length-1 ].addChild(chipValueText);

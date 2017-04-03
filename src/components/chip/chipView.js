@@ -1,8 +1,6 @@
 import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
 import {spritesStore} from './../../spritesStore';
-import {defaultPositions} from './../../constants/defaultPositions';
-import {chipValues} from './../../constants/chipValues';
-import {styles} from './../../constants/styles';
+import presets from './../../constants/presets';
 import {_hf} from './../../servises/helpFunctions'
 
 export default class ChipView {
@@ -20,8 +18,8 @@ export default class ChipView {
 		spriteContainer.buttonMode = true;
 
 
-		spriteContainer.x = defaultPositions.chips[chipType].x;
-		spriteContainer.y = defaultPositions.chips[chipType].y;
+		spriteContainer.x = presets.positions.chips[chipType].x;
+		spriteContainer.y = presets.positions.chips[chipType].y;
 
 		let sprite = new _pxS( spritesStore.chips[chipType] );
 
@@ -33,9 +31,9 @@ export default class ChipView {
 		shadow.anchor.set(0.5);
 
 		// Значение ставки на фишке
-		this.chipValue = chipValues[chipType];
+		this.chipValue = presets.data.chipValues[chipType];
 		this.chipType = chipType;
-		let chipValueText = new _pxT( _hf.formatChipValue(this.chipValue), styles.chipTextStyle );
+		let chipValueText = new _pxT( _hf.formatChipValue(this.chipValue), presets.textStyles.chipTextStyle );
 		chipValueText.anchor.set(0.5);
 
 		['touchend', 'mouseup', 'pointerup'].forEach((event)=>{

@@ -2,6 +2,8 @@ import BetView from './betView';
 
 export default class BetController {
 	constructor(configByGameCtrl) {
+		this.cfg= configByGameCtrl;
+
 		this.onTouchEndCb = (configByGameCtrl.onTouchEndCb) ?
 			configByGameCtrl.onTouchEndCb : undefined;
 
@@ -33,7 +35,7 @@ export default class BetController {
 	}
 
 	touchStart(price){
-
+		console.log('111 ➠ ', 111);
 	}
 
 	updateBetView(value){

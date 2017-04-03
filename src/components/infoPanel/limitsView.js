@@ -1,14 +1,13 @@
 import {_pxC, _pxT, _pxEx, _pxG} from './../../constants/PIXIabbr';
-import {styles} from './../../constants/styles';
+import presets from './../../constants/presets';
 import {_hf} from './../../servises/helpFunctions';
-import {blockTexts, defaultPanelData} from './infoPanelData';
 
 
 export default class limitsPanel {
 	constructor(limits) {
-		let texts = blockTexts.limitBlock;
+		let texts = presets.texts.infoPanel.limitBlock;
 
-		this.limits = limits || defaultPanelData.limitsPanel;
+		this.limits = limits || presets.data.infoPanel.limitsPanel;
 
 		this.limSprts = {};
 		let style = {font: "normal 24px Arial", fill: 'white'};
@@ -28,8 +27,8 @@ export default class limitsPanel {
 
 		texts.forEach((item) => {
 			let newText = item.type === 'gradientText' ?
-				new _pxEx.BitmapText(item.text, styles.infoPanel[item.type]) :
-				new _pxT(item.text, styles.infoPanel[item.type]);
+				new _pxEx.BitmapText(item.text, presets.textStyles.infoPanel[item.type]) :
+				new _pxT(item.text, presets.textStyles.infoPanel[item.type]);
 
 			newText.position = {x: item.x || 0, y: item.y || 0};
 

@@ -1,5 +1,5 @@
 import FloatChipView from './floatChipView';
-import {floatChipTypes} from './../../constants/chipValues';
+import presets from './../../constants/presets';
 
 export default class FloatChipController {
 	constructor(configByGameCtrl) {
@@ -21,7 +21,7 @@ export default class FloatChipController {
 	}
 
 	viewFloatChip(value){
-		this._floatChipsSprite.viewFloatChip(floatChipTypes[value], value);
+		this._floatChipsSprite.viewFloatChip(presets.data.floatChipTypes[value], value);
 	}
 
 	hideFloatChip(){

@@ -1,34 +1,33 @@
 import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
-import {betPanelText, fields, numbers} from './betPanelData';
 import {spritesStore} from './../../spritesStore';
-import {defaultPositions} from './../../constants/defaultPositions';
-import {styles} from './../../constants/styles';
+import presets from './../../constants/presets';
 import {_hf} from './../../servises/helpFunctions';
 
 export default class betPanelView {
 	constructor(values) {
-		// Контейнер для фишки с тенью и текстом
 		let spriteContainer = new _pxC();
 		this._spriteContainer = spriteContainer;
 
-		spriteContainer.position = defaultPositions.betPanel;
+		spriteContainer.position = presets.positions.betPanel.main;
 
-		let textSprites = {};
-		for(let key in betPanelText) {
-			textSprites[key] = new _pxT(betPanelText[key].text, styles.betPanel);
-			textSprites[key].position = betPanelText[key].pos;
+		let textSprites = {},
+			texts = presets.texts.betPanel;
+		for(let key in texts) {
+			textSprites[key] = new _pxT(texts[key].text, presets.textStyles.betPanel);
+			textSprites[key].position = texts[key].pos;
 			spriteContainer.addChild(textSprites[key]);
 		}
 
 		this.numSprites = {};
-		let fieldSprites = {};
-		for(let key in fields) {
+		let fieldSprites = {},
+			pos = presets.positions.betPanel;
+		for(let key in pos.fields) {
 			fieldSprites[key] = new _pxS( spritesStore.fields[key] );
-			fieldSprites[key].position = fields[key];
+			fieldSprites[key].position = pos.fields[key];
 
-			this.numSprites[key] = new _pxT(_hf.formatLimit(0), styles.betPanel);
+			this.numSprites[key] = new _pxT(_hf.formatLimit(values[key]), presets.textStyles.betPanel);
 			this.numSprites[key].anchor.set(0, 0.5);
-			this.numSprites[key].position = numbers[key];
+			this.numSprites[key].position = pos.numbers[key];
 			fieldSprites[key].addChild(this.numSprites[key]);
 
 			spriteContainer.addChild(fieldSprites[key]);

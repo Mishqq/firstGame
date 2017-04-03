@@ -1,7 +1,6 @@
 import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
 import {spritesStore} from './../../spritesStore';
-import {defaultPositions} from './../../constants/defaultPositions';
-import {styles} from './../../constants/styles';
+import presets from './../../constants/presets';
 
 export default class ButtonView {
 	constructor(btnType, config) {
@@ -15,8 +14,8 @@ export default class ButtonView {
 		spriteContainer.interactive = true;
 		spriteContainer.buttonMode = true;
 
-		spriteContainer.x = defaultPositions.buttons[btnType].x;
-		spriteContainer.y = defaultPositions.buttons[btnType].y;
+		spriteContainer.x = presets.positions.buttons[btnType].x;
+		spriteContainer.y = presets.positions.buttons[btnType].y;
 
 		if(btnType === 'btnCancel' || btnType === 'btnClear'){
 			this._sqrBtn = this.squareBtnCreate(btnType);
@@ -103,7 +102,7 @@ export default class ButtonView {
 			stateSel = new _pxS( spritesStore.buttons['btnActionSel'] ),
 			icoDef = new _pxS( spritesStore.buttons[type === 'cn' ? 'icoCancel' : 'icoClear'] ),
 			icoDis = new _pxS( spritesStore.buttons[type === 'cn' ? 'icoCancelDis' : 'icoClearDis'] ),
-			text = new _pxT( type === 'cn' ? 'Отменить' : 'Очистить', styles.buttonStyle );
+			text = new _pxT( type === 'cn' ? presets.texts.button.cancel : presets.texts.button.clear, presets.textStyles.buttonStyle );
 
 		stateSel.visible = false;
 		icoDis.visible = false;

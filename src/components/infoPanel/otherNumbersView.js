@@ -1,7 +1,6 @@
 import {_p, _pxC, _pxS, _pxT, _pxEx, _pxG} from './../../constants/PIXIabbr';
 import {spritesStore} from './../../spritesStore';
-import {styles} from './../../constants/styles';
-import {blockTexts} from './infoPanelData';
+import presets from './../../constants/presets';
 
 export default class otherNumPanel {
 	constructor(numbers) {
@@ -18,7 +17,7 @@ export default class otherNumPanel {
 
 		this.numbersSprites = {};
 
-		let texts = blockTexts.otherNumbers;
+		let texts = presets.texts.infoPanel.otherNumbers;
 
 		// Контейнер для фишки с тенью и текстом
 		this._spriteContainer = new _pxC();
@@ -29,8 +28,8 @@ export default class otherNumPanel {
 
 		texts.forEach((item) => {
 			let newText = item.type === 'gradientText' ?
-				new _pxEx.BitmapText(item.text, styles.infoPanel[item.type]) :
-				new _pxT(item.text, styles.infoPanel[item.type]);
+				new _pxEx.BitmapText(item.text, presets.textStyles.infoPanel[item.type]) :
+				new _pxT(item.text, presets.textStyles.infoPanel[item.type]);
 
 			newText.position = {x: item.x || 0, y: item.y || 0};
 
@@ -50,7 +49,7 @@ export default class otherNumPanel {
 			let num = this.numbers[key] + '%';
 
 			if(!this.numbersSprites[key]){
-				this.numbersSprites[key] = new _pxT(num, styles.infoPanel.whiteText);
+				this.numbersSprites[key] = new _pxT(num, presets.textStyles.infoPanel.whiteText);
 				this.numbersSprites[key].position = this.numbersPos[key];
 				this._spriteContainer.addChild(this.numbersSprites[key]);
 			} else {

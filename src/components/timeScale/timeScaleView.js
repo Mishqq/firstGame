@@ -1,6 +1,5 @@
 import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
-import {defaultPositions} from './../../constants/defaultPositions';
-import {styles} from './../../constants/styles';
+import presets from './../../constants/presets';
 import {spritesStore} from './../../spritesStore';
 
 export default class TimeScaleView {
@@ -15,8 +14,8 @@ export default class TimeScaleView {
 		let spriteContainer = new _pxC();
 		this.pixiContainer = spriteContainer;
 
-		spriteContainer.x = defaultPositions.timeScale.x;
-		spriteContainer.y = defaultPositions.timeScale.y;
+		spriteContainer.x = presets.positions.timeScale.x;
+		spriteContainer.y = presets.positions.timeScale.y;
 
 		this.sprites = {};
 
@@ -26,7 +25,7 @@ export default class TimeScaleView {
 			spriteContainer.addChild( this.sprites[item] );
 		});
 
-		let pixiText = new _pxT(statusText['status' + this.state], styles.timeScale);
+		let pixiText = new _pxT(statusText['status' + this.state], presets.textStyles.timeScale);
 		pixiText.anchor.set(0.5);
 		pixiText.x = spriteContainer.width/2;
 		pixiText.y = -30;

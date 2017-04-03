@@ -1,7 +1,6 @@
 import {_p, _pxC, _pxS, _pxT, _pxG, _pxEx} from './../../constants/PIXIabbr';
-import {defaultPositions} from './../../constants/defaultPositions';
+import presets from './../../constants/presets';
 import {clickAreas, pointMap, winHintPos} from './gameFieldCellMap';
-import {styles} from './../../constants/styles';
 import {TweenMax, Power2, TimelineLite} from "gsap";
 
 export default class GameFieldView {
@@ -14,8 +13,8 @@ export default class GameFieldView {
 		let spriteContainer = new _pxC();
 		this.pixiContainer = spriteContainer;
 
-		spriteContainer.x = defaultPositions.fields.big.x;
-		spriteContainer.y = defaultPositions.fields.big.y;
+		spriteContainer.x = presets.positions.fields.big.x;
+		spriteContainer.y = presets.positions.fields.big.y;
 
 		// Opt-in to interactivity
 		spriteContainer.interactive = true;
@@ -277,7 +276,7 @@ export default class GameFieldView {
 			}
 
 
-			let text = new _pxT(str, styles.filedClickAreaTextStyle);
+			let text = new _pxT(str, presets.textStyles.filedClickAreaTextStyle);
 			text.rotation = -0.5;
 
 			text.anchor.set(0.50);

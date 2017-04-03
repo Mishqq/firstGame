@@ -1,11 +1,8 @@
 import betPanelView from './betPanelView';
 
 export default class betPanelController {
-	constructor(cfgFromGameCtrl) {
-		// Конфиг, пришедший от контроллера выше
-		this._cfg = cfgFromGameCtrl;
-
-		this.betPanel = new betPanelView();
+	constructor(values) {
+		this.betPanel = new betPanelView(values);
 	}
 
 	get pixiSprite(){

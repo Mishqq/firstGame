@@ -1,6 +1,6 @@
 import GameFieldView from './gameFieldView';
 import {clickAreas} from './gameFieldCellMap';
-import {defaultPositions} from './../../constants/defaultPositions';
+import presets from './../../constants/presets';
 import {betStore} from './../../servises/betStore'
 
 export default class GameFieldController {
@@ -74,8 +74,8 @@ export default class GameFieldController {
 		// (не важно на что вешаем), то вычисляем координаты нужного поля относительно
 		// сцены вручную
 		let pos = {
-			x: event.data.global.x - defaultPositions.fields.big.x,
-			y: event.data.global.y - defaultPositions.fields.big.y
+			x: event.data.global.x - presets.positions.fields.big.x,
+			y: event.data.global.y - presets.positions.fields.big.y
 		};
 
 		let cell = this.getCellFromPos(pos);
@@ -97,8 +97,8 @@ export default class GameFieldController {
 	 */
 	getPosForBet(pos, global){
 		if(global){
-			pos.x -= defaultPositions.fields.big.x;
-			pos.y -= defaultPositions.fields.big.y;
+			pos.x -= presets.positions.fields.big.x;
+			pos.y -= presets.positions.fields.big.y;
 		}
 
 		let cell = this.getCellFromPos(pos);
@@ -106,8 +106,8 @@ export default class GameFieldController {
 		let center = {};
 		if(cell){
 			center = !global ? cell.center :
-				{x: cell.center.x + defaultPositions.fields.big.x,
-					y: cell.center.y + defaultPositions.fields.big.y};
+				{x: cell.center.x + presets.positions.fields.big.x,
+					y: cell.center.y + presets.positions.fields.big.y};
 		}
 
 		return cell ? center : false;

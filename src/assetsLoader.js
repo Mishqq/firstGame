@@ -1,6 +1,6 @@
 import PIXI from 'pixi.js';
 import {spritesStore} from './spritesStore';
-import {constants} from './constants/constants';
+import {constants} from './constants/resourses';
 
 const loader = PIXI.loader;
 const path = constants.path.assets;
@@ -36,4 +36,4 @@ function assetLoader(callback){
 	});
 }
 
-export {assetLoader}
+export default assetLoader;

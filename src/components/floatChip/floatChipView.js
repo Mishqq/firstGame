@@ -1,6 +1,6 @@
 import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
 import {spritesStore} from './../../spritesStore';
-import {styles} from './../../constants/styles';
+import presets from './../../constants/presets';
 
 export default class FloatChipView {
 	constructor(config) {
@@ -26,7 +26,7 @@ export default class FloatChipView {
 		});
 
 		// Значение на фишке
-		let chipValueText = new _pxT(';)', styles.floatChipTextStyle);
+		let chipValueText = new _pxT(';)', presets.textStyles.floatChipTextStyle);
 		chipValueText.visible = false;
 		this._floatChipsContainer.addChild(chipValueText);
 		chipValueText.anchor.x = 0.5;

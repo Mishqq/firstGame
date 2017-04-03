@@ -1,10 +1,14 @@
 import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
 import {spritesStore} from './../../spritesStore';
-import {defaultPositions} from './../../constants/defaultPositions';
-import {colorNumMap, colorBigNumMap, rollNumbers} from './historyData';
-import {styles} from './../../constants/styles';
+import presets from './../../constants/presets';
 import {_hf} from './../../servises/helpFunctions';
 import {TweenMax, Power2, TimelineLite} from "gsap";
+
+let colorBigNumMap = {
+	bgBigRed: presets.data.colorNumMap.bgRed,
+	bgBigBlack: presets.data.colorNumMap.bgBlack,
+	bgBigZero: presets.data.colorNumMap.bgZero
+};
 
 export default class historyView {
 	constructor(config) {
@@ -25,7 +29,7 @@ export default class historyView {
 		let spriteContainer = new _pxC();
 		this._spriteContainer = spriteContainer;
 
-		spriteContainer.position = defaultPositions.history;
+		spriteContainer.position = presets.positions.history;
 
 		this.createRollField();
 		this.rollPlay();
@@ -67,7 +71,7 @@ export default class historyView {
 		_a.rollNumAnimation.play();
 
 		setTimeout(() => {
-			this.viewRollResult( _hf.randEl(rollNumbers) );
+			this.viewRollResult( _hf.randEl(presets.data.history.rollNumbers) );
 			_a.rollNumAnimation.gotoAndStop(0);
 
 			this.rollCb.call(this.cbCtx, this.rolledNum)
@@ -83,7 +87,7 @@ export default class historyView {
 		_a.rollNumSprite = new _pxS(spritesStore.bgNumbers[ _hf.colorType(colorBigNumMap, num) ]);
 
 		num = (num === 'zero') ? '0' : (num === 'doubleZero') ? '00' : num;
-		_hf.addTextToSprite(_a.rollNumSprite, {x: 84, y: 84}, num, styles.historyPanel.big);
+		_hf.addTextToSprite(_a.rollNumSprite, {x: 84, y: 84}, num, presets.textStyles.historyPanel.big);
 
 		_a.rollNumAnimation.visible = false;
 
@@ -96,11 +100,11 @@ export default class historyView {
 	addNum(num){
 		let _hs = this._hisSprites;
 
-		let newNum = new _pxS(spritesStore.bgNumbers[ _hf.colorType(colorNumMap, num) ]);
+		let newNum = new _pxS(spritesStore.bgNumbers[ _hf.colorType(presets.data.colorNumMap, num) ]);
 		_hs.numTape.unshift(newNum);
 		this._spriteContainer.addChildAt( newNum, 0 );
 
-		_hf.addTextToSprite(newNum, {x: 32, y: 32}, num, styles.historyPanel.small);
+		_hf.addTextToSprite(newNum, {x: 32, y: 32}, num, presets.textStyles.historyPanel.small);
 
 		// Сдвигаем все вниз
 		_hs.numTape.forEach((item, idx) => {
