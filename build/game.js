@@ -28246,63 +28246,63 @@
 	
 	var _plugins2 = _interopRequireDefault(_plugins);
 	
-	var _Game = __webpack_require__(139);
+	var _Game = __webpack_require__(138);
 	
 	var _Game2 = _interopRequireDefault(_Game);
 	
-	var _assetsLoader = __webpack_require__(140);
+	var _assetsLoader = __webpack_require__(139);
 	
 	var _assetsLoader2 = _interopRequireDefault(_assetsLoader);
 	
-	var _touchEvents = __webpack_require__(143);
+	var _touchEvents = __webpack_require__(142);
 	
-	var _presets = __webpack_require__(181);
+	var _presets = __webpack_require__(143);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
 	var _betStore = __webpack_require__(144);
 	
-	var _gameStore = __webpack_require__(182);
+	var _gameStore = __webpack_require__(145);
 	
 	var _gameStore2 = _interopRequireDefault(_gameStore);
 	
-	var _background = __webpack_require__(145);
+	var _background = __webpack_require__(146);
 	
 	var _background2 = _interopRequireDefault(_background);
 	
-	var _gameFieldController = __webpack_require__(146);
+	var _gameFieldController = __webpack_require__(147);
 	
 	var _gameFieldController2 = _interopRequireDefault(_gameFieldController);
 	
-	var _buttonPanelController = __webpack_require__(154);
+	var _buttonPanelController = __webpack_require__(153);
 	
 	var _buttonPanelController2 = _interopRequireDefault(_buttonPanelController);
 	
-	var _chipController = __webpack_require__(156);
+	var _chipController = __webpack_require__(155);
 	
 	var _chipController2 = _interopRequireDefault(_chipController);
 	
-	var _floatChipController = __webpack_require__(160);
+	var _floatChipController = __webpack_require__(158);
 	
 	var _floatChipController2 = _interopRequireDefault(_floatChipController);
 	
-	var _betController = __webpack_require__(162);
+	var _betController = __webpack_require__(160);
 	
 	var _betController2 = _interopRequireDefault(_betController);
 	
-	var _timeScaleController = __webpack_require__(164);
+	var _timeScaleController = __webpack_require__(162);
 	
 	var _timeScaleController2 = _interopRequireDefault(_timeScaleController);
 	
-	var _infoPanelController = __webpack_require__(167);
+	var _infoPanelController = __webpack_require__(164);
 	
 	var _infoPanelController2 = _interopRequireDefault(_infoPanelController);
 	
-	var _betPanelController = __webpack_require__(174);
+	var _betPanelController = __webpack_require__(170);
 	
 	var _betPanelController2 = _interopRequireDefault(_betPanelController);
 	
-	var _historyController = __webpack_require__(177);
+	var _historyController = __webpack_require__(172);
 	
 	var _historyController2 = _interopRequireDefault(_historyController);
 	
@@ -28634,8 +28634,7 @@
 	//# sourceMappingURL=pixi-animationloop.js.map
 
 /***/ },
-/* 138 */,
-/* 139 */
+/* 138 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28701,7 +28700,7 @@
 	exports.default = Game;
 
 /***/ },
-/* 140 */
+/* 139 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -28714,9 +28713,9 @@
 	
 	var _pixi2 = _interopRequireDefault(_pixi);
 	
-	var _spritesStore = __webpack_require__(141);
+	var _spritesStore = __webpack_require__(140);
 	
-	var _resourses = __webpack_require__(180);
+	var _resourses = __webpack_require__(141);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -28757,7 +28756,7 @@
 	exports.default = assetLoader;
 
 /***/ },
-/* 141 */
+/* 140 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -28775,8 +28774,115 @@
 	exports.spritesStore = spritesStore;
 
 /***/ },
-/* 142 */,
-/* 143 */
+/* 141 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	var constants = {
+		path: {
+			assets: './assets/'
+		},
+		loadAssets: ['anums.json', 'bg_numbers.json', 'blights.json', 'buttons.json', 'chips.json', 'fields.json', 'timer.json', 'info.xml'],
+		namesMap: {
+			anums: {
+				a1: 'a1',
+				a2: 'a2',
+				a3: 'a3',
+				a4: 'a4',
+				a5: 'a5',
+				a6: 'a6',
+				a7: 'a7',
+				a8: 'a8',
+				a9: 'a9',
+				a10: 'a10',
+				a11: 'a11',
+				a12: 'a12',
+				a13: 'a13',
+				a14: 'a14',
+				a15: 'a15',
+				a16: 'a16'
+			},
+			chips: {
+				chip0: 'chip0',
+				chipSm0: 'chip0_tbl',
+				chip1: 'chip1',
+				chipSm1: 'chip1_tbl',
+				chip2: 'chip2',
+				chipSm2: 'chip2_tbl',
+				chip3: 'chip3',
+				chipSm3: 'chip3_tbl',
+				chip4: 'chip4',
+				chipSm4: 'chip4_tbl',
+				chipW: 'chip_wait',
+				chipCF: 'coefficient',
+				chipShadow: 'shadow'
+			},
+			bgNumbers: {
+				bgBlack: 'bg_black',
+				bgBigBlack: 'bg_black_big',
+				bgRed: 'bg_red',
+				bgBigRed: 'bg_red_big',
+				bgZero: 'bg_zero',
+				bgBigZero: 'bg_zero_big',
+				icoRed: 'ico_red',
+				icoBlack: 'ico_black'
+			},
+			blights: {
+				blight0: "blight-0",
+				blight10: "blight-10",
+				blight23: "blight-23",
+				blight26: "blight-26",
+				blight3: "blight-3",
+				blight5: "blight-5",
+				blight8: "blight-8",
+				blightCell: "blight-cell",
+				blightJeu0: "blight-jeu0",
+				blightOrph: "blight-orph",
+				blightS023: "blight-s023",
+				blightS58: "blight-s58",
+				blightWin: "blight-win",
+				blightZero: "blight-zero",
+				blightZwin: "blight-zwin",
+				blight: "blight"
+			},
+			buttons: {
+				btnAction: "btn_action",
+				btnActionSel: "btn_action_sel",
+				btnRepeat: "btn_repeat",
+				btnRepeatDis: "btn_repeat_dis",
+				btnRepeatSel: "btn_repeat_sel",
+				btnX2: "btn_x2",
+				btnX2Dis: "btn_x2_dis",
+				btnX2Sel: "btn_x2_sel",
+				icoCancel: "ico_cancel",
+				icoCancelDis: "ico_cancel_dis",
+				icoClear: "ico_clear",
+				icoClearDis: "ico_clear_dis"
+			},
+			fields: {
+				bonus: "bonus",
+				bonusDis: "bonus_dis",
+				fldBalance: "fld_balance",
+				fldBalanceDis: "fld_balance_dis",
+				fldBet: "fld_bet",
+				fldWin: "fld_win"
+			},
+			timer: {
+				timerBack: "timer_back",
+				timerRed: "timer_red",
+				timerYellow: "timer_yellow"
+			}
+		}
+	};
+	
+	exports.constants = constants;
+
+/***/ },
+/* 142 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -28855,6 +28961,216 @@
 	
 	exports._tevStore = touchEventsStore;
 	exports._tev = instance;
+
+/***/ },
+/* 143 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	var presets = {};
+	
+	/**
+	 * Настройки для компонентов
+	 */
+	presets.settings = {
+		game: {
+			width: 1920,
+			height: 1080,
+			webgl: true, //false for 2dContext, true for autoDetectRenderer
+			rendererOptions: {
+				backgroundColor: 0x1099bb
+			}
+		},
+		timeScale: {
+			time: 6,
+			changeColorPer: 0.25,
+			fps: 60,
+			lastTime: 3
+		}
+	};
+	
+	/**
+	 * Позиции компонентов на сцене
+	 */
+	presets.positions = {
+		chips: {
+			chip0: { x: 640, y: 957 },
+			chip1: { x: 800, y: 957 },
+			chip2: { x: 960, y: 957 },
+			chip3: { x: 1120, y: 957 },
+			chip4: { x: 1280, y: 957 }
+		},
+		buttons: {
+			btnCancel: { x: 180, y: 934 },
+			btnClear: { x: 410, y: 934 },
+			btnRepeat: { x: 1450, y: 934 },
+			btnX2: { x: 1570, y: 934 }
+		},
+		fields: {
+			big: { x: 200, y: 350 },
+			small: { x: 1200, y: 300 }
+		},
+		timeScale: { x: 725, y: 320 },
+		infoPanel: {
+			main: { x: 250, y: 120 },
+			limitsPanel: { x: 0, y: 0 }, // Относительно infoPanel.main
+			hotNumPanel: { x: 340, y: 0 }, // Относительно infoPanel.main
+			coldNumPanel: { x: 675, y: 0 }, // Относительно infoPanel.main
+			otherNumPanel: { x: 1010, y: 0 } // Относительно infoPanel.main
+		},
+		betPanel: {
+			main: { x: 50, y: 50 },
+			fields: {
+				fldBet: { x: 320, y: -10 },
+				fldWin: { x: 730, y: -10 },
+				fldBalance: { x: 1560, y: -22 }
+			},
+			numbers: {
+				fldBet: { x: 20, y: 22 },
+				fldWin: { x: 20, y: 22 },
+				fldBalance: { x: 30, y: 34 }
+			}
+		},
+		history: { x: 0, y: 0 }
+	};
+	
+	/**
+	 * Дефолтные значения компонентов
+	 */
+	presets.data = {
+		colorNumMap: {
+			bgRed: [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36],
+			bgBlack: [2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35],
+			bgZero: ['zero', 'doubleZero', 0]
+		},
+		// Значения ставок
+		chipValues: {
+			chip0: 100,
+			chip1: 500,
+			chip2: 1000,
+			chip3: 2000,
+			chip4: 3000
+		},
+		floatChipTypes: {
+			100: "fChip0",
+			500: "fChip1",
+			1000: "fChip2",
+			2000: "fChip3",
+			3000: "fChip4"
+		},
+		infoPanel: {
+			limitsPanel: { max: 30000, min: 10 },
+			hotNumPanel: [{ number: 34, amount: 37 }, { number: 17, amount: 19 }, { number: 23, amount: 47 }, { number: 15, amount: 98 }],
+			coldNumPanel: [{ number: 33, amount: 7 }, { number: 16, amount: 2 }, { number: 22, amount: 5 }, { number: 14, amount: 8 }],
+			otherNumPanel: { red: 12, black: 38, odd: 10, even: 39, zero: 1 }
+		},
+		history: {
+			rollNumbers: ['zero', 'doubleZero', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
+		},
+		betPanel: {
+			fldBet: 0,
+			fldWin: 0,
+			fldBalance: 10000
+		}
+	};
+	
+	/**
+	 * Дефолтные надписи
+	 */
+	presets.texts = {
+		timeScale: {
+			status0: 'Приём ставок',
+			status1: 'Последние ставки',
+			status2: 'Ставок больше нет',
+			status3: 'Выигрышное число '
+		},
+		infoPanel: {
+			limitBlock: [{ type: 'labelText', text: 'ЛИМИТЫ СТОЛА', x: 110, y: 10 }, { type: 'gradientText', text: 'CASINO ROULETTE', x: 70, y: 40 }, { type: 'gradientText', text: 'MAX:', x: 25, y: 95 }, { type: 'gradientText', text: 'MIN:', x: 25, y: 140 }],
+			hotNumbers: [{ type: 'labelText', text: 'ЗА ПОСЛЕДНИЕ 100 ИГР', x: 60, y: 10 }, { type: 'gradientText', text: 'ГОРЯЧИЕ НОМЕРА', x: 70, y: 40 }],
+			coldNumbers: [{ type: 'labelText', text: 'ЗА ПОСЛЕДНИЕ 100 ИГР', x: 60, y: 10 }, { type: 'gradientText', text: 'ХОЛОДНЫЕ НОМЕРА', x: 50, y: 40 }],
+			otherNumbers: [{ type: 'labelText', text: 'ЗА ПОСЛЕДНИЕ 50 ИГР', x: 60, y: 10 }, { type: 'gradientText', text: 'RED', x: 60, y: 40 }, { type: 'gradientText', text: 'BLACK', x: 210, y: 40 }, { type: 'gradientText', text: 'ODD', x: 30, y: 120 }, { type: 'gradientText', text: '0', x: 150, y: 120 }, { type: 'gradientText', text: 'EVEN', x: 240, y: 120 }]
+		},
+		button: {
+			clear: 'Очистить',
+			cancel: 'Отменить'
+		},
+		betPanel: {
+			bet: {
+				text: 'СТАВКА',
+				pos: { x: 200, y: 0 }
+			},
+			win: {
+				text: 'ВЫИГРЫШ',
+				pos: { x: 570, y: 0 }
+			},
+			balance: {
+				text: 'БАЛАНС',
+				pos: { x: 1450, y: 0 }
+			}
+		}
+	};
+	
+	/**
+	 * Стили для текстов
+	 */
+	presets.textStyles = {
+		chipTextStyle: {
+			font: 'bold 32px Arial',
+			fill: 'white',
+			align: 'center'
+		},
+		buttonStyle: {
+			font: 'normal 26px Arial',
+			fill: 'white',
+			align: 'center'
+		},
+		chipSmTextStyle: {
+			font: 'normal 14px Arial',
+			fill: 'white',
+			align: 'center'
+		},
+		floatChipTextStyle: {
+			font: 'bold 20px Arial',
+			fill: 'white',
+			align: 'center'
+		},
+		filedClickAreaTextStyle: {
+			font: "normal 18px Arial",
+			wordWrapWidth: 0,
+			fill: 'white',
+			stroke: 'black',
+			strokeThickness: 5
+		},
+		timeScale: {
+			font: "normal 36px Arial",
+			fontVariant: 'small-caps',
+			wordWrapWidth: 0,
+			fill: 'white'
+		},
+		infoPanel: {
+			gradientText: { font: "24px info" },
+			whiteText: { font: "normal 24px Arial", fill: 'white' },
+			labelText: { font: "bold 18px Arial", fill: 'yellow', align: 'center' },
+			number: { font: 'normal 30px Arial', fill: 'white', align: 'center' },
+			amount: { font: 'normal 26px Arial', fill: 'white' }
+		},
+		betPanel: {
+			font: "normal 24px Arial",
+			fontVariant: 'small-caps',
+			wordWrapWidth: 0,
+			fill: 'white'
+		},
+		historyPanel: {
+			small: { font: 'normal 30px Arial', fill: 'white', align: 'center' },
+			big: { font: "bold 96px Arial", fontVariant: 'small-caps', wordWrapWidth: 0, fill: 'white' }
+		}
+	};
+	
+	exports.default = presets;
 
 /***/ },
 /* 144 */
@@ -29015,6 +29331,32 @@
 		value: true
 	});
 	
+	var _presets = __webpack_require__(143);
+	
+	var _presets2 = _interopRequireDefault(_presets);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var GameStore = function GameStore() {
+		_classCallCheck(this, GameStore);
+	
+		this.states = {};
+	};
+	
+	exports.default = GameStore;
+
+/***/ },
+/* 146 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
 	var _pixi = __webpack_require__(1);
 	
 	var _pixi2 = _interopRequireDefault(_pixi);
@@ -29048,7 +29390,7 @@
 	exports.default = Background;
 
 /***/ },
-/* 146 */
+/* 147 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29059,13 +29401,13 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _gameFieldView = __webpack_require__(147);
+	var _gameFieldView = __webpack_require__(148);
 	
 	var _gameFieldView2 = _interopRequireDefault(_gameFieldView);
 	
 	var _gameFieldCellMap = __webpack_require__(150);
 	
-	var _presets = __webpack_require__(181);
+	var _presets = __webpack_require__(143);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
@@ -29217,7 +29559,7 @@
 	exports.default = GameFieldController;
 
 /***/ },
-/* 147 */
+/* 148 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29228,15 +29570,15 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(148);
+	var _PIXIabbr = __webpack_require__(149);
 	
-	var _presets = __webpack_require__(181);
+	var _presets = __webpack_require__(143);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
 	var _gameFieldCellMap = __webpack_require__(150);
 	
-	var _gsap = __webpack_require__(152);
+	var _gsap = __webpack_require__(151);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -29580,7 +29922,7 @@
 	exports.default = GameFieldView;
 
 /***/ },
-/* 148 */
+/* 149 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29613,7 +29955,6 @@
 	exports._pxEx = _pxEx;
 
 /***/ },
-/* 149 */,
 /* 150 */
 /***/ function(module, exports) {
 
@@ -29720,8 +30061,7 @@
 	exports.winHintPos = winHintPos;
 
 /***/ },
-/* 151 */,
-/* 152 */
+/* 151 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global) {/*!
@@ -35767,7 +36107,7 @@
 							if (global) {
 								_globals[n] = _exports[n] = cl; //provides a way to avoid global namespace pollution. By default, the main classes like TweenLite, Power1, Strong, etc. are added to window unless a GreenSockGlobals is defined. So if you want to have things added to a custom object instead, just do something like window.GreenSockGlobals = {} before loading any GreenSock files. You can even set up an alias like window.GreenSockGlobals = windows.gs = {} so that you can access everything like gs.TweenLite. Also remember that ALL classes are added to the window.com.greensock object (in their respective packages, like com.greensock.easing.Power1, com.greensock.TweenLite, etc.)
 								hasModule = (typeof(module) !== "undefined" && module.exports);
-								if (!hasModule && "function" === "function" && __webpack_require__(153)){ //AMD
+								if (!hasModule && "function" === "function" && __webpack_require__(152)){ //AMD
 									!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function() { return cl; }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 								} else if (hasModule){ //node
 									if (ns === moduleName) {
@@ -37584,7 +37924,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 153 */
+/* 152 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {module.exports = __webpack_amd_options__;
@@ -37592,7 +37932,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, {}))
 
 /***/ },
-/* 154 */
+/* 153 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -37603,7 +37943,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _buttonPanelView = __webpack_require__(155);
+	var _buttonPanelView = __webpack_require__(154);
 	
 	var _buttonPanelView2 = _interopRequireDefault(_buttonPanelView);
 	
@@ -37704,7 +38044,7 @@
 	exports.default = ButtonController;
 
 /***/ },
-/* 155 */
+/* 154 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -37715,11 +38055,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(148);
+	var _PIXIabbr = __webpack_require__(149);
 	
-	var _spritesStore = __webpack_require__(141);
+	var _spritesStore = __webpack_require__(140);
 	
-	var _presets = __webpack_require__(181);
+	var _presets = __webpack_require__(143);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
@@ -37893,7 +38233,7 @@
 	exports.default = ButtonView;
 
 /***/ },
-/* 156 */
+/* 155 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -37904,11 +38244,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _chipView = __webpack_require__(157);
+	var _chipView = __webpack_require__(156);
 	
 	var _chipView2 = _interopRequireDefault(_chipView);
 	
-	var _presets = __webpack_require__(181);
+	var _presets = __webpack_require__(143);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
@@ -38014,7 +38354,7 @@
 	exports.default = ChipController;
 
 /***/ },
-/* 157 */
+/* 156 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38025,15 +38365,15 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(148);
+	var _PIXIabbr = __webpack_require__(149);
 	
-	var _spritesStore = __webpack_require__(141);
+	var _spritesStore = __webpack_require__(140);
 	
-	var _presets = __webpack_require__(181);
+	var _presets = __webpack_require__(143);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
-	var _helpFunctions = __webpack_require__(159);
+	var _helpFunctions = __webpack_require__(157);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -38161,8 +38501,7 @@
 	exports.default = ChipView;
 
 /***/ },
-/* 158 */,
-/* 159 */
+/* 157 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38172,7 +38511,7 @@
 	});
 	exports._hf = undefined;
 	
-	var _PIXIabbr = __webpack_require__(148);
+	var _PIXIabbr = __webpack_require__(149);
 	
 	/**
 	 * Проверка принадлежности по координатам
@@ -38270,7 +38609,7 @@
 	exports._hf = _hf;
 
 /***/ },
-/* 160 */
+/* 158 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38281,11 +38620,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _floatChipView = __webpack_require__(161);
+	var _floatChipView = __webpack_require__(159);
 	
 	var _floatChipView2 = _interopRequireDefault(_floatChipView);
 	
-	var _presets = __webpack_require__(181);
+	var _presets = __webpack_require__(143);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
@@ -38343,7 +38682,7 @@
 	exports.default = FloatChipController;
 
 /***/ },
-/* 161 */
+/* 159 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38354,11 +38693,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(148);
+	var _PIXIabbr = __webpack_require__(149);
 	
-	var _spritesStore = __webpack_require__(141);
+	var _spritesStore = __webpack_require__(140);
 	
-	var _presets = __webpack_require__(181);
+	var _presets = __webpack_require__(143);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
@@ -38484,7 +38823,7 @@
 	exports.default = FloatChipView;
 
 /***/ },
-/* 162 */
+/* 160 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38495,7 +38834,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _betView = __webpack_require__(163);
+	var _betView = __webpack_require__(161);
 	
 	var _betView2 = _interopRequireDefault(_betView);
 	
@@ -38591,7 +38930,7 @@
 	exports.default = BetController;
 
 /***/ },
-/* 163 */
+/* 161 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38602,17 +38941,17 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(148);
+	var _PIXIabbr = __webpack_require__(149);
 	
-	var _spritesStore = __webpack_require__(141);
+	var _spritesStore = __webpack_require__(140);
 	
-	var _presets = __webpack_require__(181);
+	var _presets = __webpack_require__(143);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
-	var _helpFunctions = __webpack_require__(159);
+	var _helpFunctions = __webpack_require__(157);
 	
-	var _touchEvents = __webpack_require__(143);
+	var _touchEvents = __webpack_require__(142);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -38809,7 +39148,7 @@
 	exports.default = BetView;
 
 /***/ },
-/* 164 */
+/* 162 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38820,11 +39159,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _timeScaleView = __webpack_require__(165);
+	var _timeScaleView = __webpack_require__(163);
 	
 	var _timeScaleView2 = _interopRequireDefault(_timeScaleView);
 	
-	var _presets = __webpack_require__(181);
+	var _presets = __webpack_require__(143);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
@@ -38877,7 +39216,7 @@
 	exports.default = TimeScaleController;
 
 /***/ },
-/* 165 */
+/* 163 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38888,13 +39227,13 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(148);
+	var _PIXIabbr = __webpack_require__(149);
 	
-	var _presets = __webpack_require__(181);
+	var _presets = __webpack_require__(143);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
-	var _spritesStore = __webpack_require__(141);
+	var _spritesStore = __webpack_require__(140);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -39042,8 +39381,7 @@
 	exports.default = TimeScaleView;
 
 /***/ },
-/* 166 */,
-/* 167 */
+/* 164 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -39054,11 +39392,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _infoPanelView = __webpack_require__(168);
+	var _infoPanelView = __webpack_require__(165);
 	
 	var _infoPanelView2 = _interopRequireDefault(_infoPanelView);
 	
-	var _presets = __webpack_require__(181);
+	var _presets = __webpack_require__(143);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
@@ -39091,7 +39429,7 @@
 	exports.default = infoPanelController;
 
 /***/ },
-/* 168 */
+/* 165 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -39105,25 +39443,25 @@
 	// views
 	
 	
-	var _PIXIabbr = __webpack_require__(148);
+	var _PIXIabbr = __webpack_require__(149);
 	
-	var _presets = __webpack_require__(181);
+	var _presets = __webpack_require__(143);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
-	var _limitsView = __webpack_require__(169);
+	var _limitsView = __webpack_require__(166);
 	
 	var _limitsView2 = _interopRequireDefault(_limitsView);
 	
-	var _hotNumbersView = __webpack_require__(171);
+	var _hotNumbersView = __webpack_require__(167);
 	
 	var _hotNumbersView2 = _interopRequireDefault(_hotNumbersView);
 	
-	var _coldNumbersView = __webpack_require__(172);
+	var _coldNumbersView = __webpack_require__(168);
 	
 	var _coldNumbersView2 = _interopRequireDefault(_coldNumbersView);
 	
-	var _otherNumbersView = __webpack_require__(173);
+	var _otherNumbersView = __webpack_require__(169);
 	
 	var _otherNumbersView2 = _interopRequireDefault(_otherNumbersView);
 	
@@ -39189,7 +39527,7 @@
 	exports.default = infoPanelView;
 
 /***/ },
-/* 169 */
+/* 166 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -39200,13 +39538,13 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(148);
+	var _PIXIabbr = __webpack_require__(149);
 	
-	var _presets = __webpack_require__(181);
+	var _presets = __webpack_require__(143);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
-	var _helpFunctions = __webpack_require__(159);
+	var _helpFunctions = __webpack_require__(157);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -39277,8 +39615,7 @@
 	exports.default = limitsPanel;
 
 /***/ },
-/* 170 */,
-/* 171 */
+/* 167 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -39289,13 +39626,13 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(148);
+	var _PIXIabbr = __webpack_require__(149);
 	
-	var _presets = __webpack_require__(181);
+	var _presets = __webpack_require__(143);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
-	var _spritesStore = __webpack_require__(141);
+	var _spritesStore = __webpack_require__(140);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -39450,7 +39787,7 @@
 	exports.default = hotNumPanel;
 
 /***/ },
-/* 172 */
+/* 168 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -39461,13 +39798,13 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(148);
+	var _PIXIabbr = __webpack_require__(149);
 	
-	var _presets = __webpack_require__(181);
+	var _presets = __webpack_require__(143);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
-	var _spritesStore = __webpack_require__(141);
+	var _spritesStore = __webpack_require__(140);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -39622,7 +39959,7 @@
 	exports.default = coldNumPanel;
 
 /***/ },
-/* 173 */
+/* 169 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -39633,11 +39970,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(148);
+	var _PIXIabbr = __webpack_require__(149);
 	
-	var _spritesStore = __webpack_require__(141);
+	var _spritesStore = __webpack_require__(140);
 	
-	var _presets = __webpack_require__(181);
+	var _presets = __webpack_require__(143);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
@@ -39747,7 +40084,7 @@
 	exports.default = otherNumPanel;
 
 /***/ },
-/* 174 */
+/* 170 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -39758,7 +40095,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _betPanelView = __webpack_require__(175);
+	var _betPanelView = __webpack_require__(171);
 	
 	var _betPanelView2 = _interopRequireDefault(_betPanelView);
 	
@@ -39791,7 +40128,7 @@
 	exports.default = betPanelController;
 
 /***/ },
-/* 175 */
+/* 171 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -39802,15 +40139,15 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(148);
+	var _PIXIabbr = __webpack_require__(149);
 	
-	var _spritesStore = __webpack_require__(141);
+	var _spritesStore = __webpack_require__(140);
 	
-	var _presets = __webpack_require__(181);
+	var _presets = __webpack_require__(143);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
-	var _helpFunctions = __webpack_require__(159);
+	var _helpFunctions = __webpack_require__(157);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -39875,8 +40212,7 @@
 	exports.default = betPanelView;
 
 /***/ },
-/* 176 */,
-/* 177 */
+/* 172 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -39887,7 +40223,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _historyView = __webpack_require__(178);
+	var _historyView = __webpack_require__(173);
 	
 	var _historyView2 = _interopRequireDefault(_historyView);
 	
@@ -39923,7 +40259,7 @@
 	exports.default = historyController;
 
 /***/ },
-/* 178 */
+/* 173 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -39934,17 +40270,17 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(148);
+	var _PIXIabbr = __webpack_require__(149);
 	
-	var _spritesStore = __webpack_require__(141);
+	var _spritesStore = __webpack_require__(140);
 	
-	var _presets = __webpack_require__(181);
+	var _presets = __webpack_require__(143);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
-	var _helpFunctions = __webpack_require__(159);
+	var _helpFunctions = __webpack_require__(157);
 	
-	var _gsap = __webpack_require__(152);
+	var _gsap = __webpack_require__(151);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -40080,351 +40416,6 @@
 	}();
 	
 	exports.default = historyView;
-
-/***/ },
-/* 179 */,
-/* 180 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	var constants = {
-		path: {
-			assets: './assets/'
-		},
-		loadAssets: ['anums.json', 'bg_numbers.json', 'blights.json', 'buttons.json', 'chips.json', 'fields.json', 'timer.json', 'info.xml'],
-		namesMap: {
-			anums: {
-				a1: 'a1',
-				a2: 'a2',
-				a3: 'a3',
-				a4: 'a4',
-				a5: 'a5',
-				a6: 'a6',
-				a7: 'a7',
-				a8: 'a8',
-				a9: 'a9',
-				a10: 'a10',
-				a11: 'a11',
-				a12: 'a12',
-				a13: 'a13',
-				a14: 'a14',
-				a15: 'a15',
-				a16: 'a16'
-			},
-			chips: {
-				chip0: 'chip0',
-				chipSm0: 'chip0_tbl',
-				chip1: 'chip1',
-				chipSm1: 'chip1_tbl',
-				chip2: 'chip2',
-				chipSm2: 'chip2_tbl',
-				chip3: 'chip3',
-				chipSm3: 'chip3_tbl',
-				chip4: 'chip4',
-				chipSm4: 'chip4_tbl',
-				chipW: 'chip_wait',
-				chipCF: 'coefficient',
-				chipShadow: 'shadow'
-			},
-			bgNumbers: {
-				bgBlack: 'bg_black',
-				bgBigBlack: 'bg_black_big',
-				bgRed: 'bg_red',
-				bgBigRed: 'bg_red_big',
-				bgZero: 'bg_zero',
-				bgBigZero: 'bg_zero_big',
-				icoRed: 'ico_red',
-				icoBlack: 'ico_black'
-			},
-			blights: {
-				blight0: "blight-0",
-				blight10: "blight-10",
-				blight23: "blight-23",
-				blight26: "blight-26",
-				blight3: "blight-3",
-				blight5: "blight-5",
-				blight8: "blight-8",
-				blightCell: "blight-cell",
-				blightJeu0: "blight-jeu0",
-				blightOrph: "blight-orph",
-				blightS023: "blight-s023",
-				blightS58: "blight-s58",
-				blightWin: "blight-win",
-				blightZero: "blight-zero",
-				blightZwin: "blight-zwin",
-				blight: "blight"
-			},
-			buttons: {
-				btnAction: "btn_action",
-				btnActionSel: "btn_action_sel",
-				btnRepeat: "btn_repeat",
-				btnRepeatDis: "btn_repeat_dis",
-				btnRepeatSel: "btn_repeat_sel",
-				btnX2: "btn_x2",
-				btnX2Dis: "btn_x2_dis",
-				btnX2Sel: "btn_x2_sel",
-				icoCancel: "ico_cancel",
-				icoCancelDis: "ico_cancel_dis",
-				icoClear: "ico_clear",
-				icoClearDis: "ico_clear_dis"
-			},
-			fields: {
-				bonus: "bonus",
-				bonusDis: "bonus_dis",
-				fldBalance: "fld_balance",
-				fldBalanceDis: "fld_balance_dis",
-				fldBet: "fld_bet",
-				fldWin: "fld_win"
-			},
-			timer: {
-				timerBack: "timer_back",
-				timerRed: "timer_red",
-				timerYellow: "timer_yellow"
-			}
-		}
-	};
-	
-	exports.constants = constants;
-
-/***/ },
-/* 181 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	var presets = {};
-	
-	/**
-	 * Настройки для компонентов
-	 */
-	presets.settings = {
-		game: {
-			width: 1920,
-			height: 1080,
-			webgl: true, //false for 2dContext, true for autoDetectRenderer
-			rendererOptions: {
-				backgroundColor: 0x1099bb
-			}
-		},
-		timeScale: {
-			time: 6,
-			changeColorPer: 0.25,
-			fps: 60,
-			lastTime: 3
-		}
-	};
-	
-	/**
-	 * Позиции компонентов на сцене
-	 */
-	presets.positions = {
-		chips: {
-			chip0: { x: 640, y: 957 },
-			chip1: { x: 800, y: 957 },
-			chip2: { x: 960, y: 957 },
-			chip3: { x: 1120, y: 957 },
-			chip4: { x: 1280, y: 957 }
-		},
-		buttons: {
-			btnCancel: { x: 180, y: 934 },
-			btnClear: { x: 410, y: 934 },
-			btnRepeat: { x: 1450, y: 934 },
-			btnX2: { x: 1570, y: 934 }
-		},
-		fields: {
-			big: { x: 200, y: 350 },
-			small: { x: 1200, y: 300 }
-		},
-		timeScale: { x: 725, y: 320 },
-		infoPanel: {
-			main: { x: 250, y: 120 },
-			limitsPanel: { x: 0, y: 0 }, // Относительно infoPanel.main
-			hotNumPanel: { x: 340, y: 0 }, // Относительно infoPanel.main
-			coldNumPanel: { x: 675, y: 0 }, // Относительно infoPanel.main
-			otherNumPanel: { x: 1010, y: 0 } // Относительно infoPanel.main
-		},
-		betPanel: {
-			main: { x: 50, y: 50 },
-			fields: {
-				fldBet: { x: 320, y: -10 },
-				fldWin: { x: 730, y: -10 },
-				fldBalance: { x: 1560, y: -22 }
-			},
-			numbers: {
-				fldBet: { x: 20, y: 22 },
-				fldWin: { x: 20, y: 22 },
-				fldBalance: { x: 30, y: 34 }
-			}
-		},
-		history: { x: 0, y: 0 }
-	};
-	
-	/**
-	 * Дефолтные значения компонентов
-	 */
-	presets.data = {
-		colorNumMap: {
-			bgRed: [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36],
-			bgBlack: [2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35],
-			bgZero: ['zero', 'doubleZero', 0]
-		},
-		// Значения ставок
-		chipValues: {
-			chip0: 100,
-			chip1: 500,
-			chip2: 1000,
-			chip3: 2000,
-			chip4: 3000
-		},
-		floatChipTypes: {
-			100: "fChip0",
-			500: "fChip1",
-			1000: "fChip2",
-			2000: "fChip3",
-			3000: "fChip4"
-		},
-		infoPanel: {
-			limitsPanel: { max: 30000, min: 10 },
-			hotNumPanel: [{ number: 34, amount: 37 }, { number: 17, amount: 19 }, { number: 23, amount: 47 }, { number: 15, amount: 98 }],
-			coldNumPanel: [{ number: 33, amount: 7 }, { number: 16, amount: 2 }, { number: 22, amount: 5 }, { number: 14, amount: 8 }],
-			otherNumPanel: { red: 12, black: 38, odd: 10, even: 39, zero: 1 }
-		},
-		history: {
-			rollNumbers: ['zero', 'doubleZero', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]
-		},
-		betPanel: {
-			fldBet: 0,
-			fldWin: 0,
-			fldBalance: 10000
-		}
-	};
-	
-	/**
-	 * Дефолтные надписи
-	 */
-	presets.texts = {
-		timeScale: {
-			status0: 'Приём ставок',
-			status1: 'Последние ставки',
-			status2: 'Ставок больше нет',
-			status3: 'Выигрышное число '
-		},
-		infoPanel: {
-			limitBlock: [{ type: 'labelText', text: 'ЛИМИТЫ СТОЛА', x: 110, y: 10 }, { type: 'gradientText', text: 'CASINO ROULETTE', x: 70, y: 40 }, { type: 'gradientText', text: 'MAX:', x: 25, y: 95 }, { type: 'gradientText', text: 'MIN:', x: 25, y: 140 }],
-			hotNumbers: [{ type: 'labelText', text: 'ЗА ПОСЛЕДНИЕ 100 ИГР', x: 60, y: 10 }, { type: 'gradientText', text: 'ГОРЯЧИЕ НОМЕРА', x: 70, y: 40 }],
-			coldNumbers: [{ type: 'labelText', text: 'ЗА ПОСЛЕДНИЕ 100 ИГР', x: 60, y: 10 }, { type: 'gradientText', text: 'ХОЛОДНЫЕ НОМЕРА', x: 50, y: 40 }],
-			otherNumbers: [{ type: 'labelText', text: 'ЗА ПОСЛЕДНИЕ 50 ИГР', x: 60, y: 10 }, { type: 'gradientText', text: 'RED', x: 60, y: 40 }, { type: 'gradientText', text: 'BLACK', x: 210, y: 40 }, { type: 'gradientText', text: 'ODD', x: 30, y: 120 }, { type: 'gradientText', text: '0', x: 150, y: 120 }, { type: 'gradientText', text: 'EVEN', x: 240, y: 120 }]
-		},
-		button: {
-			clear: 'Очистить',
-			cancel: 'Отменить'
-		},
-		betPanel: {
-			bet: {
-				text: 'СТАВКА',
-				pos: { x: 200, y: 0 }
-			},
-			win: {
-				text: 'ВЫИГРЫШ',
-				pos: { x: 570, y: 0 }
-			},
-			balance: {
-				text: 'БАЛАНС',
-				pos: { x: 1450, y: 0 }
-			}
-		}
-	};
-	
-	/**
-	 * Стили для текстов
-	 */
-	presets.textStyles = {
-		chipTextStyle: {
-			font: 'bold 32px Arial',
-			fill: 'white',
-			align: 'center'
-		},
-		buttonStyle: {
-			font: 'normal 26px Arial',
-			fill: 'white',
-			align: 'center'
-		},
-		chipSmTextStyle: {
-			font: 'normal 14px Arial',
-			fill: 'white',
-			align: 'center'
-		},
-		floatChipTextStyle: {
-			font: 'bold 20px Arial',
-			fill: 'white',
-			align: 'center'
-		},
-		filedClickAreaTextStyle: {
-			font: "normal 18px Arial",
-			wordWrapWidth: 0,
-			fill: 'white',
-			stroke: 'black',
-			strokeThickness: 5
-		},
-		timeScale: {
-			font: "normal 36px Arial",
-			fontVariant: 'small-caps',
-			wordWrapWidth: 0,
-			fill: 'white'
-		},
-		infoPanel: {
-			gradientText: { font: "24px info" },
-			whiteText: { font: "normal 24px Arial", fill: 'white' },
-			labelText: { font: "bold 18px Arial", fill: 'yellow', align: 'center' },
-			number: { font: 'normal 30px Arial', fill: 'white', align: 'center' },
-			amount: { font: 'normal 26px Arial', fill: 'white' }
-		},
-		betPanel: {
-			font: "normal 24px Arial",
-			fontVariant: 'small-caps',
-			wordWrapWidth: 0,
-			fill: 'white'
-		},
-		historyPanel: {
-			small: { font: 'normal 30px Arial', fill: 'white', align: 'center' },
-			big: { font: "bold 96px Arial", fontVariant: 'small-caps', wordWrapWidth: 0, fill: 'white' }
-		}
-	};
-	
-	exports.default = presets;
-
-/***/ },
-/* 182 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	
-	var _presets = __webpack_require__(181);
-	
-	var _presets2 = _interopRequireDefault(_presets);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var GameStore = function GameStore() {
-		_classCallCheck(this, GameStore);
-	
-		this.states = {};
-	};
-	
-	exports.default = GameStore;
 
 /***/ }
 /******/ ]);
