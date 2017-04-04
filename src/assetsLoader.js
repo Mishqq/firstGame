@@ -1,10 +1,10 @@
 import PIXI from 'pixi.js';
-import {spritesStore} from './spritesStore';
-import {constants} from './constants/resourses';
+import resourses from './constants/resourses';
+import presets from './constants/presets';
 
 const loader = PIXI.loader;
-const path = constants.path.assets;
-let assets = constants.loadAssets;
+const path = resourses.path.assets;
+let assets = resourses.loadAssets;
 
 assets = assets.map((item)=>{
 	let str = new RegExp('xml');
@@ -21,14 +21,14 @@ assets = assets.map((item)=>{
 function assetLoader(callback){
 	loader.add(assets);
 
-	loader.load((loader, resources)=>{
+	loader.load(()=>{
 		// Загоняем сырые данные из json-файлов в хранилище спрайтов (spritesStore) по группам
-		for(let key in constants.namesMap){
-			let spriteGroup = constants.namesMap[key]; // anums, chips, bgNumbers...
+		for(let key in resourses.namesMap){
+			let spriteGroup = resourses.namesMap[key]; // anums, chips, bgNumbers...
 
 			for(let keyInGroup in spriteGroup){
 				// keyInGroup for chips: chip0, chipSm0, chip1...
-				spritesStore[key][keyInGroup] = PIXI.utils.TextureCache[ spriteGroup[keyInGroup] ];
+				presets.spriteStore[key][keyInGroup] = PIXI.utils.TextureCache[ spriteGroup[keyInGroup] ];
 			}
 		}
 

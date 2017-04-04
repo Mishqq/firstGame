@@ -1,13 +1,10 @@
 import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
-import {spritesStore} from './../../spritesStore';
 import presets from './../../constants/presets';
 import {_hf} from './../../servises/helpFunctions'
 
 export default class ChipView {
 	constructor(chipType, config) {
-		this.onClickCb = (config.onClickCb) ? config.onClickCb : undefined;
-		this.chipTouchStartCb = (config.chipTouchStartCb) ? config.chipTouchStartCb : undefined;
-		this.cbCtx = (config.ctx) ? config.ctx : this;
+		this.cfg = config;
 
 		// Контейнер для фишки с тенью и текстом
 		let spriteContainer = new _pxC();
@@ -21,13 +18,13 @@ export default class ChipView {
 		spriteContainer.x = presets.positions.chips[chipType].x;
 		spriteContainer.y = presets.positions.chips[chipType].y;
 
-		let sprite = new _pxS( spritesStore.chips[chipType] );
+		let sprite = new _pxS( presets.spriteStore.chips[chipType] );
 
 
 		sprite.anchor.set(0.5);
 
 		// Тень под фишкой
-		let shadow = new _pxS( spritesStore.chips.chipShadow );
+		let shadow = new _pxS( presets.spriteStore.chips.chipShadow );
 		shadow.anchor.set(0.5);
 
 		// Значение ставки на фишке
@@ -62,15 +59,13 @@ export default class ChipView {
 	}
 
 	chipTouchEnd(){
-		this.onClickCb ?
-			this.onClickCb.call(this.cbCtx, this.chipValue) :
-			console.log('chipClickEvent (ChipView)', this.chipValue);
+		// onClick в ChipController
+		this.cfg.click.call(this.cfg.ctx, this.chipValue);
 	}
 
 	chipTouchStart(){
-		this.chipTouchStartCb ?
-			this.chipTouchStartCb.call(this.cbCtx, this.chipValue) :
-			console.log('chipTouchMove (ChipView)', this.chipValue);
+		// chipTouchStart в ChipController
+		this.cfg.touchStart.call(this.cfg.ctx, this.chipValue);
 	}
 
 	setActive(){

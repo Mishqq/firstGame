@@ -7,20 +7,20 @@ export default class ButtonController {
 
 		// Конфиг, который передаём во вьюху
 		const buttonsCallbackConfig = {
-			btnCancel: {
-				onClickCb: this.cancelBtnClick,
-				ctx: this
-			},
+			// btnCancel: {
+			// 	onClickCb: this.btnCancel,
+			// 	ctx: this
+			// },
 			btnClear: {
-				onClickCb: this.clearBtnClick,
+				onClickCb: this.btnClear,
 				ctx: this
 			},
 			btnRepeat: {
-				onClickCb: this.repeatBtnClick,
+				onClickCb: this.btnRepeat,
 				ctx: this
 			},
 			btnX2: {
-				onClickCb: this.x2BtnClick,
+				onClickCb: this.btnX2,
 				ctx: this
 			}
 		};
@@ -45,35 +45,41 @@ export default class ButtonController {
 		})
 	};
 
-	cancelBtnClick(){
-		if(this._cfg && this._cfg.cancelCb){
-			this._cfg.cancelCb.call(this._cfg.ctx)
+	enablePanel(){
+		this._buttonClasses.forEach((btnView)=>{
+			btnView.btnDefault();
+		})
+	};
+
+	btnCancel(){
+		if(this._cfg && this._cfg.cancel){
+			this._cfg.cancel.call(this._cfg.ctx)
 		} else {
-			console.log('cancelBtnClick (ButtonPanelController)');
+			console.log('cancel (ButtonPanelController)');
 		}
 	}
 
-	clearBtnClick(){
-		if(this._cfg && this._cfg.clearCb){
-			this._cfg.clearCb.call(this._cfg.ctx)
+	btnClear(){
+		if(this._cfg && this._cfg.clear){
+			this._cfg.clear.call(this._cfg.ctx)
 		} else {
-			console.log('clearBtnClick (ButtonPanelController)');
+			console.log('clear (ButtonPanelController)');
 		}
 	}
 
-	repeatBtnClick(){
-		if(this._cfg && this._cfg.repeatCb){
-			this._cfg.repeatCb.call(this._cfg.ctx)
+	btnRepeat(){
+		if(this._cfg && this._cfg.repeat){
+			this._cfg.repeat.call(this._cfg.ctx)
 		} else {
-			console.log('repeatBtnClick (ButtonPanelController)');
+			console.log('repeat (ButtonPanelController)');
 		}
 	}
 
-	x2BtnClick(){
-		if(this._cfg && this._cfg.x2Cb){
-			this._cfg.x2Cb.call(this._cfg.ctx)
+	btnX2(){
+		if(this._cfg && this._cfg.x2){
+			this._cfg.x2.call(this._cfg.ctx)
 		} else {
-			console.log('x2BtnClick (ButtonPanelController)');
+			console.log('x2 (ButtonPanelController)');
 		}
 	}
 }

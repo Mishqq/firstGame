@@ -1,5 +1,4 @@
 import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
-import {spritesStore} from './../../spritesStore';
 import presets from './../../constants/presets';
 import {_hf} from './../../servises/helpFunctions'
 import {_tevStore, _tev} from './../../servises/touchEvents'
@@ -15,17 +14,13 @@ let smallChipTypes = {
 
 export default class BetView {
 	constructor(config, value) {
+		this.cfg = config;
+
 		this._summ = (value) ? value : 0;
 
 		let chipType = 'chipSm0';
 		for(let smChipKey in smallChipTypes)
 			if(smallChipTypes[smChipKey] === value) chipType = smChipKey;
-
-		this.onClickCb = (config.onClickCb) ? config.onClickCb : undefined;
-		this.onTouchEndCb = (config.onTouchEndCb) ? config.onTouchEndCb : undefined;
-		this.onTouchStartCb = (config.onTouchStartCb) ? config.onTouchStartCb : undefined;
-		this.updateBetModel = (config.updateBetModel) ? config.updateBetModel : undefined;
-		this.cbCtx = (config.ctx) ? config.ctx : this;
 
 		this._betContainer = new _pxC();
 		this._betContainer.x = config.pos.x;
@@ -33,7 +28,7 @@ export default class BetView {
 
 		this._betContainer.interactive = true;
 
-		let betSprite = new _pxS( spritesStore.chips[chipType] );
+		let betSprite = new _pxS( presets.spriteStore.chips[chipType] );
 		betSprite.anchor.set(0.5);
 
 		let chipValueText = new _pxT( _hf.formatChipValue(value), presets.textStyles.chipSmTextStyle );
@@ -55,12 +50,6 @@ export default class BetView {
 		return this._betContainer;
 	}
 
-	onClick(){
-		this.onClickCb ?
-			this.onClickCb.call(this.cbCtx) :
-			console.log('betClickEvent (betView)');
-	}
-
 	/**
 	 * Функция вызывается при окончании движения ставки на уже существующем спрайте.
 	 * Тут есть небольшой косяк: вьюха будет знать о модели, т.к. данную функцию
@@ -68,21 +57,17 @@ export default class BetView {
 	 * @param event
 	 */
 	onTouchEnd(event){
-		this.onTouchEndCb ?
-			this.onTouchEndCb.call(this.cbCtx, event) :
-			console.log('betTouchEnd (BetView)');
+		// метод touchEnd в BetController
+		this.cfg.touchEnd.call(this.cfg.ctx, event)
 	}
 
 	get balance(){
 		return this._summ;
 	}
 
-	onTouchStart(){
-		_tev.setEvent(_tevStore.BET_TOUCH_START);
-
-		this.onTouchStartCb ?
-			this.onTouchStartCb.call(this.cbCtx, this.getTopChipValue()) :
-			console.log('betTouchStart (BetView)');
+	onTouchStart(event){
+		// метод touchStart в BetController
+		this.cfg.touchStart.call(this.cfg.ctx, event, true);
 	}
 
 	/**
@@ -107,7 +92,7 @@ export default class BetView {
 		let count=0;
 		sortChipSmTypeArr.forEach((chipSmType, idx)=>{
 			for(let i=0; i<betSprites[chipSmType]; i+=1){
-				let newSprite = new _pxS( spritesStore.chips[chipSmType] );
+				let newSprite = new _pxS( presets.spriteStore.chips[chipSmType] );
 				newSprite.anchor.set(0.5);
 				newSprite.y -= count*5;
 				spriteContainer.addChild(newSprite);
@@ -122,9 +107,7 @@ export default class BetView {
 			spriteContainer.children[ spriteContainer.children.length-1 ].addChild(chipValueText);
 		}
 
-		this.updateBetModel ?
-			this.updateBetModel.call(this.cbCtx) :
-			console.log('updateBetModel (betView)', this.updateBetModel);
+		this.cfg.updateBetModel.call(this.cfg.ctx);
 	}
 
 	/**
@@ -157,6 +140,10 @@ export default class BetView {
 		return q2;
 	}
 
+	/**
+	 * Возвращаем значение верхней снимаемой фишки со стопки
+	 * @returns {*}
+	 */
 	getTopChipValue(){
 		let betSprites = this.calculateSprites(this._summ);
 

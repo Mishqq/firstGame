@@ -1,6 +1,5 @@
 import {_pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
 import presets from './../../constants/presets';
-import {spritesStore} from './../../spritesStore';
 
 export default class coldNumPanel {
 	constructor(numbers) {
@@ -69,7 +68,7 @@ export default class coldNumPanel {
 		if(obj.number === 'doubleZero') obj.number = '00';
 
 		let numCnt = new _pxC(),
-			bg = new _pxS( spritesStore.bgNumbers[color] ),
+			bg = new _pxS( presets.spriteStore.bgNumbers[color] ),
 			num = new _pxT(obj.number, presets.textStyles.infoPanel.number),
 			amount = new _pxT(obj.amount, presets.textStyles.infoPanel.amount);
 

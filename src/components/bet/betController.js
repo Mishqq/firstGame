@@ -2,24 +2,13 @@ import BetView from './betView';
 
 export default class BetController {
 	constructor(configByGameCtrl) {
-		this.cfg= configByGameCtrl;
-
-		this.onTouchEndCb = (configByGameCtrl.onTouchEndCb) ?
-			configByGameCtrl.onTouchEndCb : undefined;
-
-		this.onTouchStartCb = (configByGameCtrl.onTouchStartCb) ?
-			configByGameCtrl.onTouchStartCb : undefined;
-
-		this.deleteBetCb = (configByGameCtrl.deleteBetCb) ?
-			configByGameCtrl.deleteBetCb : undefined;
-
-		this.cbCtx = (configByGameCtrl.ctx) ? configByGameCtrl.ctx : this;
+		this.cfg = configByGameCtrl;
 
 		let config = {
 			pos: configByGameCtrl.pos,
-			onTouchStartCb: this.touchStart,
+			touchStart: this.touchStart,
 			updateBetModel: this.updateBetModel,
-			onTouchEndCb: this.onTouchEnd,
+			touchEnd: this.onTouchEnd,
 			ctx: this
 		};
 
@@ -34,8 +23,9 @@ export default class BetController {
 		return this._betView.balance;
 	}
 
-	touchStart(price){
-		console.log('111 ➠ ', 111);
+	touchStart(event, betTouchStart){
+		// betTouchStart в gameController
+		this.cfg.touchStart.call(this.cfg.ctx, event, betTouchStart);
 	}
 
 	updateBetView(value){
@@ -48,18 +38,17 @@ export default class BetController {
 	updateBetModel(){
 		if(this._betView.balance === 0){
 			console.log('удаляем ставку');
-			this.deleteBetCb ?
-				this.deleteBetCb.call(this.cbCtx, this) :
-				console.log('betDelete (BetController)');
+
+			// метод deleteBet в gameController
+			this.cfg.delBet.call(this.cfg.ctx, this);
 		} else {
 			console.log('апдейтим модель ставки');
 		}
 	}
 
 	onTouchEnd(event){
-		this.onTouchEndCb ?
-			this.onTouchEndCb.call(this.cbCtx, event) :
-			console.log('betTouchEnd (BetController)');
+		// метод setBet в gameController
+		this.cfg.setBet.call(this.cfg.ctx, event);
 	}
 
 	getTopChipValue(){

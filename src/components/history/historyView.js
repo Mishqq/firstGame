@@ -1,5 +1,4 @@
 import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
-import {spritesStore} from './../../spritesStore';
 import presets from './../../constants/presets';
 import {_hf} from './../../servises/helpFunctions';
 import {TweenMax, Power2, TimelineLite} from "gsap";
@@ -11,7 +10,9 @@ let colorBigNumMap = {
 };
 
 export default class historyView {
-	constructor(config) {
+	constructor(config, callbacks) {
+		this.cb = callbacks;
+
 		this.rolledNum = undefined;
 
 		this._hisSprites = {
@@ -19,9 +20,6 @@ export default class historyView {
 			rollNumSprite: undefined,
 			numTape: []
 		};
-
-		this.cbCtx = (config.ctx) ? config.ctx : this;
-		this.rollCb = (config.rollCb) ? config.rollCb : ()=>{console.log('lolec ➠ ')};
 
 		this.rollTime = (config.rollTime) ? config.rollTime : 2.5;
 
@@ -47,8 +45,8 @@ export default class historyView {
 	createRollField(){
 		let _a = this._hisSprites,
 			arrForAnimation = [];
-		for(let key in spritesStore.anums)
-			arrForAnimation.push( spritesStore.anums[key] );
+		for(let key in presets.spriteStore.anums)
+			arrForAnimation.push( presets.spriteStore.anums[key] );
 
 		_a.rollNumAnimation = new _pxEx.MovieClip(arrForAnimation);
 		_a.rollNumAnimation.animationSpeed = 0.25;
@@ -68,13 +66,14 @@ export default class historyView {
 			this._spriteContainer.removeChild(_a.rollNumSprite);
 		}
 
-		_a.rollNumAnimation.play();
+		// _a.rollNumAnimation.play();
+		_a.rollNumAnimation.gotoAndPlay(0);
 
 		setTimeout(() => {
 			this.viewRollResult( _hf.randEl(presets.data.history.rollNumbers) );
 			_a.rollNumAnimation.gotoAndStop(0);
 
-			this.rollCb.call(this.cbCtx, this.rolledNum)
+			this.cb.rollCb.call(this.cb.ctx, this.rolledNum);
 		}, this.rollTime * 1000)
 	}
 
@@ -84,7 +83,7 @@ export default class historyView {
 	 */
 	viewRollResult(num){
 		let _a = this._hisSprites;
-		_a.rollNumSprite = new _pxS(spritesStore.bgNumbers[ _hf.colorType(colorBigNumMap, num) ]);
+		_a.rollNumSprite = new _pxS(presets.spriteStore.bgNumbers[ _hf.colorType(colorBigNumMap, num) ]);
 
 		num = (num === 'zero') ? '0' : (num === 'doubleZero') ? '00' : num;
 		_hf.addTextToSprite(_a.rollNumSprite, {x: 84, y: 84}, num, presets.textStyles.historyPanel.big);
@@ -100,7 +99,7 @@ export default class historyView {
 	addNum(num){
 		let _hs = this._hisSprites;
 
-		let newNum = new _pxS(spritesStore.bgNumbers[ _hf.colorType(presets.data.colorNumMap, num) ]);
+		let newNum = new _pxS(presets.spriteStore.bgNumbers[ _hf.colorType(presets.data.colorNumMap, num) ]);
 		_hs.numTape.unshift(newNum);
 		this._spriteContainer.addChildAt( newNum, 0 );
 

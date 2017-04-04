@@ -1,5 +1,4 @@
 import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
-import {spritesStore} from './../../spritesStore';
 import presets from './../../constants/presets';
 import {_hf} from './../../servises/helpFunctions';
 
@@ -22,7 +21,7 @@ export default class betPanelView {
 		let fieldSprites = {},
 			pos = presets.positions.betPanel;
 		for(let key in pos.fields) {
-			fieldSprites[key] = new _pxS( spritesStore.fields[key] );
+			fieldSprites[key] = new _pxS( presets.spriteStore.fields[key] );
 			fieldSprites[key].position = pos.fields[key];
 
 			this.numSprites[key] = new _pxT(_hf.formatLimit(values[key]), presets.textStyles.betPanel);

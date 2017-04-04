@@ -1,20 +1,12 @@
 import GameFieldView from './gameFieldView';
 import {clickAreas} from './gameFieldCellMap';
 import presets from './../../constants/presets';
-import {betStore} from './../../servises/betStore'
 
 export default class GameFieldController {
 	constructor(configByGameCtrl) {
-		let config = {
-			onClickCb: this.onClick,
-			onHoverCb: this.hoverAreas,
-			ctx: this
-		};
+		this.cfg = configByGameCtrl;
 
-		this.onClickCb = (configByGameCtrl.onClickCb) ? configByGameCtrl.onClickCb : undefined;
-		this.ctx = (configByGameCtrl.ctx) ? configByGameCtrl.ctx : this;
-
-		this._gameFieldBig = new GameFieldView(config);
+		this._gameFieldBig = new GameFieldView({click: this.onClick, hover: this.hoverAreas, ctx: this});
 	}
 
 	/**
@@ -22,15 +14,10 @@ export default class GameFieldController {
 	 * @param event
 	 */
 	onClick(event){
-		this.onClickCb ?
-			this.onClickCb.call(this.ctx, event) :
-			console.log('gameFieldClickEvent (GameFieldController)');
-
-		// let localPos = event.data.getLocalPosition(this._gameFieldBig);
-		// this.getCellFromPos(localPos);
+		this.cfg.setBet.call(this.cfg.ctx, event);
 	}
 
-	get gameFieldSprite(){
+	get pixiSprite(){
 		return this._gameFieldBig.pixiContainer;
 	}
 
@@ -68,7 +55,7 @@ export default class GameFieldController {
 	 * @returns {boolean}
 	 */
 	hoverAreas(event){
-		if(!betStore.activeChip && !betStore.floatChip) return false;
+		if(!this.cfg.checkChips.call(this.cfg.ctx)) return false;
 
 		// т.к. событие mousemove и touchmove у нас отрабатывают по всей сцене
 		// (не важно на что вешаем), то вычисляем координаты нужного поля относительно
@@ -82,9 +69,7 @@ export default class GameFieldController {
 
 		this.hideHints();
 
-		if(cell && cell.c.length){
-			this.showHints(cell.c);
-		}
+		if(cell && cell.c.length) this.showHints(cell.c);
 	}
 
 	/**

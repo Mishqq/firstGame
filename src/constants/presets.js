@@ -1,6 +1,14 @@
 let presets = {};
 
 
+let spriteGroups = ['chips', 'anums', 'bgNumbers', 'blights', 'buttons', 'fields', 'timer'];
+
+presets.spriteStore = {};
+spriteGroups.forEach((item)=>{
+	presets.spriteStore[item] = {};
+});
+
+
 /**
  * Настройки для компонентов
  */
@@ -14,10 +22,13 @@ presets.settings = {
 		}
 	},
 	timeScale: {
-		time: 6,
+		time: 10,
 		changeColorPer: 0.25,
 		fps: 60,
-		lastTime: 3
+		lastTime: 4
+	},
+	history: {
+		rollTime: 14 // timeScale.time + timeScale.lastTime
 	}
 };
 

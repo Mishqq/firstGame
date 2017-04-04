@@ -5,9 +5,7 @@ import {TweenMax, Power2, TimelineLite} from "gsap";
 
 export default class GameFieldView {
 	constructor(config) {
-		this.onClickCb = (config.onClickCb) ? config.onClickCb : undefined;
-		this.onHoverCb = (config.onHoverCb) ? config.onHoverCb : undefined;
-		this.cbCtx = (config.ctx) ? config.ctx : this;
+		this.cfg = config;
 
 		// Контейнер для фишки с тенью и текстом
 		let spriteContainer = new _pxC();
@@ -53,21 +51,7 @@ export default class GameFieldView {
 	 * @param event
 	 */
 	onClick(event){
-		this.onClickCb ?
-			this.onClickCb.call(this.cbCtx, event) :
-			console.log('gameFieldClickEvent (GameFieldView)');
-	}
-
-	/**
-	 * Функция отработки по нажатию
-	 * @param event
-	 */
-	onTouchStart(event){
-		if(this.onTouchStartCb) {
-			this.onTouchStartCb.call(this.cbCtx, this.chipValue);
-		} else {
-			console.log('gameFieldTouchStart (ChipView)');
-		}
+		this.cfg.click.call(this.cfg.ctx, event);
 	}
 
 	/**
@@ -237,9 +221,7 @@ export default class GameFieldView {
 	 * @param event
 	 */
 	hoverAreas(event){
-		this.onHoverCb ?
-			this.onHoverCb.call(this.cbCtx, event) :
-			console.log('hoverAreas (ChipView)');
+		this.cfg.hover.call(this.cfg.ctx, event);
 	}
 
 

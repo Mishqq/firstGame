@@ -3,10 +3,7 @@ import presets from './../../constants/presets';
 
 export default class TimeScaleController {
 	constructor(cfgFromGameCtrl) {
-		if(cfgFromGameCtrl){
-			this.ctx = cfgFromGameCtrl.ctx ? cfgFromGameCtrl.ctx : undefined;
-			this.disableCb = cfgFromGameCtrl.disableCb ? cfgFromGameCtrl.disableCb : undefined;
-		}
+		this.cfg = cfgFromGameCtrl;
 
 		let cbForView = {
 			disableCb: this.endTime,
@@ -29,8 +26,7 @@ export default class TimeScaleController {
 	}
 
 	endTime(){
-		this.disableCb ?
-			this.disableCb.call(this.ctx) :
-			console.log('chipClickEvent (ChipView)');
+		// lockTable в gameController
+		this.cfg.lockTable.call(this.cfg.ctx);
 	}
 }

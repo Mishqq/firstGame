@@ -1,21 +1,16 @@
 import ChipView from './chipView';
 import presets from './../../constants/presets';
-import {betStore} from './../../servises/betStore'
 
 //TODO: Переделатю вьюху: класс контейнера должен быть один, а не по количеству фишек
 
 export default class ChipController {
-	constructor() {
-		let config = {
-			onClickCb: this.onClick,
-			chipTouchStartCb: this.chipTouchStart,
-			ctx: this
-		};
+	constructor(configFromGameCtrl) {
+		this.cfg = configFromGameCtrl;
 
 		this._chips = {};
 
 		['chip0', 'chip1', 'chip2', 'chip3', 'chip4'].forEach((item)=>{
-			let chip = new ChipView(item, config);
+			let chip = new ChipView(item, {click: this.onClick, touchStart: this.chipTouchStart, ctx: this});
 			this._chips[item] = chip;
 		});
 	}
@@ -38,18 +33,29 @@ export default class ChipController {
 			}
 		}
 
-		betStore.activeChip = thisChip.active ?
-			thisChip.chipData() : undefined;
+		let chip = thisChip.active ? thisChip.chipData() : undefined;
+
+		// chipClick в gameController
+		this.cfg.click.call(this.cfg.ctx, chip);
 	}
 
 	chipTouchStart(price){
 		let chipType = this.returnChipType(price);
-		betStore.activeChip = {value: price, type: chipType};
+		let chip = {value: price, type: chipType};
+
+		// chipTouchStart в gameController
+		this.cfg.touchStart.call(this.cfg.ctx, chip);
 	}
 
 	disablePanel(){
 		for(let key in this.chips){
 			this.chips[key].disableChip();
+		}
+	}
+
+	enablePanel(){
+		for(let key in this.chips){
+			this.chips[key].enableChip();
 		}
 	}
 

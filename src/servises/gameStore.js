@@ -1,9 +1,11 @@
 import presets from '../constants/presets'
 
 export default class GameStore {
-	constructor(){
-		this.states = {
+	constructor(config){
+		this.states = {};
 
-		}
+		this.betsCtrl = {};
+
+		this.balance = config.balance;
 	}
 }

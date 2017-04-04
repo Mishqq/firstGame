@@ -1,4 +1,4 @@
-const constants = {
+const resourses = {
 	path: {
 		assets: './assets/'
 	},
@@ -104,4 +104,4 @@ const constants = {
 	}
 };
 
-export {constants}
+export default resourses

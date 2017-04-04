@@ -1,11 +1,9 @@
 import historyView from './historyView';
 
 export default class historyController {
-	constructor(cfgFromGameCtrl) {
+	constructor(config, callbacks) {
 		// Конфиг, пришедший от контроллера выше
-		this._cfg = cfgFromGameCtrl;
-
-		this.historyView = new historyView(cfgFromGameCtrl);
+		this.historyView = new historyView(config, callbacks);
 	}
 
 	get pixiSprite(){

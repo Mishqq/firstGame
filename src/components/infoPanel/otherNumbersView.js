@@ -1,5 +1,4 @@
 import {_p, _pxC, _pxS, _pxT, _pxEx, _pxG} from './../../constants/PIXIabbr';
-import {spritesStore} from './../../spritesStore';
 import presets from './../../constants/presets';
 
 export default class otherNumPanel {
@@ -77,10 +76,10 @@ export default class otherNumPanel {
 	}
 
 	drawRhombus(){
-		let redR = new _pxS(spritesStore.bgNumbers.icoRed);
+		let redR = new _pxS(presets.spriteStore.bgNumbers.icoRed);
 		redR.position = {x: 20, y: 75};
 
-		let blackR = new _pxS(spritesStore.bgNumbers.icoBlack);
+		let blackR = new _pxS(presets.spriteStore.bgNumbers.icoBlack);
 		blackR.position = {x: 200, y: 75};
 		this._spriteContainer.addChild(redR);
 		this._spriteContainer.addChild(blackR);

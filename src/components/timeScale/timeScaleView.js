@@ -1,6 +1,5 @@
 import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
 import presets from './../../constants/presets';
-import {spritesStore} from './../../spritesStore';
 
 export default class TimeScaleView {
 	constructor(callbacks, config, statusText) {
@@ -20,7 +19,7 @@ export default class TimeScaleView {
 		this.sprites = {};
 
 		['timerBack', 'timerYellow', 'timerRed'].forEach((item) => {
-			this.sprites[item] = new _pxS( spritesStore.timer[item] );
+			this.sprites[item] = new _pxS( presets.spriteStore.timer[item] );
 			if(item === 'timerRed') this.sprites[item].visible = false;
 			spriteContainer.addChild( this.sprites[item] );
 		});
@@ -46,11 +45,26 @@ export default class TimeScaleView {
 		if(this.isRun) return false;
 
 		this.isRun = true;
+
+		this.setState(this.state = 0);
+
 		this.timeScaleLoop();
 	}
 
 	pause(){
 		this.isRun = false;
+	}
+
+	defaultState(){
+		let width = this.sprites.timerBack.width,
+			redLine = this.sprites.timerRed,
+			yellowLine = this.sprites.timerYellow;
+
+		redLine.visible = false;
+		redLine.width = width;
+
+		yellowLine.visible = true;
+		yellowLine.width = width;
 	}
 
 	/**
@@ -97,6 +111,8 @@ export default class TimeScaleView {
 		let cfg = this.cfg;
 		this.setState('next');
 
+		this.isRun = false;
+
 		console.log('Последние ставки - ', cfg.lastTime, 'сек');
 		setTimeout(()=>{
 			this.setState('next');
@@ -114,6 +130,8 @@ export default class TimeScaleView {
 	setState(state){
 		this.state = (typeof(state) === 'number') ? state :
 			(state === 'next') ? this.state+1 : this.state-1;
+
+		if(state === 0) this.defaultState();
 
 		this.sprites.text.text = this.text['status'+this.state];
 	}

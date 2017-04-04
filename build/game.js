@@ -28254,55 +28254,51 @@
 	
 	var _assetsLoader2 = _interopRequireDefault(_assetsLoader);
 	
-	var _touchEvents = __webpack_require__(142);
-	
-	var _presets = __webpack_require__(143);
+	var _presets = __webpack_require__(141);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
-	var _betStore = __webpack_require__(144);
-	
-	var _gameStore = __webpack_require__(145);
+	var _gameStore = __webpack_require__(142);
 	
 	var _gameStore2 = _interopRequireDefault(_gameStore);
 	
-	var _background = __webpack_require__(146);
+	var _background = __webpack_require__(143);
 	
 	var _background2 = _interopRequireDefault(_background);
 	
-	var _gameFieldController = __webpack_require__(147);
+	var _gameFieldController = __webpack_require__(144);
 	
 	var _gameFieldController2 = _interopRequireDefault(_gameFieldController);
 	
-	var _buttonPanelController = __webpack_require__(153);
+	var _buttonPanelController = __webpack_require__(150);
 	
 	var _buttonPanelController2 = _interopRequireDefault(_buttonPanelController);
 	
-	var _chipController = __webpack_require__(155);
+	var _chipController = __webpack_require__(152);
 	
 	var _chipController2 = _interopRequireDefault(_chipController);
 	
-	var _floatChipController = __webpack_require__(158);
+	var _floatChipController = __webpack_require__(155);
 	
 	var _floatChipController2 = _interopRequireDefault(_floatChipController);
 	
-	var _betController = __webpack_require__(160);
+	var _betController = __webpack_require__(157);
 	
 	var _betController2 = _interopRequireDefault(_betController);
 	
-	var _timeScaleController = __webpack_require__(162);
+	var _timeScaleController = __webpack_require__(160);
 	
 	var _timeScaleController2 = _interopRequireDefault(_timeScaleController);
 	
-	var _infoPanelController = __webpack_require__(164);
+	var _infoPanelController = __webpack_require__(162);
 	
 	var _infoPanelController2 = _interopRequireDefault(_infoPanelController);
 	
-	var _betPanelController = __webpack_require__(170);
+	var _betPanelController = __webpack_require__(168);
 	
 	var _betPanelController2 = _interopRequireDefault(_betPanelController);
 	
-	var _historyController = __webpack_require__(172);
+	var _historyController = __webpack_require__(170);
 	
 	var _historyController2 = _interopRequireDefault(_historyController);
 	
@@ -28322,11 +28318,15 @@
 			value: function init() {
 				var _this = this;
 	
+				// Component controller instances collection
+				this._cmpCtrls = {};
+	
 				var game = this.game,
 				    stage = game.stage;
 	
-				this.gameStore = new _gameStore2.default();
-				console.log('this.gameStore ➠ ', this.gameStore);
+				this.gameStore = new _gameStore2.default({
+					balance: _presets2.default.data.betPanel.fldBalance
+				});
 	
 				this.stage = stage;
 	
@@ -28335,42 +28335,28 @@
 	    */
 				var bg = new _background2.default();
 				stage.addChild(bg);
-	
 				stage.interactive = true;
 	
 				['mousemove', 'touchmove', 'pointermove'].forEach(function (event) {
 					stage.on(event, _this.onTouchMove, _this);
 				});
 	
-				// ['touchend', 'mouseup', 'pointerup'].forEach((event)=>{
-				// 	stage.on(event, this.setBet, this);
-				// });
+				// Игровое поле
+				this._cmpCtrls.gameField = new _gameFieldController2.default({ setBet: this.setBet, checkChips: this.checkChips, ctx: this });
 	
-				/**
-	    * Игровое поле
-	    */
-				this.gameField = new _gameFieldController2.default({
-					onClickCb: this.setBet,
-					ctx: this
-				});
-				stage.addChild(this.gameField.gameFieldSprite);
-	
-				/**
-	    * Прогружаем все json-атласы
-	    */
+				// Прогружаем все json-атласы
 				(0, _assetsLoader2.default)(function () {
-					var chipsController = new _chipController2.default();
+					var chipsController = new _chipController2.default({ click: _this.chipClick, touchStart: _this.chipTouchStart, ctx: _this });
 					_this.chipsController = chipsController;
+	
 					for (var key in chipsController.chips) {
 						stage.addChild(chipsController.chips[key].sprite);
-					}
-	
-					// Панель кнопок
+					} // Панель кнопок
 					var buttonsController = new _buttonPanelController2.default({
-						cancelCb: _this.btnPanelCancelCb,
-						clearCb: _this.btnPanelClearCb,
-						repeatCb: _this.btnPanelRepeatCb,
-						x2Cb: _this.btnPanelX2Cb,
+						cancel: _this.btnCancel,
+						clear: _this.btnClear,
+						repeat: _this.btnRepeat,
+						x2: _this.btnX2,
 						ctx: _this
 					});
 					_this.buttonsController = buttonsController;
@@ -28378,56 +28364,58 @@
 						stage.addChild(button);
 					});
 	
-					_this.floatChipContainer = new _floatChipController2.default({
-						onTouchEndCb: _this.setBet,
-						ctx: _this
-					});
-					stage.addChild(_this.floatChipContainer.getFloatChipsSprite);
+					// Плавающая фишка
+					_this._cmpCtrls.fChip = new _floatChipController2.default({ setBet: _this.setBet, ctx: _this });
 	
-					_this._timeScale = new _timeScaleController2.default({
-						disableCb: _this.disableChipsAndButtons,
-						ctx: _this
-					});
-					stage.addChild(_this._timeScale.pixiSprite);
-					_this._timeScale.start();
+					// Шкала-таймер
+					_this._cmpCtrls.timeScale = new _timeScaleController2.default({ lockTable: _this.lockTable, ctx: _this });
+					_this._cmpCtrls.timeScale.start();
 	
-					var infoPanelFishData = {
-						limitsPanel: { max: 30000, min: 50 },
-						hotNumPanel: [{ number: 12, amount: 1 }, { number: 'doubleZero', amount: 2 }, { number: 12, amount: 3 }, { number: 12, amount: 4 }],
-						coldNumPanel: [{ number: 7, amount: 1 }, { number: 7, amount: 2 }, { number: 'zero', amount: 3 }, { number: 7, amount: 4 }],
-						otherNumPanel: { red: 12, black: 12, odd: 12, even: 12, zero: 12 }
-					};
-					_this.infoPanel = new _infoPanelController2.default(infoPanelFishData);
-					stage.addChild(_this.infoPanel.pixiSprite);
+					// Панель с информацией о лимитах, горячих/холодных номерах
+					_this._cmpCtrls.infoPanel = new _infoPanelController2.default(_presets2.default.data.infoPanel);
 	
-					_this.betPanelCtrl = new _betPanelController2.default(_presets2.default.data.betPanel);
-					stage.addChild(_this.betPanelCtrl.pixiSprite);
+					// Панель с информацией о выигрыше/ставке/балансе
+					_this._cmpCtrls.betPanelCtrl = new _betPanelController2.default(_presets2.default.data.betPanel);
 	
-					_this.historyCtrl = new _historyController2.default({
-						rollTime: 6,
-						rollCb: _this.rollNumber,
-						ctx: _this
-					});
-					stage.addChild(_this.historyCtrl.pixiSprite);
+					// Панель с рулеткой и лентой истории
+					_this._cmpCtrls.historyCtrl = new _historyController2.default(_presets2.default.settings.history, { rollCb: _this.rollNumber, ctx: _this });
 	
-					setTimeout(function () {
-						_this.historyCtrl.play();
-					}, 10000);
-	
-					game.start();
+					for (var _key in _this._cmpCtrls) {
+						stage.addChild(_this._cmpCtrls[_key].pixiSprite);
+					}game.start();
 				});
+			}
+		}, {
+			key: 'restartGame',
+			value: function restartGame() {
+				this.gameStore.activeChip = undefined;
+				this.gameStore.betTouchStart = false;
+	
+				// Прописываем новый баланс. Добавляем в историю номер предыдущего розыгрыша
+	
+				this.stage.interactive = true;
+	
+				this.chipsController.enablePanel();
+				this.buttonsController.enablePanel();
+				this._cmpCtrls.gameField.enableField();
+	
+				for (var key in this.gameStore.betsCtrl) {
+					this.gameStore.betsCtrl[key].enableMove();
+				}this._cmpCtrls.timeScale.start();
+	
+				this._cmpCtrls.historyCtrl.play();
 			}
 		}, {
 			key: 'onTouchMove',
 			value: function onTouchMove(event) {
-				var fChip = this.floatChipContainer,
-				    betsCtrl = _betStore.betStore.betsCtrl;
+				var fChip = this._cmpCtrls.fChip,
+				    betsCtrl = this.gameStore.betsCtrl;
 	
-				if (_betStore.betStore.activeChip && !_touchEvents._tev.isActive(_touchEvents._tevStore.BET_TOUCH_START)) {
+				if (this.gameStore.activeChip && !this.gameStore.betTouchStart) {
 					// Если у нас есть активный тип ставки и если тачстарт начался не на существующей ставке
-					fChip.viewFloatChip(_betStore.betStore.activeChip.value);
+					fChip.viewFloatChip(this.gameStore.activeChip.value);
 					fChip.setPosition(event.data.global);
-				} else if (_touchEvents._tev.isActive(_touchEvents._tevStore.BET_TOUCH_START)) {
+				} else if (this.gameStore.betTouchStart) {
 					// Если тачстарт начался с существующей ставки
 					var pos4Bet = this.getPosForBet(event.data.global, true);
 					var betStoreId = pos4Bet.x + '_' + pos4Bet.y;
@@ -28435,14 +28423,24 @@
 					var value = betsCtrl[betStoreId].getTopChipValue();
 	
 					betsCtrl[betStoreId].updateBetView(-value);
-					_betStore.betStore.activeChip = { value: value };
+					this.gameStore.activeChip = { value: value };
 	
-					_touchEvents._tev.clearEvents();
+					this.gameStore.betTouchStart = false;
 				}
+			}
+		}, {
+			key: 'betTouchStart',
+			value: function betTouchStart(event) {
+				this.gameStore.betTouchStart = true;
+				// let betsCtrl = this.gameStore.betsCtrl;
+				// let pos4Bet = this.getPosForBet(event.data.global, true);
+				// let betStoreId = pos4Bet.x + '_' +pos4Bet.y;
+				//
+				// this.gameStore.activeChip = {value: betsCtrl[betStoreId].getTopChipValue()};
 			}
 	
 			/**
-	   * Эта функция является коллбеков, который вызывается по событию touchEnd у компонента bet
+	   * Эта функция является коллбеком, который вызывается по событию touchEnd у компонента bet
 	   * (betView.touchEnd -> betCtrl.touchEnd -> onTouchEnd)
 	   * Описание:
 	   * Функция определяет, было ли событие touchEnd совершено над игровым полем.
@@ -28461,9 +28459,11 @@
 		}, {
 			key: 'setBet',
 			value: function setBet(event) {
+				this.gameStore.betTouchStart = false;
+	
 				var pos4Bet = this.getPosForBet(event.data.global, true),
-				    betsCtrl = _betStore.betStore.betsCtrl,
-				    chip = _betStore.betStore.activeChip;
+				    betsCtrl = this.gameStore.betsCtrl,
+				    chip = this.gameStore.activeChip;
 	
 				if (!chip && this.chipsController.getActiveChip()) chip = this.chipsController.getActiveChip().chipData();
 	
@@ -28475,23 +28475,20 @@
 						betsCtrl[betStoreId].updateBetView(currentValue);
 					} else {
 						var configForBetCtrl = {
-							pos: pos4Bet,
-							value: currentValue,
-							onTouchEndCb: this.setBet,
-							onTouchStartCb: this.onTouchMove,
-							deleteBetCb: this.deleteBet,
-							ctx: this
-						};
+							pos: pos4Bet, value: currentValue,
+							setBet: this.setBet,
+							touchStart: this.betTouchStart,
+							delBet: this.deleteBet,
+							ctx: this };
 	
 						var betController = new _betController2.default(configForBetCtrl);
 						this.stage.addChild(betController.betSprite);
 						betsCtrl[betStoreId] = betController;
 					}
 				}
-				_betStore.betStore.activeChip = undefined;
+				this.gameStore.activeChip = undefined;
 	
 				this.clearTableBet();
-	
 				this.updateBetModel();
 			}
 	
@@ -28502,19 +28499,19 @@
 		}, {
 			key: 'clearTableBet',
 			value: function clearTableBet() {
-				this.floatChipContainer.hideFloatChip();
-				this.gameField.hideHints();
+				this._cmpCtrls.fChip.hideFloatChip();
+				this._cmpCtrls.gameField.hideHints();
 			}
 		}, {
 			key: 'getPosForBet',
 			value: function getPosForBet(pos, global) {
-				return this.gameField.getPosForBet(pos, global);
+				return this._cmpCtrls.gameField.getPosForBet(pos, global);
 			}
 		}, {
 			key: 'deleteBet',
 			value: function deleteBet(betCtrl) {
-				for (var ctrl in _betStore.betStore.betsCtrl) {
-					if (ctrl === betCtrl) delete _betStore.betStore.betsCtrl[betCtrl];
+				for (var ctrl in this.gameStore.betsCtrl) {
+					if (this.gameStore.betsCtrl[ctrl] === betCtrl) delete this.gameStore.betsCtrl[ctrl];
 				}
 			}
 		}, {
@@ -28525,37 +28522,69 @@
 	   * Синхронизируем изменение вьюхи и коллекцию ставок
 	   * (не коллекцию контроллеров компонентов ставок)
 	   */
-			value: function updateBetModel() {}
+			value: function updateBetModel() {
+				var bet = 0;
+				for (var key in this.gameStore.betsCtrl) {
+					bet += this.gameStore.betsCtrl[key].balance;
+				}this._cmpCtrls.betPanelCtrl.updateInfoPanelView({ fldBet: bet });
+			}
 	
 			/**
 	   * Метод лочит панель фишек и кнопок по истечению времени
 	   */
 	
 		}, {
-			key: 'disableChipsAndButtons',
-			value: function disableChipsAndButtons() {
-				// TODO: если в момент окончания времени есть плавающая фишка - скрывать
+			key: 'lockTable',
+			value: function lockTable() {
+				var _this2 = this;
+	
 				console.log('Вызываем методы блокировки фишек и кнопок ➠ ');
+				this.clearTableBet();
+	
 				this.stage.interactive = false;
 	
 				this.chipsController.disablePanel();
 				this.buttonsController.disablePanel();
-				this.gameField.disableField();
+				this._cmpCtrls.gameField.disableField();
 	
-				for (var key in _betStore.betStore.betsCtrl) {
-					_betStore.betStore.betsCtrl[key].disableMove();
-				}
+				for (var key in this.gameStore.betsCtrl) {
+					this.gameStore.betsCtrl[key].disableMove();
+				} // Рассчет выигрыша
+	
+				setTimeout(function () {
+					_this2.restartGame();
+				}, 3000);
 			}
 		}, {
 			key: 'rollNumber',
 			value: function rollNumber(number) {
-				var _this2 = this;
+				var _this3 = this;
 	
-				this.gameField.showWinNum(number);
+				this._cmpCtrls.gameField.showWinNum(number);
 	
 				setTimeout(function () {
-					_this2.gameField.hideWinNum();
+					_this3._cmpCtrls.gameField.hideWinNum();
 				}, 3000);
+			}
+	
+			/**
+	   * ===========================   chips click callbacks  ================================
+	   */
+	
+		}, {
+			key: 'chipClick',
+			value: function chipClick(chip) {
+				this.gameStore.activeChip = chip;
+			}
+		}, {
+			key: 'chipTouchStart',
+			value: function chipTouchStart(chip) {
+				this.gameStore.activeChip = chip;
+			}
+		}, {
+			key: 'checkChips',
+			value: function checkChips() {
+				return this.gameStore.activeChip;
 			}
 	
 			/**
@@ -28563,32 +28592,32 @@
 	   */
 	
 		}, {
-			key: 'btnPanelCancelCb',
-			value: function btnPanelCancelCb() {
+			key: 'btnCancel',
+			value: function btnCancel() {
 				console.log('cancelClick (gameController)');
 			}
 		}, {
-			key: 'btnPanelClearCb',
-			value: function btnPanelClearCb() {
-				for (var key in _betStore.betStore.betsCtrl) {
-					var ctrl = _betStore.betStore.betsCtrl[key];
+			key: 'btnClear',
+			value: function btnClear() {
+				for (var key in this.gameStore.betsCtrl) {
+					var ctrl = this.gameStore.betsCtrl[key];
 					ctrl.betSprite.removeChildren();
 	
 					this.stage.removeChild(ctrl.betSprite);
 	
-					delete _betStore.betStore.betsCtrl[key];
+					delete this.gameStore.betsCtrl[key];
 				}
 			}
 		}, {
-			key: 'btnPanelRepeatCb',
-			value: function btnPanelRepeatCb() {
+			key: 'btnRepeat',
+			value: function btnRepeat() {
 				console.log('repeatClick (gameController)');
 			}
 		}, {
-			key: 'btnPanelX2Cb',
-			value: function btnPanelX2Cb() {
-				for (var key in _betStore.betStore.betsCtrl) {
-					var ctrl = _betStore.betStore.betsCtrl[key],
+			key: 'btnX2',
+			value: function btnX2() {
+				for (var key in this.gameStore.betsCtrl) {
+					var ctrl = this.gameStore.betsCtrl[key],
 					    value = ctrl.balance;
 	
 					ctrl.updateBetView(value);
@@ -28713,15 +28742,19 @@
 	
 	var _pixi2 = _interopRequireDefault(_pixi);
 	
-	var _spritesStore = __webpack_require__(140);
+	var _resourses = __webpack_require__(140);
 	
-	var _resourses = __webpack_require__(141);
+	var _resourses2 = _interopRequireDefault(_resourses);
+	
+	var _presets = __webpack_require__(141);
+	
+	var _presets2 = _interopRequireDefault(_presets);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	var loader = _pixi2.default.loader;
-	var path = _resourses.constants.path.assets;
-	var assets = _resourses.constants.loadAssets;
+	var path = _resourses2.default.path.assets;
+	var assets = _resourses2.default.loadAssets;
 	
 	assets = assets.map(function (item) {
 		var str = new RegExp('xml');
@@ -28738,14 +28771,14 @@
 	function assetLoader(callback) {
 		loader.add(assets);
 	
-		loader.load(function (loader, resources) {
+		loader.load(function () {
 			// Загоняем сырые данные из json-файлов в хранилище спрайтов (spritesStore) по группам
-			for (var key in _resourses.constants.namesMap) {
-				var spriteGroup = _resourses.constants.namesMap[key]; // anums, chips, bgNumbers...
+			for (var key in _resourses2.default.namesMap) {
+				var spriteGroup = _resourses2.default.namesMap[key]; // anums, chips, bgNumbers...
 	
 				for (var keyInGroup in spriteGroup) {
 					// keyInGroup for chips: chip0, chipSm0, chip1...
-					_spritesStore.spritesStore[key][keyInGroup] = _pixi2.default.utils.TextureCache[spriteGroup[keyInGroup]];
+					_presets2.default.spriteStore[key][keyInGroup] = _pixi2.default.utils.TextureCache[spriteGroup[keyInGroup]];
 				}
 			}
 	
@@ -28764,25 +28797,7 @@
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	var spriteGroups = ['chips', 'anums', 'bgNumbers', 'blights', 'buttons', 'fields', 'timer'],
-	    spritesStore = {};
-	
-	spriteGroups.forEach(function (item) {
-		spritesStore[item] = {};
-	});
-	
-	exports.spritesStore = spritesStore;
-
-/***/ },
-/* 141 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	var constants = {
+	var resourses = {
 		path: {
 			assets: './assets/'
 		},
@@ -28879,91 +28894,10 @@
 		}
 	};
 	
-	exports.constants = constants;
+	exports.default = resourses;
 
 /***/ },
-/* 142 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var touchEventsStore = {
-		BET_TOUCH_START: 'betTouchStart',
-		BET_TOUCH_MOVE: 'betTouchMove',
-		CHIP_TOUCH_START: 'chipTouchStart',
-		CHIP_TOUCH_MOVE: 'chipTouchMove',
-		FLOAT_CHIP_MOVE: 'floatChipMove'
-	};
-	
-	var touchEventsClass = function () {
-		function touchEventsClass() {
-			_classCallCheck(this, touchEventsClass);
-	
-			this._touchStates = {};
-			for (var key in touchEventsStore) {
-				this._touchStates[touchEventsStore[key]] = false;
-			}
-		}
-	
-		/**
-	  * Вовзращает/устанавливает активное состояние
-	  * @returns {*}
-	  */
-	
-	
-		_createClass(touchEventsClass, [{
-			key: 'clearEvents',
-			value: function clearEvents() {
-				for (var key in this._touchStates) {
-					this._touchStates[key] = false;
-				}
-			}
-		}, {
-			key: 'cancelEvent',
-			value: function cancelEvent(event) {
-				this._touchStates[event] = false;
-			}
-		}, {
-			key: 'setEvent',
-			value: function setEvent(event) {
-				this.clearEvents();
-				this._touchStates[event] = true;
-			}
-		}, {
-			key: 'isActive',
-			value: function isActive(event) {
-				return this._touchStates[event];
-			}
-		}, {
-			key: 'touchState',
-			get: function get() {
-				var activeState = void 0;
-				for (var key in this._touchStates) {
-					activeState = this._touchStates[key] ? key : 'undefined';
-				}
-				return activeState;
-			}
-		}]);
-	
-		return touchEventsClass;
-	}();
-	
-	var instance = new touchEventsClass();
-	Object.freeze(instance);
-	
-	exports._tevStore = touchEventsStore;
-	exports._tev = instance;
-
-/***/ },
-/* 143 */
+/* 141 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -28972,6 +28906,13 @@
 		value: true
 	});
 	var presets = {};
+	
+	var spriteGroups = ['chips', 'anums', 'bgNumbers', 'blights', 'buttons', 'fields', 'timer'];
+	
+	presets.spriteStore = {};
+	spriteGroups.forEach(function (item) {
+		presets.spriteStore[item] = {};
+	});
 	
 	/**
 	 * Настройки для компонентов
@@ -28986,10 +28927,13 @@
 			}
 		},
 		timeScale: {
-			time: 6,
+			time: 10,
 			changeColorPer: 0.25,
 			fps: 60,
-			lastTime: 3
+			lastTime: 4
+		},
+		history: {
+			rollTime: 14 // timeScale.time + timeScale.lastTime
 		}
 	};
 	
@@ -29173,156 +29117,7 @@
 	exports.default = presets;
 
 /***/ },
-/* 144 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var betStoreClass = function () {
-		function betStoreClass() {
-			_classCallCheck(this, betStoreClass);
-	
-			this.bets = {};
-			this.betsCtrl = {};
-	
-			this.proxy = new Proxy(this.bets, {
-				get: function get(target, prop) {
-					console.log('`Чтение ${prop}` ➠ ', '\u0427\u0442\u0435\u043D\u0438\u0435 ' + prop);
-					return target[prop];
-				},
-				set: function set(target, prop, value) {
-					console.log('`Запись ${prop} ${value}` ➠ ', '\u0417\u0430\u043F\u0438\u0441\u044C ' + prop + ' ' + value);
-					target[prop] = value;
-					return true;
-				}
-			});
-		}
-	
-		/**
-	  * Коллекция ставок с привязкой к полям
-	  * @param bets
-	  */
-	
-	
-		_createClass(betStoreClass, [{
-			key: 'clearBets',
-	
-	
-			/**
-	   * Очищаем все данные модели
-	   */
-			value: function clearBets() {
-				this.bets = [];
-				this.currentBetSum = 0;
-			}
-	
-			/**
-	   * Добавление ставки
-	   * @param bet - {field, bet}
-	   */
-	
-		}, {
-			key: 'addBet',
-			value: function addBet(bet) {
-				this.bets[bet.field] = bet.value;
-			}
-	
-			/**
-	   * Удаление ставки
-	   * @param field - название поля
-	   */
-	
-		}, {
-			key: 'removeBet',
-			value: function removeBet(field) {
-				this.bets[field] = undefined;
-			}
-		}, {
-			key: 'bets',
-			set: function set(bets) {
-				// this.proxy = bets; - если захотим попроксировать
-				this._bets = bets;
-			},
-			get: function get() {
-				// return this.proxy;
-				return this._bets;
-			}
-	
-			/**
-	   * Коллекция ставок с привязкой к полям
-	   * @param bets
-	   */
-	
-		}, {
-			key: 'betsCtrl',
-			set: function set(betsCtrl) {
-				this._betsCtrl = betsCtrl;
-			},
-			get: function get() {
-				return this._betsCtrl;
-			}
-	
-			/**
-	   * Текущая сумма ставок
-	   * @param bet
-	   */
-	
-		}, {
-			key: 'currentBetSum',
-			set: function set(bet) {
-				this._currentBetSum = bet;
-			},
-			get: function get() {
-				return this._currentBetSum;
-			}
-	
-			/**
-	   * Активный тип ставки (одна из фишек на панели - 100/500/1К...)
-	   * @param chip
-	   */
-	
-		}, {
-			key: 'activeChip',
-			set: function set(chip) {
-				this._activeChip = chip;
-			},
-			get: function get() {
-				return this._activeChip;
-			}
-	
-			/**
-	   * Активный тип ставки (одна из фишек на панели - 100/500/1К...)
-	   * @param chip
-	   */
-	
-		}, {
-			key: 'floatChip',
-			set: function set(chip) {
-				this._floatChip = chip;
-			},
-			get: function get() {
-				return this._floatChip;
-			}
-		}]);
-	
-		return betStoreClass;
-	}();
-	
-	var instance = new betStoreClass();
-	// Object.preventExtensions(instance); - не хочет работать 'set activeChip'
-	
-	exports.betStore = instance;
-
-/***/ },
-/* 145 */
+/* 142 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29331,7 +29126,7 @@
 		value: true
 	});
 	
-	var _presets = __webpack_require__(143);
+	var _presets = __webpack_require__(141);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
@@ -29339,16 +29134,20 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var GameStore = function GameStore() {
+	var GameStore = function GameStore(config) {
 		_classCallCheck(this, GameStore);
 	
 		this.states = {};
+	
+		this.betsCtrl = {};
+	
+		this.balance = config.balance;
 	};
 	
 	exports.default = GameStore;
 
 /***/ },
-/* 146 */
+/* 143 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29390,7 +29189,7 @@
 	exports.default = Background;
 
 /***/ },
-/* 147 */
+/* 144 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29401,17 +29200,15 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _gameFieldView = __webpack_require__(148);
+	var _gameFieldView = __webpack_require__(145);
 	
 	var _gameFieldView2 = _interopRequireDefault(_gameFieldView);
 	
-	var _gameFieldCellMap = __webpack_require__(150);
+	var _gameFieldCellMap = __webpack_require__(147);
 	
-	var _presets = __webpack_require__(143);
+	var _presets = __webpack_require__(141);
 	
 	var _presets2 = _interopRequireDefault(_presets);
-	
-	var _betStore = __webpack_require__(144);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -29421,16 +29218,9 @@
 		function GameFieldController(configByGameCtrl) {
 			_classCallCheck(this, GameFieldController);
 	
-			var config = {
-				onClickCb: this.onClick,
-				onHoverCb: this.hoverAreas,
-				ctx: this
-			};
+			this.cfg = configByGameCtrl;
 	
-			this.onClickCb = configByGameCtrl.onClickCb ? configByGameCtrl.onClickCb : undefined;
-			this.ctx = configByGameCtrl.ctx ? configByGameCtrl.ctx : this;
-	
-			this._gameFieldBig = new _gameFieldView2.default(config);
+			this._gameFieldBig = new _gameFieldView2.default({ click: this.onClick, hover: this.hoverAreas, ctx: this });
 		}
 	
 		/**
@@ -29442,10 +29232,7 @@
 		_createClass(GameFieldController, [{
 			key: 'onClick',
 			value: function onClick(event) {
-				this.onClickCb ? this.onClickCb.call(this.ctx, event) : console.log('gameFieldClickEvent (GameFieldController)');
-	
-				// let localPos = event.data.getLocalPosition(this._gameFieldBig);
-				// this.getCellFromPos(localPos);
+				this.cfg.setBet.call(this.cfg.ctx, event);
 			}
 		}, {
 			key: 'showHints',
@@ -29490,7 +29277,7 @@
 		}, {
 			key: 'hoverAreas',
 			value: function hoverAreas(event) {
-				if (!_betStore.betStore.activeChip && !_betStore.betStore.floatChip) return false;
+				if (!this.cfg.checkChips.call(this.cfg.ctx)) return false;
 	
 				// т.к. событие mousemove и touchmove у нас отрабатывают по всей сцене
 				// (не важно на что вешаем), то вычисляем координаты нужного поля относительно
@@ -29504,9 +29291,7 @@
 	
 				this.hideHints();
 	
-				if (cell && cell.c.length) {
-					this.showHints(cell.c);
-				}
+				if (cell && cell.c.length) this.showHints(cell.c);
 			}
 	
 			/**
@@ -29547,7 +29332,7 @@
 				this._gameFieldBig.enableField();
 			}
 		}, {
-			key: 'gameFieldSprite',
+			key: 'pixiSprite',
 			get: function get() {
 				return this._gameFieldBig.pixiContainer;
 			}
@@ -29559,7 +29344,7 @@
 	exports.default = GameFieldController;
 
 /***/ },
-/* 148 */
+/* 145 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29570,15 +29355,15 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(149);
+	var _PIXIabbr = __webpack_require__(146);
 	
-	var _presets = __webpack_require__(143);
+	var _presets = __webpack_require__(141);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
-	var _gameFieldCellMap = __webpack_require__(150);
+	var _gameFieldCellMap = __webpack_require__(147);
 	
-	var _gsap = __webpack_require__(151);
+	var _gsap = __webpack_require__(148);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -29590,9 +29375,7 @@
 	
 			_classCallCheck(this, GameFieldView);
 	
-			this.onClickCb = config.onClickCb ? config.onClickCb : undefined;
-			this.onHoverCb = config.onHoverCb ? config.onHoverCb : undefined;
-			this.cbCtx = config.ctx ? config.ctx : this;
+			this.cfg = config;
 	
 			// Контейнер для фишки с тенью и текстом
 			var spriteContainer = new _PIXIabbr._pxC();
@@ -29634,22 +29417,7 @@
 	   * @param event
 	   */
 			value: function onClick(event) {
-				this.onClickCb ? this.onClickCb.call(this.cbCtx, event) : console.log('gameFieldClickEvent (GameFieldView)');
-			}
-	
-			/**
-	   * Функция отработки по нажатию
-	   * @param event
-	   */
-	
-		}, {
-			key: 'onTouchStart',
-			value: function onTouchStart(event) {
-				if (this.onTouchStartCb) {
-					this.onTouchStartCb.call(this.cbCtx, this.chipValue);
-				} else {
-					console.log('gameFieldTouchStart (ChipView)');
-				}
+				this.cfg.click.call(this.cfg.ctx, event);
 			}
 	
 			/**
@@ -29854,7 +29622,7 @@
 		}, {
 			key: 'hoverAreas',
 			value: function hoverAreas(event) {
-				this.onHoverCb ? this.onHoverCb.call(this.cbCtx, event) : console.log('hoverAreas (ChipView)');
+				this.cfg.hover.call(this.cfg.ctx, event);
 			}
 		}, {
 			key: 'disableField',
@@ -29922,7 +29690,7 @@
 	exports.default = GameFieldView;
 
 /***/ },
-/* 149 */
+/* 146 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -29955,7 +29723,7 @@
 	exports._pxEx = _pxEx;
 
 /***/ },
-/* 150 */
+/* 147 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -30061,7 +29829,7 @@
 	exports.winHintPos = winHintPos;
 
 /***/ },
-/* 151 */
+/* 148 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global) {/*!
@@ -36107,7 +35875,7 @@
 							if (global) {
 								_globals[n] = _exports[n] = cl; //provides a way to avoid global namespace pollution. By default, the main classes like TweenLite, Power1, Strong, etc. are added to window unless a GreenSockGlobals is defined. So if you want to have things added to a custom object instead, just do something like window.GreenSockGlobals = {} before loading any GreenSock files. You can even set up an alias like window.GreenSockGlobals = windows.gs = {} so that you can access everything like gs.TweenLite. Also remember that ALL classes are added to the window.com.greensock object (in their respective packages, like com.greensock.easing.Power1, com.greensock.TweenLite, etc.)
 								hasModule = (typeof(module) !== "undefined" && module.exports);
-								if (!hasModule && "function" === "function" && __webpack_require__(152)){ //AMD
+								if (!hasModule && "function" === "function" && __webpack_require__(149)){ //AMD
 									!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function() { return cl; }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 								} else if (hasModule){ //node
 									if (ns === moduleName) {
@@ -37924,7 +37692,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 152 */
+/* 149 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {module.exports = __webpack_amd_options__;
@@ -37932,7 +37700,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, {}))
 
 /***/ },
-/* 153 */
+/* 150 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -37943,7 +37711,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _buttonPanelView = __webpack_require__(154);
+	var _buttonPanelView = __webpack_require__(151);
 	
 	var _buttonPanelView2 = _interopRequireDefault(_buttonPanelView);
 	
@@ -37960,20 +37728,20 @@
 	
 			// Конфиг, который передаём во вьюху
 			var buttonsCallbackConfig = {
-				btnCancel: {
-					onClickCb: this.cancelBtnClick,
-					ctx: this
-				},
+				// btnCancel: {
+				// 	onClickCb: this.btnCancel,
+				// 	ctx: this
+				// },
 				btnClear: {
-					onClickCb: this.clearBtnClick,
+					onClickCb: this.btnClear,
 					ctx: this
 				},
 				btnRepeat: {
-					onClickCb: this.repeatBtnClick,
+					onClickCb: this.btnRepeat,
 					ctx: this
 				},
 				btnX2: {
-					onClickCb: this.x2BtnClick,
+					onClickCb: this.btnX2,
 					ctx: this
 				}
 			};
@@ -37996,39 +37764,46 @@
 				});
 			}
 		}, {
-			key: 'cancelBtnClick',
-			value: function cancelBtnClick() {
-				if (this._cfg && this._cfg.cancelCb) {
-					this._cfg.cancelCb.call(this._cfg.ctx);
+			key: 'enablePanel',
+			value: function enablePanel() {
+				this._buttonClasses.forEach(function (btnView) {
+					btnView.btnDefault();
+				});
+			}
+		}, {
+			key: 'btnCancel',
+			value: function btnCancel() {
+				if (this._cfg && this._cfg.cancel) {
+					this._cfg.cancel.call(this._cfg.ctx);
 				} else {
-					console.log('cancelBtnClick (ButtonPanelController)');
+					console.log('cancel (ButtonPanelController)');
 				}
 			}
 		}, {
-			key: 'clearBtnClick',
-			value: function clearBtnClick() {
-				if (this._cfg && this._cfg.clearCb) {
-					this._cfg.clearCb.call(this._cfg.ctx);
+			key: 'btnClear',
+			value: function btnClear() {
+				if (this._cfg && this._cfg.clear) {
+					this._cfg.clear.call(this._cfg.ctx);
 				} else {
-					console.log('clearBtnClick (ButtonPanelController)');
+					console.log('clear (ButtonPanelController)');
 				}
 			}
 		}, {
-			key: 'repeatBtnClick',
-			value: function repeatBtnClick() {
-				if (this._cfg && this._cfg.repeatCb) {
-					this._cfg.repeatCb.call(this._cfg.ctx);
+			key: 'btnRepeat',
+			value: function btnRepeat() {
+				if (this._cfg && this._cfg.repeat) {
+					this._cfg.repeat.call(this._cfg.ctx);
 				} else {
-					console.log('repeatBtnClick (ButtonPanelController)');
+					console.log('repeat (ButtonPanelController)');
 				}
 			}
 		}, {
-			key: 'x2BtnClick',
-			value: function x2BtnClick() {
-				if (this._cfg && this._cfg.x2Cb) {
-					this._cfg.x2Cb.call(this._cfg.ctx);
+			key: 'btnX2',
+			value: function btnX2() {
+				if (this._cfg && this._cfg.x2) {
+					this._cfg.x2.call(this._cfg.ctx);
 				} else {
-					console.log('x2BtnClick (ButtonPanelController)');
+					console.log('x2 (ButtonPanelController)');
 				}
 			}
 		}, {
@@ -38044,7 +37819,7 @@
 	exports.default = ButtonController;
 
 /***/ },
-/* 154 */
+/* 151 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38055,11 +37830,9 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(149);
+	var _PIXIabbr = __webpack_require__(146);
 	
-	var _spritesStore = __webpack_require__(140);
-	
-	var _presets = __webpack_require__(143);
+	var _presets = __webpack_require__(141);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
@@ -38173,10 +37946,10 @@
 	
 				var type = btnSquareType === 'btnCancel' ? 'cn' : 'cl';
 	
-				var stateDef = new _PIXIabbr._pxS(_spritesStore.spritesStore.buttons['btnAction']),
-				    stateSel = new _PIXIabbr._pxS(_spritesStore.spritesStore.buttons['btnActionSel']),
-				    icoDef = new _PIXIabbr._pxS(_spritesStore.spritesStore.buttons[type === 'cn' ? 'icoCancel' : 'icoClear']),
-				    icoDis = new _PIXIabbr._pxS(_spritesStore.spritesStore.buttons[type === 'cn' ? 'icoCancelDis' : 'icoClearDis']),
+				var stateDef = new _PIXIabbr._pxS(_presets2.default.spriteStore.buttons['btnAction']),
+				    stateSel = new _PIXIabbr._pxS(_presets2.default.spriteStore.buttons['btnActionSel']),
+				    icoDef = new _PIXIabbr._pxS(_presets2.default.spriteStore.buttons[type === 'cn' ? 'icoCancel' : 'icoClear']),
+				    icoDis = new _PIXIabbr._pxS(_presets2.default.spriteStore.buttons[type === 'cn' ? 'icoCancelDis' : 'icoClearDis']),
 				    text = new _PIXIabbr._pxT(type === 'cn' ? _presets2.default.texts.button.cancel : _presets2.default.texts.button.clear, _presets2.default.textStyles.buttonStyle);
 	
 				stateSel.visible = false;
@@ -38206,9 +37979,9 @@
 	
 				var type = btnSquareType === 'btnRepeat' ? 'rpt' : 'x2';
 	
-				var stateDef = new _PIXIabbr._pxS(_spritesStore.spritesStore.buttons[type === 'rpt' ? 'btnRepeat' : 'btnX2']),
-				    stateSel = new _PIXIabbr._pxS(_spritesStore.spritesStore.buttons[type === 'rpt' ? 'btnRepeatSel' : 'btnX2Sel']),
-				    stateDis = new _PIXIabbr._pxS(_spritesStore.spritesStore.buttons[type === 'rpt' ? 'btnRepeatDis' : 'btnX2Dis']);
+				var stateDef = new _PIXIabbr._pxS(_presets2.default.spriteStore.buttons[type === 'rpt' ? 'btnRepeat' : 'btnX2']),
+				    stateSel = new _PIXIabbr._pxS(_presets2.default.spriteStore.buttons[type === 'rpt' ? 'btnRepeatSel' : 'btnX2Sel']),
+				    stateDis = new _PIXIabbr._pxS(_presets2.default.spriteStore.buttons[type === 'rpt' ? 'btnRepeatDis' : 'btnX2Dis']);
 	
 				stateSel.visible = false;
 				stateDis.visible = false;
@@ -38233,7 +38006,7 @@
 	exports.default = ButtonView;
 
 /***/ },
-/* 155 */
+/* 152 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38244,15 +38017,13 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _chipView = __webpack_require__(156);
+	var _chipView = __webpack_require__(153);
 	
 	var _chipView2 = _interopRequireDefault(_chipView);
 	
-	var _presets = __webpack_require__(143);
+	var _presets = __webpack_require__(141);
 	
 	var _presets2 = _interopRequireDefault(_presets);
-	
-	var _betStore = __webpack_require__(144);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -38261,21 +38032,17 @@
 	//TODO: Переделатю вьюху: класс контейнера должен быть один, а не по количеству фишек
 	
 	var ChipController = function () {
-		function ChipController() {
+		function ChipController(configFromGameCtrl) {
 			var _this = this;
 	
 			_classCallCheck(this, ChipController);
 	
-			var config = {
-				onClickCb: this.onClick,
-				chipTouchStartCb: this.chipTouchStart,
-				ctx: this
-			};
+			this.cfg = configFromGameCtrl;
 	
 			this._chips = {};
 	
 			['chip0', 'chip1', 'chip2', 'chip3', 'chip4'].forEach(function (item) {
-				var chip = new _chipView2.default(item, config);
+				var chip = new _chipView2.default(item, { click: _this.onClick, touchStart: _this.chipTouchStart, ctx: _this });
 				_this._chips[item] = chip;
 			});
 		}
@@ -38294,19 +38061,32 @@
 					}
 				}
 	
-				_betStore.betStore.activeChip = thisChip.active ? thisChip.chipData() : undefined;
+				var chip = thisChip.active ? thisChip.chipData() : undefined;
+	
+				// chipClick в gameController
+				this.cfg.click.call(this.cfg.ctx, chip);
 			}
 		}, {
 			key: 'chipTouchStart',
 			value: function chipTouchStart(price) {
 				var chipType = this.returnChipType(price);
-				_betStore.betStore.activeChip = { value: price, type: chipType };
+				var chip = { value: price, type: chipType };
+	
+				// chipTouchStart в gameController
+				this.cfg.touchStart.call(this.cfg.ctx, chip);
 			}
 		}, {
 			key: 'disablePanel',
 			value: function disablePanel() {
 				for (var key in this.chips) {
 					this.chips[key].disableChip();
+				}
+			}
+		}, {
+			key: 'enablePanel',
+			value: function enablePanel() {
+				for (var key in this.chips) {
+					this.chips[key].enableChip();
 				}
 			}
 	
@@ -38354,7 +38134,7 @@
 	exports.default = ChipController;
 
 /***/ },
-/* 156 */
+/* 153 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38365,15 +38145,13 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(149);
+	var _PIXIabbr = __webpack_require__(146);
 	
-	var _spritesStore = __webpack_require__(140);
-	
-	var _presets = __webpack_require__(143);
+	var _presets = __webpack_require__(141);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
-	var _helpFunctions = __webpack_require__(157);
+	var _helpFunctions = __webpack_require__(154);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -38385,9 +38163,7 @@
 	
 			_classCallCheck(this, ChipView);
 	
-			this.onClickCb = config.onClickCb ? config.onClickCb : undefined;
-			this.chipTouchStartCb = config.chipTouchStartCb ? config.chipTouchStartCb : undefined;
-			this.cbCtx = config.ctx ? config.ctx : this;
+			this.cfg = config;
 	
 			// Контейнер для фишки с тенью и текстом
 			var spriteContainer = new _PIXIabbr._pxC();
@@ -38400,12 +38176,12 @@
 			spriteContainer.x = _presets2.default.positions.chips[chipType].x;
 			spriteContainer.y = _presets2.default.positions.chips[chipType].y;
 	
-			var sprite = new _PIXIabbr._pxS(_spritesStore.spritesStore.chips[chipType]);
+			var sprite = new _PIXIabbr._pxS(_presets2.default.spriteStore.chips[chipType]);
 	
 			sprite.anchor.set(0.5);
 	
 			// Тень под фишкой
-			var shadow = new _PIXIabbr._pxS(_spritesStore.spritesStore.chips.chipShadow);
+			var shadow = new _PIXIabbr._pxS(_presets2.default.spriteStore.chips.chipShadow);
 			shadow.anchor.set(0.5);
 	
 			// Значение ставки на фишке
@@ -38430,12 +38206,14 @@
 		_createClass(ChipView, [{
 			key: 'chipTouchEnd',
 			value: function chipTouchEnd() {
-				this.onClickCb ? this.onClickCb.call(this.cbCtx, this.chipValue) : console.log('chipClickEvent (ChipView)', this.chipValue);
+				// onClick в ChipController
+				this.cfg.click.call(this.cfg.ctx, this.chipValue);
 			}
 		}, {
 			key: 'chipTouchStart',
 			value: function chipTouchStart() {
-				this.chipTouchStartCb ? this.chipTouchStartCb.call(this.cbCtx, this.chipValue) : console.log('chipTouchMove (ChipView)', this.chipValue);
+				// chipTouchStart в ChipController
+				this.cfg.touchStart.call(this.cfg.ctx, this.chipValue);
 			}
 		}, {
 			key: 'setActive',
@@ -38501,7 +38279,7 @@
 	exports.default = ChipView;
 
 /***/ },
-/* 157 */
+/* 154 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38511,7 +38289,7 @@
 	});
 	exports._hf = undefined;
 	
-	var _PIXIabbr = __webpack_require__(149);
+	var _PIXIabbr = __webpack_require__(146);
 	
 	/**
 	 * Проверка принадлежности по координатам
@@ -38609,7 +38387,7 @@
 	exports._hf = _hf;
 
 /***/ },
-/* 158 */
+/* 155 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38620,11 +38398,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _floatChipView = __webpack_require__(159);
+	var _floatChipView = __webpack_require__(156);
 	
 	var _floatChipView2 = _interopRequireDefault(_floatChipView);
 	
-	var _presets = __webpack_require__(143);
+	var _presets = __webpack_require__(141);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
@@ -38636,28 +38414,31 @@
 		function FloatChipController(configByGameCtrl) {
 			_classCallCheck(this, FloatChipController);
 	
-			this.onTouchEndCb = configByGameCtrl.onTouchEndCb ? configByGameCtrl.onTouchEndCb : undefined;
-			this.cbCtx = configByGameCtrl.ctx ? configByGameCtrl.ctx : this;
+			this.cfg = configByGameCtrl;
 	
-			var config = {
-				viewFloatChip: this.viewFloatChip,
-				setPosition: this.setPosition,
-				onTouchEndCb: this.onTouchEnd,
-				ctx: this
-			};
-	
-			this._floatChipsSprite = new _floatChipView2.default(config);
+			this._floatChipsSprite = new _floatChipView2.default({ touchEnd: this.touchEnd, ctx: this });
 		}
 	
 		_createClass(FloatChipController, [{
-			key: 'viewFloatChip',
-			value: function viewFloatChip(value) {
-				this._floatChipsSprite.viewFloatChip(_presets2.default.data.floatChipTypes[value], value);
-			}
-		}, {
 			key: 'hideFloatChip',
 			value: function hideFloatChip() {
 				this._floatChipsSprite.hideFloatChips();
+			}
+		}, {
+			key: 'touchEnd',
+			value: function touchEnd(event) {
+				// setBet в gameController
+				this.cfg.setBet.call(this.cfg.ctx, event);
+			}
+	
+			/**
+	   * Вызываются из gameController
+	   */
+	
+		}, {
+			key: 'viewFloatChip',
+			value: function viewFloatChip(value) {
+				this._floatChipsSprite.viewFloatChip(_presets2.default.data.floatChipTypes[value], value);
 			}
 		}, {
 			key: 'setPosition',
@@ -38665,12 +38446,7 @@
 				this._floatChipsSprite.setPosition(pos);
 			}
 		}, {
-			key: 'onTouchEnd',
-			value: function onTouchEnd(event) {
-				this.onTouchEndCb ? this.onTouchEndCb.call(this.cbCtx, event) : console.log('floatChipTouchEnd (FloatChipController)');
-			}
-		}, {
-			key: 'getFloatChipsSprite',
+			key: 'pixiSprite',
 			get: function get() {
 				return this._floatChipsSprite.floatChipContainer;
 			}
@@ -38682,7 +38458,7 @@
 	exports.default = FloatChipController;
 
 /***/ },
-/* 159 */
+/* 156 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38693,11 +38469,9 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(149);
+	var _PIXIabbr = __webpack_require__(146);
 	
-	var _spritesStore = __webpack_require__(140);
-	
-	var _presets = __webpack_require__(143);
+	var _presets = __webpack_require__(141);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
@@ -38710,6 +38484,8 @@
 			var _this = this;
 	
 			_classCallCheck(this, FloatChipView);
+	
+			this.cfg = config;
 	
 			this.onTouchEndCb = config.onTouchEndCb ? config.onTouchEndCb : undefined;
 			this.cbCtx = config.ctx ? config.ctx : this;
@@ -38726,7 +38502,7 @@
 			});
 	
 			['chipSm0', 'chipSm1', 'chipSm2', 'chipSm3', 'chipSm4'].forEach(function (chipType) {
-				var floatChipSprite = new _PIXIabbr._pxS(_spritesStore.spritesStore.chips[chipType]);
+				var floatChipSprite = new _PIXIabbr._pxS(_presets2.default.spriteStore.chips[chipType]);
 				// floatChipSprite.visible = false;
 				floatChipSprite.anchor.set(0.5);
 				_this._floatChipsContainer.addChild(floatChipSprite);
@@ -38749,7 +38525,8 @@
 		_createClass(FloatChipView, [{
 			key: 'onTouchEnd',
 			value: function onTouchEnd(event) {
-				this.onTouchEndCb ? this.onTouchEndCb.call(this.cbCtx, event) : console.log('floatChipTouchEnd (FloatChipView)');
+				// touchEnd в FloatChipController
+				this.cfg.touchEnd.call(this.cfg.ctx, event);
 			}
 	
 			/**
@@ -38823,7 +38600,7 @@
 	exports.default = FloatChipView;
 
 /***/ },
-/* 160 */
+/* 157 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38834,7 +38611,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _betView = __webpack_require__(161);
+	var _betView = __webpack_require__(158);
 	
 	var _betView2 = _interopRequireDefault(_betView);
 	
@@ -38848,19 +38625,11 @@
 	
 			this.cfg = configByGameCtrl;
 	
-			this.onTouchEndCb = configByGameCtrl.onTouchEndCb ? configByGameCtrl.onTouchEndCb : undefined;
-	
-			this.onTouchStartCb = configByGameCtrl.onTouchStartCb ? configByGameCtrl.onTouchStartCb : undefined;
-	
-			this.deleteBetCb = configByGameCtrl.deleteBetCb ? configByGameCtrl.deleteBetCb : undefined;
-	
-			this.cbCtx = configByGameCtrl.ctx ? configByGameCtrl.ctx : this;
-	
 			var config = {
 				pos: configByGameCtrl.pos,
-				onTouchStartCb: this.touchStart,
+				touchStart: this.touchStart,
 				updateBetModel: this.updateBetModel,
-				onTouchEndCb: this.onTouchEnd,
+				touchEnd: this.onTouchEnd,
 				ctx: this
 			};
 	
@@ -38869,8 +38638,9 @@
 	
 		_createClass(BetController, [{
 			key: 'touchStart',
-			value: function touchStart(price) {
-				console.log('111 ➠ ', 111);
+			value: function touchStart(event, betTouchStart) {
+				// betTouchStart в gameController
+				this.cfg.touchStart.call(this.cfg.ctx, event, betTouchStart);
 			}
 		}, {
 			key: 'updateBetView',
@@ -38887,7 +38657,9 @@
 			value: function updateBetModel() {
 				if (this._betView.balance === 0) {
 					console.log('удаляем ставку');
-					this.deleteBetCb ? this.deleteBetCb.call(this.cbCtx, this) : console.log('betDelete (BetController)');
+	
+					// метод deleteBet в gameController
+					this.cfg.delBet.call(this.cfg.ctx, this);
 				} else {
 					console.log('апдейтим модель ставки');
 				}
@@ -38895,7 +38667,8 @@
 		}, {
 			key: 'onTouchEnd',
 			value: function onTouchEnd(event) {
-				this.onTouchEndCb ? this.onTouchEndCb.call(this.cbCtx, event) : console.log('betTouchEnd (BetController)');
+				// метод setBet в gameController
+				this.cfg.setBet.call(this.cfg.ctx, event);
 			}
 		}, {
 			key: 'getTopChipValue',
@@ -38930,7 +38703,7 @@
 	exports.default = BetController;
 
 /***/ },
-/* 161 */
+/* 158 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -38941,17 +38714,15 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(149);
+	var _PIXIabbr = __webpack_require__(146);
 	
-	var _spritesStore = __webpack_require__(140);
-	
-	var _presets = __webpack_require__(143);
+	var _presets = __webpack_require__(141);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
-	var _helpFunctions = __webpack_require__(157);
+	var _helpFunctions = __webpack_require__(154);
 	
-	var _touchEvents = __webpack_require__(142);
+	var _touchEvents = __webpack_require__(159);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -38971,24 +38742,20 @@
 	
 			_classCallCheck(this, BetView);
 	
+			this.cfg = config;
+	
 			this._summ = value ? value : 0;
 	
 			var chipType = 'chipSm0';
 			for (var smChipKey in smallChipTypes) {
 				if (smallChipTypes[smChipKey] === value) chipType = smChipKey;
-			}this.onClickCb = config.onClickCb ? config.onClickCb : undefined;
-			this.onTouchEndCb = config.onTouchEndCb ? config.onTouchEndCb : undefined;
-			this.onTouchStartCb = config.onTouchStartCb ? config.onTouchStartCb : undefined;
-			this.updateBetModel = config.updateBetModel ? config.updateBetModel : undefined;
-			this.cbCtx = config.ctx ? config.ctx : this;
-	
-			this._betContainer = new _PIXIabbr._pxC();
+			}this._betContainer = new _PIXIabbr._pxC();
 			this._betContainer.x = config.pos.x;
 			this._betContainer.y = config.pos.y;
 	
 			this._betContainer.interactive = true;
 	
-			var betSprite = new _PIXIabbr._pxS(_spritesStore.spritesStore.chips[chipType]);
+			var betSprite = new _PIXIabbr._pxS(_presets2.default.spriteStore.chips[chipType]);
 			betSprite.anchor.set(0.5);
 	
 			var chipValueText = new _PIXIabbr._pxT(_helpFunctions._hf.formatChipValue(value), _presets2.default.textStyles.chipSmTextStyle);
@@ -39007,10 +38774,8 @@
 		}
 	
 		_createClass(BetView, [{
-			key: 'onClick',
-			value: function onClick() {
-				this.onClickCb ? this.onClickCb.call(this.cbCtx) : console.log('betClickEvent (betView)');
-			}
+			key: 'onTouchEnd',
+	
 	
 			/**
 	   * Функция вызывается при окончании движения ставки на уже существующем спрайте.
@@ -39018,18 +38783,15 @@
 	   * нельзя вызвать ниоткуда, кроме как событиями 'touchend','mouseup','pointerup' (PIXI-events)
 	   * @param event
 	   */
-	
-		}, {
-			key: 'onTouchEnd',
 			value: function onTouchEnd(event) {
-				this.onTouchEndCb ? this.onTouchEndCb.call(this.cbCtx, event) : console.log('betTouchEnd (BetView)');
+				// метод touchEnd в BetController
+				this.cfg.touchEnd.call(this.cfg.ctx, event);
 			}
 		}, {
 			key: 'onTouchStart',
-			value: function onTouchStart() {
-				_touchEvents._tev.setEvent(_touchEvents._tevStore.BET_TOUCH_START);
-	
-				this.onTouchStartCb ? this.onTouchStartCb.call(this.cbCtx, this.getTopChipValue()) : console.log('betTouchStart (BetView)');
+			value: function onTouchStart(event) {
+				// метод touchStart в BetController
+				this.cfg.touchStart.call(this.cfg.ctx, event, true);
 			}
 	
 			/**
@@ -39057,7 +38819,7 @@
 				var count = 0;
 				sortChipSmTypeArr.forEach(function (chipSmType, idx) {
 					for (var i = 0; i < betSprites[chipSmType]; i += 1) {
-						var newSprite = new _PIXIabbr._pxS(_spritesStore.spritesStore.chips[chipSmType]);
+						var newSprite = new _PIXIabbr._pxS(_presets2.default.spriteStore.chips[chipSmType]);
 						newSprite.anchor.set(0.5);
 						newSprite.y -= count * 5;
 						spriteContainer.addChild(newSprite);
@@ -39072,7 +38834,7 @@
 					spriteContainer.children[spriteContainer.children.length - 1].addChild(chipValueText);
 				}
 	
-				this.updateBetModel ? this.updateBetModel.call(this.cbCtx) : console.log('updateBetModel (betView)', this.updateBetModel);
+				this.cfg.updateBetModel.call(this.cfg.ctx);
 			}
 	
 			/**
@@ -39108,6 +38870,12 @@
 	
 				return q2;
 			}
+	
+			/**
+	   * Возвращаем значение верхней снимаемой фишки со стопки
+	   * @returns {*}
+	   */
+	
 		}, {
 			key: 'getTopChipValue',
 			value: function getTopChipValue() {
@@ -39148,7 +38916,88 @@
 	exports.default = BetView;
 
 /***/ },
-/* 162 */
+/* 159 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var touchEventsStore = {
+		BET_TOUCH_START: 'betTouchStart',
+		BET_TOUCH_MOVE: 'betTouchMove',
+		CHIP_TOUCH_START: 'chipTouchStart',
+		CHIP_TOUCH_MOVE: 'chipTouchMove',
+		FLOAT_CHIP_MOVE: 'floatChipMove'
+	};
+	
+	var touchEventsClass = function () {
+		function touchEventsClass() {
+			_classCallCheck(this, touchEventsClass);
+	
+			this._touchStates = {};
+			for (var key in touchEventsStore) {
+				this._touchStates[touchEventsStore[key]] = false;
+			}
+		}
+	
+		/**
+	  * Вовзращает/устанавливает активное состояние
+	  * @returns {*}
+	  */
+	
+	
+		_createClass(touchEventsClass, [{
+			key: 'clearEvents',
+			value: function clearEvents() {
+				for (var key in this._touchStates) {
+					this._touchStates[key] = false;
+				}
+			}
+		}, {
+			key: 'cancelEvent',
+			value: function cancelEvent(event) {
+				this._touchStates[event] = false;
+			}
+		}, {
+			key: 'setEvent',
+			value: function setEvent(event) {
+				this.clearEvents();
+				this._touchStates[event] = true;
+			}
+		}, {
+			key: 'isActive',
+			value: function isActive(event) {
+				return this._touchStates[event];
+			}
+		}, {
+			key: 'touchState',
+			get: function get() {
+				var activeState = void 0;
+				for (var key in this._touchStates) {
+					activeState = this._touchStates[key] ? key : 'undefined';
+				}
+				return activeState;
+			}
+		}]);
+	
+		return touchEventsClass;
+	}();
+	
+	var instance = new touchEventsClass();
+	Object.freeze(instance);
+	
+	exports._tevStore = touchEventsStore;
+	exports._tev = instance;
+
+/***/ },
+/* 160 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -39159,11 +39008,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _timeScaleView = __webpack_require__(163);
+	var _timeScaleView = __webpack_require__(161);
 	
 	var _timeScaleView2 = _interopRequireDefault(_timeScaleView);
 	
-	var _presets = __webpack_require__(143);
+	var _presets = __webpack_require__(141);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
@@ -39175,10 +39024,7 @@
 		function TimeScaleController(cfgFromGameCtrl) {
 			_classCallCheck(this, TimeScaleController);
 	
-			if (cfgFromGameCtrl) {
-				this.ctx = cfgFromGameCtrl.ctx ? cfgFromGameCtrl.ctx : undefined;
-				this.disableCb = cfgFromGameCtrl.disableCb ? cfgFromGameCtrl.disableCb : undefined;
-			}
+			this.cfg = cfgFromGameCtrl;
 	
 			var cbForView = {
 				disableCb: this.endTime,
@@ -39201,7 +39047,8 @@
 		}, {
 			key: 'endTime',
 			value: function endTime() {
-				this.disableCb ? this.disableCb.call(this.ctx) : console.log('chipClickEvent (ChipView)');
+				// lockTable в gameController
+				this.cfg.lockTable.call(this.cfg.ctx);
 			}
 		}, {
 			key: 'pixiSprite',
@@ -39216,7 +39063,7 @@
 	exports.default = TimeScaleController;
 
 /***/ },
-/* 163 */
+/* 161 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -39227,13 +39074,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(149);
+	var _PIXIabbr = __webpack_require__(146);
 	
-	var _presets = __webpack_require__(143);
+	var _presets = __webpack_require__(141);
 	
 	var _presets2 = _interopRequireDefault(_presets);
-	
-	var _spritesStore = __webpack_require__(140);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -39261,7 +39106,7 @@
 			this.sprites = {};
 	
 			['timerBack', 'timerYellow', 'timerRed'].forEach(function (item) {
-				_this.sprites[item] = new _PIXIabbr._pxS(_spritesStore.spritesStore.timer[item]);
+				_this.sprites[item] = new _PIXIabbr._pxS(_presets2.default.spriteStore.timer[item]);
 				if (item === 'timerRed') _this.sprites[item].visible = false;
 				spriteContainer.addChild(_this.sprites[item]);
 			});
@@ -39281,12 +39126,28 @@
 				if (this.isRun) return false;
 	
 				this.isRun = true;
+	
+				this.setState(this.state = 0);
+	
 				this.timeScaleLoop();
 			}
 		}, {
 			key: 'pause',
 			value: function pause() {
 				this.isRun = false;
+			}
+		}, {
+			key: 'defaultState',
+			value: function defaultState() {
+				var width = this.sprites.timerBack.width,
+				    redLine = this.sprites.timerRed,
+				    yellowLine = this.sprites.timerYellow;
+	
+				redLine.visible = false;
+				redLine.width = width;
+	
+				yellowLine.visible = true;
+				yellowLine.width = width;
 			}
 	
 			/**
@@ -39343,6 +39204,8 @@
 				var cfg = this.cfg;
 				this.setState('next');
 	
+				this.isRun = false;
+	
 				console.log('Последние ставки - ', cfg.lastTime, 'сек');
 				setTimeout(function () {
 					_this3.setState('next');
@@ -39363,6 +39226,8 @@
 			value: function setState(state) {
 				this.state = typeof state === 'number' ? state : state === 'next' ? this.state + 1 : this.state - 1;
 	
+				if (state === 0) this.defaultState();
+	
 				this.sprites.text.text = this.text['status' + this.state];
 			}
 		}, {
@@ -39381,7 +39246,7 @@
 	exports.default = TimeScaleView;
 
 /***/ },
-/* 164 */
+/* 162 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -39392,11 +39257,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _infoPanelView = __webpack_require__(165);
+	var _infoPanelView = __webpack_require__(163);
 	
 	var _infoPanelView2 = _interopRequireDefault(_infoPanelView);
 	
-	var _presets = __webpack_require__(143);
+	var _presets = __webpack_require__(141);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
@@ -39429,7 +39294,7 @@
 	exports.default = infoPanelController;
 
 /***/ },
-/* 165 */
+/* 163 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -39443,25 +39308,25 @@
 	// views
 	
 	
-	var _PIXIabbr = __webpack_require__(149);
+	var _PIXIabbr = __webpack_require__(146);
 	
-	var _presets = __webpack_require__(143);
+	var _presets = __webpack_require__(141);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
-	var _limitsView = __webpack_require__(166);
+	var _limitsView = __webpack_require__(164);
 	
 	var _limitsView2 = _interopRequireDefault(_limitsView);
 	
-	var _hotNumbersView = __webpack_require__(167);
+	var _hotNumbersView = __webpack_require__(165);
 	
 	var _hotNumbersView2 = _interopRequireDefault(_hotNumbersView);
 	
-	var _coldNumbersView = __webpack_require__(168);
+	var _coldNumbersView = __webpack_require__(166);
 	
 	var _coldNumbersView2 = _interopRequireDefault(_coldNumbersView);
 	
-	var _otherNumbersView = __webpack_require__(169);
+	var _otherNumbersView = __webpack_require__(167);
 	
 	var _otherNumbersView2 = _interopRequireDefault(_otherNumbersView);
 	
@@ -39527,7 +39392,7 @@
 	exports.default = infoPanelView;
 
 /***/ },
-/* 166 */
+/* 164 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -39538,13 +39403,13 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(149);
+	var _PIXIabbr = __webpack_require__(146);
 	
-	var _presets = __webpack_require__(143);
+	var _presets = __webpack_require__(141);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
-	var _helpFunctions = __webpack_require__(157);
+	var _helpFunctions = __webpack_require__(154);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -39615,7 +39480,7 @@
 	exports.default = limitsPanel;
 
 /***/ },
-/* 167 */
+/* 165 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -39626,13 +39491,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(149);
+	var _PIXIabbr = __webpack_require__(146);
 	
-	var _presets = __webpack_require__(143);
+	var _presets = __webpack_require__(141);
 	
 	var _presets2 = _interopRequireDefault(_presets);
-	
-	var _spritesStore = __webpack_require__(140);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -39712,7 +39575,7 @@
 				if (obj.number === 'doubleZero') obj.number = '00';
 	
 				var numCnt = new _PIXIabbr._pxC(),
-				    bg = new _PIXIabbr._pxS(_spritesStore.spritesStore.bgNumbers[color]),
+				    bg = new _PIXIabbr._pxS(_presets2.default.spriteStore.bgNumbers[color]),
 				    num = new _PIXIabbr._pxT(obj.number, _presets2.default.textStyles.infoPanel.number),
 				    amount = new _PIXIabbr._pxT(obj.amount, _presets2.default.textStyles.infoPanel.amount);
 	
@@ -39787,7 +39650,7 @@
 	exports.default = hotNumPanel;
 
 /***/ },
-/* 168 */
+/* 166 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -39798,13 +39661,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(149);
+	var _PIXIabbr = __webpack_require__(146);
 	
-	var _presets = __webpack_require__(143);
+	var _presets = __webpack_require__(141);
 	
 	var _presets2 = _interopRequireDefault(_presets);
-	
-	var _spritesStore = __webpack_require__(140);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -39884,7 +39745,7 @@
 				if (obj.number === 'doubleZero') obj.number = '00';
 	
 				var numCnt = new _PIXIabbr._pxC(),
-				    bg = new _PIXIabbr._pxS(_spritesStore.spritesStore.bgNumbers[color]),
+				    bg = new _PIXIabbr._pxS(_presets2.default.spriteStore.bgNumbers[color]),
 				    num = new _PIXIabbr._pxT(obj.number, _presets2.default.textStyles.infoPanel.number),
 				    amount = new _PIXIabbr._pxT(obj.amount, _presets2.default.textStyles.infoPanel.amount);
 	
@@ -39959,7 +39820,7 @@
 	exports.default = coldNumPanel;
 
 /***/ },
-/* 169 */
+/* 167 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -39970,11 +39831,9 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(149);
+	var _PIXIabbr = __webpack_require__(146);
 	
-	var _spritesStore = __webpack_require__(140);
-	
-	var _presets = __webpack_require__(143);
+	var _presets = __webpack_require__(141);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
@@ -40063,10 +39922,10 @@
 		}, {
 			key: 'drawRhombus',
 			value: function drawRhombus() {
-				var redR = new _PIXIabbr._pxS(_spritesStore.spritesStore.bgNumbers.icoRed);
+				var redR = new _PIXIabbr._pxS(_presets2.default.spriteStore.bgNumbers.icoRed);
 				redR.position = { x: 20, y: 75 };
 	
-				var blackR = new _PIXIabbr._pxS(_spritesStore.spritesStore.bgNumbers.icoBlack);
+				var blackR = new _PIXIabbr._pxS(_presets2.default.spriteStore.bgNumbers.icoBlack);
 				blackR.position = { x: 200, y: 75 };
 				this._spriteContainer.addChild(redR);
 				this._spriteContainer.addChild(blackR);
@@ -40084,7 +39943,7 @@
 	exports.default = otherNumPanel;
 
 /***/ },
-/* 170 */
+/* 168 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -40095,7 +39954,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _betPanelView = __webpack_require__(171);
+	var _betPanelView = __webpack_require__(169);
 	
 	var _betPanelView2 = _interopRequireDefault(_betPanelView);
 	
@@ -40128,7 +39987,7 @@
 	exports.default = betPanelController;
 
 /***/ },
-/* 171 */
+/* 169 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -40139,15 +39998,13 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(149);
+	var _PIXIabbr = __webpack_require__(146);
 	
-	var _spritesStore = __webpack_require__(140);
-	
-	var _presets = __webpack_require__(143);
+	var _presets = __webpack_require__(141);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
-	var _helpFunctions = __webpack_require__(157);
+	var _helpFunctions = __webpack_require__(154);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -40174,7 +40031,7 @@
 			var fieldSprites = {},
 			    pos = _presets2.default.positions.betPanel;
 			for (var _key in pos.fields) {
-				fieldSprites[_key] = new _PIXIabbr._pxS(_spritesStore.spritesStore.fields[_key]);
+				fieldSprites[_key] = new _PIXIabbr._pxS(_presets2.default.spriteStore.fields[_key]);
 				fieldSprites[_key].position = pos.fields[_key];
 	
 				this.numSprites[_key] = new _PIXIabbr._pxT(_helpFunctions._hf.formatLimit(values[_key]), _presets2.default.textStyles.betPanel);
@@ -40212,7 +40069,7 @@
 	exports.default = betPanelView;
 
 /***/ },
-/* 172 */
+/* 170 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -40223,7 +40080,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _historyView = __webpack_require__(173);
+	var _historyView = __webpack_require__(171);
 	
 	var _historyView2 = _interopRequireDefault(_historyView);
 	
@@ -40232,13 +40089,11 @@
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var historyController = function () {
-		function historyController(cfgFromGameCtrl) {
+		function historyController(config, callbacks) {
 			_classCallCheck(this, historyController);
 	
 			// Конфиг, пришедший от контроллера выше
-			this._cfg = cfgFromGameCtrl;
-	
-			this.historyView = new _historyView2.default(cfgFromGameCtrl);
+			this.historyView = new _historyView2.default(config, callbacks);
 		}
 	
 		_createClass(historyController, [{
@@ -40259,7 +40114,7 @@
 	exports.default = historyController;
 
 /***/ },
-/* 173 */
+/* 171 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -40270,17 +40125,15 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(149);
+	var _PIXIabbr = __webpack_require__(146);
 	
-	var _spritesStore = __webpack_require__(140);
-	
-	var _presets = __webpack_require__(143);
+	var _presets = __webpack_require__(141);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
-	var _helpFunctions = __webpack_require__(157);
+	var _helpFunctions = __webpack_require__(154);
 	
-	var _gsap = __webpack_require__(151);
+	var _gsap = __webpack_require__(148);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -40293,8 +40146,10 @@
 	};
 	
 	var historyView = function () {
-		function historyView(config) {
+		function historyView(config, callbacks) {
 			_classCallCheck(this, historyView);
+	
+			this.cb = callbacks;
 	
 			this.rolledNum = undefined;
 	
@@ -40302,11 +40157,6 @@
 				rollNumAnimation: undefined,
 				rollNumSprite: undefined,
 				numTape: []
-			};
-	
-			this.cbCtx = config.ctx ? config.ctx : this;
-			this.rollCb = config.rollCb ? config.rollCb : function () {
-				console.log('lolec ➠ ');
 			};
 	
 			this.rollTime = config.rollTime ? config.rollTime : 2.5;
@@ -40333,8 +40183,8 @@
 			value: function createRollField() {
 				var _a = this._hisSprites,
 				    arrForAnimation = [];
-				for (var key in _spritesStore.spritesStore.anums) {
-					arrForAnimation.push(_spritesStore.spritesStore.anums[key]);
+				for (var key in _presets2.default.spriteStore.anums) {
+					arrForAnimation.push(_presets2.default.spriteStore.anums[key]);
 				}_a.rollNumAnimation = new _PIXIabbr._pxEx.MovieClip(arrForAnimation);
 				_a.rollNumAnimation.animationSpeed = 0.25;
 			}
@@ -40358,13 +40208,14 @@
 					this._spriteContainer.removeChild(_a.rollNumSprite);
 				}
 	
-				_a.rollNumAnimation.play();
+				// _a.rollNumAnimation.play();
+				_a.rollNumAnimation.gotoAndPlay(0);
 	
 				setTimeout(function () {
 					_this.viewRollResult(_helpFunctions._hf.randEl(_presets2.default.data.history.rollNumbers));
 					_a.rollNumAnimation.gotoAndStop(0);
 	
-					_this.rollCb.call(_this.cbCtx, _this.rolledNum);
+					_this.cb.rollCb.call(_this.cb.ctx, _this.rolledNum);
 				}, this.rollTime * 1000);
 			}
 	
@@ -40377,7 +40228,7 @@
 			key: 'viewRollResult',
 			value: function viewRollResult(num) {
 				var _a = this._hisSprites;
-				_a.rollNumSprite = new _PIXIabbr._pxS(_spritesStore.spritesStore.bgNumbers[_helpFunctions._hf.colorType(colorBigNumMap, num)]);
+				_a.rollNumSprite = new _PIXIabbr._pxS(_presets2.default.spriteStore.bgNumbers[_helpFunctions._hf.colorType(colorBigNumMap, num)]);
 	
 				num = num === 'zero' ? '0' : num === 'doubleZero' ? '00' : num;
 				_helpFunctions._hf.addTextToSprite(_a.rollNumSprite, { x: 84, y: 84 }, num, _presets2.default.textStyles.historyPanel.big);
@@ -40393,7 +40244,7 @@
 			value: function addNum(num) {
 				var _hs = this._hisSprites;
 	
-				var newNum = new _PIXIabbr._pxS(_spritesStore.spritesStore.bgNumbers[_helpFunctions._hf.colorType(_presets2.default.data.colorNumMap, num)]);
+				var newNum = new _PIXIabbr._pxS(_presets2.default.spriteStore.bgNumbers[_helpFunctions._hf.colorType(_presets2.default.data.colorNumMap, num)]);
 				_hs.numTape.unshift(newNum);
 				this._spriteContainer.addChildAt(newNum, 0);
 	

@@ -1,5 +1,4 @@
 import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
-import {spritesStore} from './../../spritesStore';
 import presets from './../../constants/presets';
 
 export default class ButtonView {
@@ -98,10 +97,10 @@ export default class ButtonView {
 	squareBtnCreate(btnSquareType){
 		let type = (btnSquareType === 'btnCancel') ? 'cn' : 'cl';
 
-		let stateDef = new _pxS( spritesStore.buttons['btnAction'] ),
-			stateSel = new _pxS( spritesStore.buttons['btnActionSel'] ),
-			icoDef = new _pxS( spritesStore.buttons[type === 'cn' ? 'icoCancel' : 'icoClear'] ),
-			icoDis = new _pxS( spritesStore.buttons[type === 'cn' ? 'icoCancelDis' : 'icoClearDis'] ),
+		let stateDef = new _pxS( presets.spriteStore.buttons['btnAction'] ),
+			stateSel = new _pxS( presets.spriteStore.buttons['btnActionSel'] ),
+			icoDef = new _pxS( presets.spriteStore.buttons[type === 'cn' ? 'icoCancel' : 'icoClear'] ),
+			icoDis = new _pxS( presets.spriteStore.buttons[type === 'cn' ? 'icoCancelDis' : 'icoClearDis'] ),
 			text = new _pxT( type === 'cn' ? presets.texts.button.cancel : presets.texts.button.clear, presets.textStyles.buttonStyle );
 
 		stateSel.visible = false;
@@ -126,9 +125,9 @@ export default class ButtonView {
 	roundBtnCreate(btnSquareType){
 		let type = (btnSquareType === 'btnRepeat') ? 'rpt' : 'x2';
 
-		let stateDef = new _pxS( spritesStore.buttons[type === 'rpt' ? 'btnRepeat' : 'btnX2'] ),
-			stateSel = new _pxS( spritesStore.buttons[type === 'rpt' ? 'btnRepeatSel' : 'btnX2Sel'] ),
-			stateDis = new _pxS( spritesStore.buttons[type === 'rpt' ? 'btnRepeatDis' : 'btnX2Dis'] );
+		let stateDef = new _pxS( presets.spriteStore.buttons[type === 'rpt' ? 'btnRepeat' : 'btnX2'] ),
+			stateSel = new _pxS( presets.spriteStore.buttons[type === 'rpt' ? 'btnRepeatSel' : 'btnX2Sel'] ),
+			stateDis = new _pxS( presets.spriteStore.buttons[type === 'rpt' ? 'btnRepeatDis' : 'btnX2Dis'] );
 
 		stateSel.visible = false;
 		stateDis.visible = false;

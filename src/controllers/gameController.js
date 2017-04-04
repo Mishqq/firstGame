@@ -2,10 +2,7 @@ import PIXI from 'pixi.js';
 import plugins from './../plugins';
 import Game from './../Game';
 import assetLoader from './../assetsLoader'
-import {_tevStore, _tev} from './../servises/touchEvents'
 import presets from './../constants/presets'
-
-import {betStore} from '../servises/betStore';
 
 import GameStore from '../servises/gameStore';
 
@@ -28,11 +25,15 @@ export default class GameController {
 	}
 
 	init(){
+		// Component controller instances collection
+		this._cmpCtrls = {};
+
 		let game = this.game,
 			stage = game.stage;
 
-		this.gameStore = new GameStore();
-		console.log('this.gameStore ➠ ', this.gameStore);
+		this.gameStore = new GameStore({
+			balance: presets.data.betPanel.fldBalance
+		});
 
 		this.stage = stage;
 
@@ -41,43 +42,30 @@ export default class GameController {
 		 */
 		let bg = new Background();
 		stage.addChild(bg);
-
 		stage.interactive = true;
 
 		['mousemove', 'touchmove', 'pointermove'].forEach((event)=>{
 			stage.on(event, this.onTouchMove, this);
 		});
 
-		// ['touchend', 'mouseup', 'pointerup'].forEach((event)=>{
-		// 	stage.on(event, this.setBet, this);
-		// });
+		// Игровое поле
+		this._cmpCtrls.gameField = new GameFieldController({setBet: this.setBet, checkChips: this.checkChips, ctx: this});
 
-		/**
-		 * Игровое поле
-		 */
-		this.gameField = new GameFieldController({
-			onClickCb: this.setBet,
-			ctx: this
-		});
-		stage.addChild(this.gameField.gameFieldSprite);
 
-		/**
-		 * Прогружаем все json-атласы
-		 */
+		// Прогружаем все json-атласы
 		assetLoader(()=>{
-			let chipsController = new ChipController();
+			let chipsController = new ChipController({click: this.chipClick, touchStart: this.chipTouchStart, ctx: this});
 			this.chipsController = chipsController;
-			for(let key in chipsController.chips){
-				stage.addChild(chipsController.chips[key].sprite);
-			}
 
+			for(let key in chipsController.chips)
+				stage.addChild(chipsController.chips[key].sprite);
 
 			// Панель кнопок
 			let buttonsController = new ButtonController({
-				cancelCb: this.btnPanelCancelCb,
-				clearCb: this.btnPanelClearCb,
-				repeatCb: this.btnPanelRepeatCb,
-				x2Cb: this.btnPanelX2Cb,
+				cancel: this.btnCancel,
+				clear: this.btnClear,
+				repeat: this.btnRepeat,
+				x2: this.btnX2,
 				ctx: this
 			});
 			this.buttonsController = buttonsController;
@@ -85,71 +73,63 @@ export default class GameController {
 				stage.addChild(button);
 			});
 
+			// Плавающая фишка
+			this._cmpCtrls.fChip = new FloatChipController({setBet: this.setBet, ctx: this});
 
-			this.floatChipContainer = new FloatChipController({
-				onTouchEndCb: this.setBet,
-				ctx: this
-			});
-			stage.addChild(this.floatChipContainer.getFloatChipsSprite);
+			// Шкала-таймер
+			this._cmpCtrls.timeScale = new TimeScaleController({lockTable:this.lockTable, ctx: this});
+			this._cmpCtrls.timeScale.start();
 
+			// Панель с информацией о лимитах, горячих/холодных номерах
+			this._cmpCtrls.infoPanel = new infoPanelController(presets.data.infoPanel);
 
-			this._timeScale = new TimeScaleController({
-				disableCb:this.disableChipsAndButtons,
-				ctx: this
-			});
-			stage.addChild(this._timeScale.pixiSprite);
-			this._timeScale.start();
+			// Панель с информацией о выигрыше/ставке/балансе
+			this._cmpCtrls.betPanelCtrl = new betPanelController(presets.data.betPanel);
 
-
-			let infoPanelFishData = {
-				limitsPanel: {max: 30000, min: 50},
-				hotNumPanel: [
-					{number: 12, amount: 1},
-					{number: 'doubleZero', amount: 2},
-					{number: 12, amount: 3},
-					{number: 12, amount: 4}
-				],
-				coldNumPanel: [
-					{number: 7, amount: 1},
-					{number: 7, amount: 2},
-					{number: 'zero', amount: 3},
-					{number: 7, amount: 4}
-				],
-				otherNumPanel: {red: 12, black: 12, odd: 12, even: 12, zero: 12}
-			};
-			this.infoPanel = new infoPanelController(infoPanelFishData);
-			stage.addChild(this.infoPanel.pixiSprite);
+			// Панель с рулеткой и лентой истории
+			this._cmpCtrls.historyCtrl = new historyController(
+				presets.settings.history, {rollCb: this.rollNumber, ctx: this}
+			);
 
 
-			this.betPanelCtrl = new betPanelController(presets.data.betPanel);
-			stage.addChild(this.betPanelCtrl.pixiSprite);
+			for(let key in this._cmpCtrls)
+				stage.addChild(this._cmpCtrls[key].pixiSprite);
 
-
-			this.historyCtrl = new historyController({
-				rollTime: 6,
-				rollCb: this.rollNumber,
-				ctx: this
-			});
-			stage.addChild(this.historyCtrl.pixiSprite);
-
-			setTimeout(() => {
-				this.historyCtrl.play();
-			}, 10000);
 
 			game.start();
 		});
 	};
 
-	onTouchMove(event){
-		let fChip = this.floatChipContainer,
-			betsCtrl = betStore.betsCtrl;
+	restartGame(){
+		this.gameStore.activeChip = undefined;
+		this.gameStore.betTouchStart = false;
 
-		if( betStore.activeChip && !_tev.isActive(_tevStore.BET_TOUCH_START) ){
+		// Прописываем новый баланс. Добавляем в историю номер предыдущего розыгрыша
+
+		this.stage.interactive = true;
+
+		this.chipsController.enablePanel();
+		this.buttonsController.enablePanel();
+		this._cmpCtrls.gameField.enableField();
+
+		for(let key in this.gameStore.betsCtrl)
+			this.gameStore.betsCtrl[key].enableMove();
+
+		this._cmpCtrls.timeScale.start();
+
+		this._cmpCtrls.historyCtrl.play();
+	}
+
+	onTouchMove(event){
+		let fChip = this._cmpCtrls.fChip,
+			betsCtrl = this.gameStore.betsCtrl;
+
+		if( this.gameStore.activeChip && !this.gameStore.betTouchStart ){
 			// Если у нас есть активный тип ставки и если тачстарт начался не на существующей ставке
-			fChip.viewFloatChip(betStore.activeChip.value);
+			fChip.viewFloatChip(this.gameStore.activeChip.value);
 			fChip.setPosition( event.data.global );
 
-		} else if( _tev.isActive(_tevStore.BET_TOUCH_START) ){
+		} else if( this.gameStore.betTouchStart ){
 			// Если тачстарт начался с существующей ставки
 			let pos4Bet = this.getPosForBet(event.data.global, true);
 			let betStoreId = pos4Bet.x + '_' +pos4Bet.y;
@@ -157,14 +137,23 @@ export default class GameController {
 			let value = betsCtrl[betStoreId].getTopChipValue();
 
 			betsCtrl[betStoreId].updateBetView(-value);
-			betStore.activeChip = {value: value};
+			this.gameStore.activeChip = {value: value};
 
-			_tev.clearEvents();
+			this.gameStore.betTouchStart = false;
 		}
 	}
 
+	betTouchStart(event){
+		this.gameStore.betTouchStart = true;
+		// let betsCtrl = this.gameStore.betsCtrl;
+		// let pos4Bet = this.getPosForBet(event.data.global, true);
+		// let betStoreId = pos4Bet.x + '_' +pos4Bet.y;
+		//
+		// this.gameStore.activeChip = {value: betsCtrl[betStoreId].getTopChipValue()};
+	}
+
 	/**
-	 * Эта функция является коллбеков, который вызывается по событию touchEnd у компонента bet
+	 * Эта функция является коллбеком, который вызывается по событию touchEnd у компонента bet
 	 * (betView.touchEnd -> betCtrl.touchEnd -> onTouchEnd)
 	 * Описание:
 	 * Функция определяет, было ли событие touchEnd совершено над игровым полем.
@@ -180,9 +169,11 @@ export default class GameController {
 	 * @param event
 	 */
 	setBet(event){
+		this.gameStore.betTouchStart = false;
+
 		let pos4Bet = this.getPosForBet(event.data.global, true),
-			betsCtrl = betStore.betsCtrl,
-			chip = betStore.activeChip;
+			betsCtrl = this.gameStore.betsCtrl,
+			chip = this.gameStore.activeChip;
 
 		if(!chip && this.chipsController.getActiveChip()) chip = this.chipsController.getActiveChip().chipData();
 
@@ -194,23 +185,20 @@ export default class GameController {
 				betsCtrl[betStoreId].updateBetView(currentValue);
 			} else {
 				let configForBetCtrl = {
-					pos: pos4Bet,
-					value: currentValue,
-					onTouchEndCb: this.setBet,
-					onTouchStartCb: this.onTouchMove,
-					deleteBetCb: this.deleteBet,
-					ctx: this
-				};
+					pos: pos4Bet, value: currentValue,
+					setBet: this.setBet,
+					touchStart: this.betTouchStart,
+					delBet: this.deleteBet,
+					ctx: this};
 
 				let betController = new BetController(configForBetCtrl);
 				this.stage.addChild(betController.betSprite);
 				betsCtrl[betStoreId] = betController;
 			}
 		}
-		betStore.activeChip = undefined;
+		this.gameStore.activeChip = undefined;
 
 		this.clearTableBet();
-
 		this.updateBetModel();
 	}
 
@@ -218,17 +206,17 @@ export default class GameController {
 	 * Очищаем стол: скидываем размер ставки, скрываем белые кольца
 	 */
 	clearTableBet(){
- 		this.floatChipContainer.hideFloatChip();
-		this.gameField.hideHints();
+ 		this._cmpCtrls.fChip.hideFloatChip();
+		this._cmpCtrls.gameField.hideHints();
 	};
 
 	getPosForBet(pos, global){
-		return this.gameField.getPosForBet(pos, global);
+		return this._cmpCtrls.gameField.getPosForBet(pos, global);
 	}
 
 	deleteBet(betCtrl){
-		for(let ctrl in betStore.betsCtrl){
-			if(ctrl === betCtrl) delete betStore.betsCtrl[betCtrl];
+		for(let ctrl in this.gameStore.betsCtrl){
+			if(this.gameStore.betsCtrl[ctrl] === betCtrl) delete this.gameStore.betsCtrl[ctrl];
 		}
 	};
 
@@ -238,64 +226,90 @@ export default class GameController {
 	 * (не коллекцию контроллеров компонентов ставок)
 	 */
 	updateBetModel(){
+		let bet = 0;
+		for(let key in this.gameStore.betsCtrl)
+			bet += this.gameStore.betsCtrl[key].balance;
 
+		this._cmpCtrls.betPanelCtrl.updateInfoPanelView({fldBet: bet});
 	}
 
 
 	/**
 	 * Метод лочит панель фишек и кнопок по истечению времени
 	 */
-	disableChipsAndButtons(){
-		// TODO: если в момент окончания времени есть плавающая фишка - скрывать
+	lockTable(){
 		console.log('Вызываем методы блокировки фишек и кнопок ➠ ');
+		this.clearTableBet();
+
 		this.stage.interactive = false;
 
 		this.chipsController.disablePanel();
 		this.buttonsController.disablePanel();
-		this.gameField.disableField();
+		this._cmpCtrls.gameField.disableField();
 
-		for(let key in betStore.betsCtrl){
-			betStore.betsCtrl[key].disableMove();
-		}
+		for(let key in this.gameStore.betsCtrl)
+			this.gameStore.betsCtrl[key].disableMove();
+
+		// Рассчет выигрыша
+
+		setTimeout(() => {
+			this.restartGame();
+		}, 3000)
 	}
 
 
 	rollNumber(number){
-		this.gameField.showWinNum(number);
+		this._cmpCtrls.gameField.showWinNum(number);
 
 		setTimeout(() => {
-			this.gameField.hideWinNum();
+			this._cmpCtrls.gameField.hideWinNum();
 		}, 3000)
 	}
 
+
+	/**
+	 * ===========================   chips click callbacks  ================================
+	 */
+
+	chipClick(chip){
+		this.gameStore.activeChip = chip;
+	}
+
+	chipTouchStart(chip){
+		this.gameStore.activeChip = chip;
+	}
+
+	checkChips(){
+		return this.gameStore.activeChip
+	}
 
 
 	/**
 	 * ===========================   buttonPanel click callbacks  ================================
 	 */
 
-	btnPanelCancelCb(){
+	btnCancel(){
 		console.log('cancelClick (gameController)');
 	}
 
-	btnPanelClearCb(){
-		for(let key in betStore.betsCtrl){
-			let ctrl = betStore.betsCtrl[key];
+	btnClear(){
+		for(let key in this.gameStore.betsCtrl){
+			let ctrl = this.gameStore.betsCtrl[key];
 			ctrl.betSprite.removeChildren();
 
 			this.stage.removeChild(ctrl.betSprite);
 
-			delete betStore.betsCtrl[key];
+			delete this.gameStore.betsCtrl[key];
 		}
 	}
 
-	btnPanelRepeatCb(){
+	btnRepeat(){
 		console.log('repeatClick (gameController)');
 	}
 
-	btnPanelX2Cb(){
-		for(let key in betStore.betsCtrl){
-			let ctrl = betStore.betsCtrl[key],
+	btnX2(){
+		for(let key in this.gameStore.betsCtrl){
+			let ctrl = this.gameStore.betsCtrl[key],
 				value = ctrl.balance;
 
 			ctrl.updateBetView(value);

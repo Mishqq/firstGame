@@ -1,9 +1,10 @@
 import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
-import {spritesStore} from './../../spritesStore';
 import presets from './../../constants/presets';
 
 export default class FloatChipView {
 	constructor(config) {
+		this.cfg = config;
+
 		this.onTouchEndCb = (config.onTouchEndCb) ? config.onTouchEndCb : undefined;
 		this.cbCtx = (config.ctx) ? config.ctx : this;
 
@@ -19,7 +20,7 @@ export default class FloatChipView {
 		});
 
 		['chipSm0', 'chipSm1', 'chipSm2', 'chipSm3', 'chipSm4'].forEach((chipType)=>{
-			let floatChipSprite = new _pxS( spritesStore.chips[chipType] );
+			let floatChipSprite = new _pxS( presets.spriteStore.chips[chipType] );
 			// floatChipSprite.visible = false;
 			floatChipSprite.anchor.set(0.5);
 			this._floatChipsContainer.addChild(floatChipSprite);
@@ -42,9 +43,8 @@ export default class FloatChipView {
 	}
 
 	onTouchEnd(event){
-		this.onTouchEndCb ?
-			this.onTouchEndCb.call(this.cbCtx, event) :
-			console.log('floatChipTouchEnd (FloatChipView)');
+		// touchEnd в FloatChipController
+		this.cfg.touchEnd.call(this.cfg.ctx, event);
 	}
 
 	/**
