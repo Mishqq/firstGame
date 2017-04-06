@@ -70,6 +70,7 @@ export default class historyView {
 		_a.rollNumAnimation.gotoAndPlay(0);
 
 		setTimeout(() => {
+			// this.viewRollResult( 12 );
 			this.viewRollResult( _hf.randEl(presets.data.history.rollNumbers) );
 			_a.rollNumAnimation.gotoAndStop(0);
 
@@ -85,8 +86,8 @@ export default class historyView {
 		let _a = this._hisSprites;
 		_a.rollNumSprite = new _pxS(presets.spriteStore.bgNumbers[ _hf.colorType(colorBigNumMap, num) ]);
 
-		num = (num === 'zero') ? '0' : (num === 'doubleZero') ? '00' : num;
-		_hf.addTextToSprite(_a.rollNumSprite, {x: 84, y: 84}, num, presets.textStyles.historyPanel.big);
+		let text = (num === 'zero') ? '0' : (num === 'doubleZero') ? '00' : num;
+		_hf.addTextToSprite(_a.rollNumSprite, {x: 84, y: 84}, text, presets.textStyles.historyPanel.big);
 
 		_a.rollNumAnimation.visible = false;
 
@@ -103,7 +104,8 @@ export default class historyView {
 		_hs.numTape.unshift(newNum);
 		this._spriteContainer.addChildAt( newNum, 0 );
 
-		_hf.addTextToSprite(newNum, {x: 32, y: 32}, num, presets.textStyles.historyPanel.small);
+		let text = (num === 'zero') ? '0' : (num === 'doubleZero') ? '00' : num;
+		_hf.addTextToSprite(newNum, {x: 32, y: 32}, text, presets.textStyles.historyPanel.small);
 
 		// Сдвигаем все вниз
 		_hs.numTape.forEach((item, idx) => {

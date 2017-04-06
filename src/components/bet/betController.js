@@ -4,6 +4,8 @@ export default class BetController {
 	constructor(configByGameCtrl) {
 		this.cfg = configByGameCtrl;
 
+		this._numbers = this.cfg.type;
+
 		let config = {
 			pos: configByGameCtrl.pos,
 			touchStart: this.touchStart,
@@ -29,6 +31,14 @@ export default class BetController {
 	}
 
 	updateBetView(value){
+		let limit = this.cfg.limits[ this._numbers.length ];
+
+		if(value > 0 && this.balance === limit.max)
+			return false;
+
+		if(this.balance + value > limit.max)
+			value = limit.max - this.balance;
+
 		this._betView.updateBet(value);
 	}
 
@@ -61,5 +71,13 @@ export default class BetController {
 
 	enableMove(){
 		this._betView.enableMove();
+	}
+
+	clearBet(){
+		this._betView.clearBet();
+	}
+
+	get numbers(){
+		return this._numbers;
 	}
 }

@@ -80,7 +80,7 @@ export default class GameFieldController {
 	 * @param global - boolean, используем ли глобальные координаты, или координаты игрового поля
 	 * @returns {x, y}
 	 */
-	getPosForBet(pos, global){
+	getDataForBet(pos, global){
 		if(global){
 			pos.x -= presets.positions.fields.big.x;
 			pos.y -= presets.positions.fields.big.y;
@@ -88,14 +88,28 @@ export default class GameFieldController {
 
 		let cell = this.getCellFromPos(pos);
 
-		let center = {};
-		if(cell){
-			center = !global ? cell.center :
+		if(cell && !cell.cells){
+			// Если к ячейке привязаны только её координаты
+
+			let center = !global ? cell.center :
 				{x: cell.center.x + presets.positions.fields.big.x,
 					y: cell.center.y + presets.positions.fields.big.y};
-		}
 
-		return cell ? center : false;
+			return {center: center, numbers: cell.c};
+		} else if(cell && cell.cells) {
+			// Если к ячейке привязаны координаты других ячеек ~~SnakeBet
+			let centers = [];
+
+			cell.cells.forEach((item) => {
+				let center = !global ? item.center :
+					{x: item.center.x + presets.positions.fields.big.x,
+						y: item.center.y + presets.positions.fields.big.y};
+
+				centers.push({center: center, numbers: item.c})
+			});
+
+			return centers;
+		}
 	}
 
 	disableField(){

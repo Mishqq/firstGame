@@ -1,5 +1,6 @@
 let presets = {};
 
+let limits = {min: 100, max: 30000};
 
 let spriteGroups = ['chips', 'anums', 'bgNumbers', 'blights', 'buttons', 'fields', 'timer'];
 
@@ -25,10 +26,11 @@ presets.settings = {
 		time: 10,
 		changeColorPer: 0.25,
 		fps: 60,
-		lastTime: 4
+		lastTime: 3,
+		viewResTime: 3
 	},
 	history: {
-		rollTime: 14 // timeScale.time + timeScale.lastTime
+		rollTime: 13 // timeScale.time + timeScale.lastTime
 	}
 };
 
@@ -104,7 +106,7 @@ presets.data = {
 		3000:   "fChip4"
 	},
 	infoPanel: {
-		limitsPanel: {max: 30000, min: 10},
+		limitsPanel: {max: limits.max, min: limits.min},
 		hotNumPanel: [
 			{number: 34, amount: 37},
 			{number: 17, amount: 19},
@@ -182,6 +184,30 @@ presets.texts = {
 			pos: {x: 1450, y: 0}
 		}
 	}
+};
+
+presets.limits = {
+	min: limits.min,
+	max: limits.max,
+	1:  {min: limits.min || 100, max: 5000},
+	2:  {min: limits.min || 100, max: 5000},
+	3:  {min: limits.min || 100, max: 5000},
+	4:  {min: limits.min || 100, max: 5000},
+	5:  {min: limits.min || 100, max: 5000},
+	6:  {min: limits.min || 100, max: 5000},
+	12: {min: limits.min || 100, max: 5000},
+	18: {min: limits.min || 100, max: 5000}
+};
+
+presets.coefficients = {
+	1:  35, // single num
+	2:  18, // 2 num
+	3:  12, // column (3 num)
+	4:  9,  // 4 num
+	5:  6,  // basket (5 num)
+	6:  6,  // 2 columns,
+	12: 3,  // row / dozen
+	18: 2   // odd / even / red / black / 1-18 / 19-36
 };
 
 

@@ -88,6 +88,18 @@ function randEl(arr){
 	return arr[Math.floor(Math.random() * arr.length)];
 }
 
+/**
+ * Возвращаем класс сущности
+ * @param ent
+ * @returns {string}
+ */
+function getClass(ent){
+	let str = Object.prototype.toString.call(ent);
+	let type = str.substr(8, str.length-9).toLowerCase();
+
+	return type;
+}
+
 
 let _hf = {
 	isPosInBounds,
@@ -95,7 +107,8 @@ let _hf = {
 	formatLimit,
 	colorType,
 	addTextToSprite,
-	randEl
+	randEl,
+	getClass
 };
 
 export {_hf};

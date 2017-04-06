@@ -1,7 +1,7 @@
 import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
 import presets from './../../constants/presets';
 import {_hf} from './../../servises/helpFunctions'
-import {_tevStore, _tev} from './../../servises/touchEvents'
+import {TweenMax, Power2, TimelineLite} from "gsap";
 
 let smallChipTypes = {
 	chipSm0: presets.data.chipValues.chip0,
@@ -162,5 +162,10 @@ export default class BetView {
 
 	enableMove(){
 		this.betViewContainer.interactive = true;
+	}
+
+
+	clearBet(){
+		let tween = new TweenLite(this._betContainer, 1, {x:0, y:0, alpha: 0});
 	}
 }

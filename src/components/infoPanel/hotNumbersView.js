@@ -1,5 +1,6 @@
 import {_pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
 import presets from './../../constants/presets';
+import _hf from './../../servises/helpFunctions';
 
 export default class hotNumPanel {
 	constructor(numbers) {
@@ -89,6 +90,8 @@ export default class hotNumPanel {
 	 * @param param
 	 */
 	updateView(param){
+		//TODO Проверить работоспособность _hf.getClass(param)
+
 		let str = Object.prototype.toString.call(param);
 		let type = str.substr(8, str.length-9).toLowerCase();
 
