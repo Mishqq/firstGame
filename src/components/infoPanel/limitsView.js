@@ -1,6 +1,6 @@
 import {_pxC, _pxT, _pxEx, _pxG} from './../../constants/PIXIabbr';
 import presets from './../../constants/presets';
-import {_hf} from './../../servises/helpFunctions';
+import {_hf} from '../../services/helpFunctions';
 
 
 export default class limitsPanel {

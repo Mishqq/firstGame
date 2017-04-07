@@ -1,6 +1,6 @@
 import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
 import presets from './../../constants/presets';
-import {_hf} from './../../servises/helpFunctions';
+import {_hf} from '../../services/helpFunctions';
 import {TweenMax, Power2, TimelineLite} from "gsap";
 
 let colorBigNumMap = {

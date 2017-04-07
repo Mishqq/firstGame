@@ -1,6 +1,6 @@
 import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
 import presets from './../../constants/presets';
-import {gameSounds} from '../../servises/resourseLoader';
+import {gameSounds} from '../../services/resourseLoader';
 
 export default class ButtonView {
 	constructor(btnType, config) {

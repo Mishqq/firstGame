@@ -31,7 +31,7 @@ let clickAreas = [
 	{x:1287, y:82, w:78, h: cs.h, c:[35,36]}, {x:1287, y:0, w: 78, h: cs.h+30, c:[36]},
 ];
 
-// templates for other filed cells
+// templates for other field cells
 let rows = {
 	odd: [
 		{x: cs.odds, y:290, w: cs.w-1, h: cs.h, c:[1,2,3]}, {x: cs.odds, y:238, w: cs.w-1, h: cs.h, c:[1]},

@@ -37975,7 +37975,7 @@
 	// 34,35,36
 	{ x: 1287, y: 290, w: 53, h: cs.h, c: [34, 35, 36] }, { x: 1287, y: 238, w: 78, h: cs.h, c: [34] }, { x: 1287, y: 186, w: 78, h: cs.h, c: [34, 35] }, { x: 1287, y: 134, w: 78, h: cs.h, c: [35] }, { x: 1287, y: 82, w: 78, h: cs.h, c: [35, 36] }, { x: 1287, y: 0, w: 78, h: cs.h + 30, c: [36] }];
 	
-	// templates for other filed cells
+	// templates for other field cells
 	var rows = {
 		odd: [{ x: cs.odds, y: 290, w: cs.w - 1, h: cs.h, c: [1, 2, 3] }, { x: cs.odds, y: 238, w: cs.w - 1, h: cs.h, c: [1] }, { x: cs.odds, y: 186, w: cs.w - 1, h: cs.h, c: [1, 2] }, { x: cs.odds, y: 134, w: cs.w - 1, h: cs.h, c: [2] }, { x: cs.odds, y: 82, w: cs.w - 1, h: cs.h, c: [2, 3] }, { x: cs.odds, y: 0, w: cs.w - 1, h: cs.h + 30, c: [3] }],
 		even: [{ x: cs.evs, y: 290, w: cs.w, h: cs.h, c: [1, 2, 3, 4, 5, 6] }, { x: cs.evs, y: 238, w: cs.w, h: cs.h, c: [1, 4] }, { x: cs.evs, y: 186, w: cs.w, h: cs.h, c: [1, 2, 4, 5] }, { x: cs.evs, y: 134, w: cs.w, h: cs.h, c: [2, 5] }, { x: cs.evs, y: 82, w: cs.w, h: cs.h, c: [2, 3, 5, 6] }, { x: cs.evs, y: 0, w: cs.w, h: cs.h + 30, c: [3, 6] }]

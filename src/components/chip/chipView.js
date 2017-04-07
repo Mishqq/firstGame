@@ -1,7 +1,7 @@
 import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
 import presets from './../../constants/presets';
-import {_hf} from './../../servises/helpFunctions';
-import {gameSounds} from '../../servises/resourseLoader';
+import {_hf} from '../../services/helpFunctions';
+import {gameSounds} from '../../services/resourseLoader';
 
 export default class ChipView {
 	constructor(chipType, config) {

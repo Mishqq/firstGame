@@ -1,11 +1,11 @@
 import PIXI from 'pixi.js';
 import plugins from './../plugins';
 import Game from './../Game';
-import {assetLoader, gameSounds} from '../servises/resourseLoader'
+import {assetLoader, gameSounds} from '../services/resourseLoader'
 import presets from './../constants/presets'
 
-import GameStore from '../servises/gameStore';
-import {_hf} from '../servises/helpFunctions';
+import GameStore from '../services/gameStore';
+import {_hf} from '../services/helpFunctions';
 
 // Components
 import Background           from './../components/background/background';
