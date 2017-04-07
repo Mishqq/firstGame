@@ -47,16 +47,16 @@ presets.positions = {
 		chip4: {x: 1280, y: 957}
 	},
 	buttons: {
-		btnCancel:     {x: 180, y: 934},
-		btnClear:       {x: 410, y: 934},
-		btnRepeat:      {x: 1450, y: 934},
-		btnX2:          {x: 1570, y: 934}
+		btnCancel:      {x: 180, y: 934},
+		btnClear:       {x: 350, y: 934},
+		btnRepeat:      {x: 1470, y: 934},
+		btnX2:          {x: 1590, y: 934}
 	},
 	fields: {
-		big: {x: 200, y: 350},
+		big: {x: 200, y: 370},
 		small: {x: 1200, y: 300}
 	},
-	timeScale: {x: 725, y: 320},
+	timeScale: {x: 725, y: 347},
 	infoPanel: {
 		main: {x: 250, y: 120},
 		limitsPanel: {x: 0, y: 0}, // Относительно infoPanel.main
@@ -144,26 +144,26 @@ presets.texts = {
 	},
 	infoPanel: {
 		limitBlock: [
-			{type: 'labelText',     text: 'ЛИМИТЫ СТОЛА',       x: 110, y: 10},
-			{type: 'gradientText',  text: 'CASINO ROULETTE',    x: 70,  y: 40},
+			{type: 'labelText',     text: 'ЛИМИТЫ СТОЛА',       x: 120, y: 15},
+			{type: 'gradientText',  text: 'CASINO ROULETTE',    x: 90,  y: 40},
 			{type: 'gradientText',  text: 'MAX:',               x: 25,  y: 95},
 			{type: 'gradientText',  text: 'MIN:',               x: 25,  y: 140}
 		],
 		hotNumbers: [
-			{type: 'labelText',     text: 'ЗА ПОСЛЕДНИЕ 100 ИГР',   x: 60, y: 10},
-			{type: 'gradientText',  text: 'ГОРЯЧИЕ НОМЕРА',         x: 70,  y: 40}
+			{type: 'labelText',     text: 'ЗА ПОСЛЕДНИЕ 100 ИГР',   x: 80, y: 15},
+			{type: 'gradientText',  text: 'ГОРЯЧИЕ НОМЕРА',         x: 80,  y: 40}
 		],
 		coldNumbers: [
-			{type: 'labelText',     text: 'ЗА ПОСЛЕДНИЕ 100 ИГР',   x: 60, y: 10},
-			{type: 'gradientText',  text: 'ХОЛОДНЫЕ НОМЕРА',        x: 50,  y: 40}
+			{type: 'labelText',     text: 'ЗА ПОСЛЕДНИЕ 100 ИГР',   x: 80, y: 15},
+			{type: 'gradientText',  text: 'ХОЛОДНЫЕ НОМЕРА',        x: 70, y: 40}
 		],
 		otherNumbers: [
-			{type: 'labelText',     text: 'ЗА ПОСЛЕДНИЕ 50 ИГР',   x: 60, y: 10},
+			{type: 'labelText',     text: 'ЗА ПОСЛЕДНИЕ 50 ИГР',   x: 85, y: 15},
 			{type: 'gradientText',  text: 'RED',   x: 60, y: 40},
-			{type: 'gradientText',  text: 'BLACK', x: 210,  y: 40},
-			{type: 'gradientText',  text: 'ODD',   x: 30,  y: 120},
+			{type: 'gradientText',  text: 'BLACK', x: 220,  y: 40},
+			{type: 'gradientText',  text: 'ODD',   x: 40,  y: 120},
 			{type: 'gradientText',  text: '0',     x: 150,  y: 120},
-			{type: 'gradientText',  text: 'EVEN',  x: 240,  y: 120}
+			{type: 'gradientText',  text: 'EVEN',  x: 250,  y: 120}
 		]
 	},
 	button: {
@@ -243,17 +243,17 @@ presets.textStyles = {
 		strokeThickness: 5
 	},
 	timeScale: {
-		font: "normal 36px Arial",
+		font: "normal 26px Arial",
 		fontVariant: 'small-caps',
 		wordWrapWidth: 0,
 		fill: 'white',
 	},
 	infoPanel: {
-		gradientText: {font: "24px info"},
-		whiteText: {font: "normal 24px Arial", fill: 'white'},
-		labelText: {font: "bold 18px Arial", fill: 'yellow', align: 'center'},
-		number: {font: 'normal 30px Arial', fill: 'white', align: 'center'},
-		amount: {font: 'normal 26px Arial', fill: 'white'}
+		gradientText: {font: "20px info"},
+		whiteText: {font: "normal 18px Arial", fill: 'white'},
+		labelText: {font: "bold 14px Arial", fill: 0xFFE144, align: 'center'},
+		number: {font: 'normal 26px Arial', fill: 'white', align: 'center'},
+		amount: {font: 'normal 22px Arial', fill: 'white'}
 	},
 	betPanel: {
 		font: "normal 24px Arial",

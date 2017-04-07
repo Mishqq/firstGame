@@ -27,7 +27,7 @@ export default class TimeScaleView {
 		let pixiText = new _pxT(statusText['status' + this.state], presets.textStyles.timeScale);
 		pixiText.anchor.set(0.5);
 		pixiText.x = spriteContainer.width/2;
-		pixiText.y = -30;
+		pixiText.y = -20;
 		spriteContainer.addChild( pixiText );
 		this.sprites.text = pixiText;
 	}
