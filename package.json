@@ -30,6 +30,7 @@
   "dependencies": {
     "gsap": "^1.19.1",
     "pixi-animationloop": "^1.0.9",
-    "pixi.js": "^3.0.8"
+    "pixi.js": "^3.0.8",
+    "yuki-createjs": "0.0.3"
   }
 }

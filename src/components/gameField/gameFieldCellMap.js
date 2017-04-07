@@ -1,5 +1,5 @@
 // Размер ячейки
-let cs = {w: 53, h:52, evs: 184, odds: 132};
+let cs = {w: 53, h:53, evs: 184, odds: 132};
 
 let clickAreas = [
 	{type: 'zero', x:0, y:0, w:80, h:158, c:['doubleZero']}, //zero
@@ -29,15 +29,6 @@ let clickAreas = [
 	{x:1287, y:290, w:53, h: cs.h, c:[34,35,36]}, {x:1287, y:238, w:78, h: cs.h, c:[34]},
 	{x:1287, y:186, w:78, h: cs.h, c:[34,35]}, {x:1287, y:134, w:78, h: cs.h, c:[35]},
 	{x:1287, y:82, w:78, h: cs.h, c:[35,36]}, {x:1287, y:0, w: 78, h: cs.h+30, c:[36]},
-
-	// snake
-	// {x:1340, y:290, w:54, h:52, c:[1,5,9,12,14,16,19,23,27,30,32,34]}
-	// {x:1340, y:290, w:54, h:52, c:[1,5,9,12,14,16,19,23,27,30,32,34], pos: [
-	// 	{x: 1287, y: 238}, {x: 1182, y: 134}, {x: 1077, y: 0},
-	// 	{x: 972, y: 0}, {x: 867, y: 134}, {x: 762, y: 238},
-	// 	{x: 657, y: 238}, {x: 552, y: 134}, {x: 447, y: 0},
-	// 	{x: 342, y: 0}, {x: 237, y: 134}, {x: 132, y: 238}
-	// ]}
 ];
 
 // templates for other filed cells
@@ -45,7 +36,7 @@ let rows = {
 	odd: [
 		{x: cs.odds, y:290, w: cs.w-1, h: cs.h, c:[1,2,3]}, {x: cs.odds, y:238, w: cs.w-1, h: cs.h, c:[1]},
 		{x: cs.odds, y:186, w: cs.w-1, h: cs.h, c:[1,2]}, {x: cs.odds, y:134, w: cs.w-1, h: cs.h, c:[2]},
-		{x: cs.odds, y:82, w: cs.w-1, h: cs.h, c:[2,3]}, {x: cs.odds, y:0, w: cs.w-1, h:82, c:[3]}
+		{x: cs.odds, y:82, w: cs.w-1, h: cs.h, c:[2,3]}, {x: cs.odds, y:0, w: cs.w-1, h:cs.h+30, c:[3]}
 	],
 	even: [
 		{x: cs.evs, y:290, w: cs.w, h: cs.h, c:[1,2,3,4,5,6]}, {x: cs.evs, y:238, w: cs.w, h: cs.h, c:[1,4]},

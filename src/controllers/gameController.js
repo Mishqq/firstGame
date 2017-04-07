@@ -1,7 +1,7 @@
 import PIXI from 'pixi.js';
 import plugins from './../plugins';
 import Game from './../Game';
-import assetLoader from './../assetsLoader'
+import {assetLoader, gameSounds} from '../servises/resourseLoader'
 import presets from './../constants/presets'
 
 import GameStore from '../servises/gameStore';
@@ -100,7 +100,7 @@ export default class GameController {
 
 
 			game.start();
-		});
+		}, this);
 	};
 
 	restartGame(){
@@ -273,8 +273,10 @@ export default class GameController {
 			this.gameStore.betsCtrl[key].disableMove();
 
 		setTimeout(() => {
-			for(let key in this.gameStore.betsCtrl)
+			for(let key in this.gameStore.betsCtrl){
 				this.gameStore.betsCtrl[key].clearBet();
+				gameSounds.play('sound03');
+			}
 		}, 2000);
 
 		setTimeout(() => {
@@ -293,6 +295,7 @@ export default class GameController {
 
 		// Рассчет выигрыша
 		let win = this.calculateWin(number);
+		if(win) gameSounds.play('sound06');
 
 		setTimeout(() => {
 			if(win) this._cmpCtrls.betPanelCtrl.updateInfoPanelView({fldWin: win});

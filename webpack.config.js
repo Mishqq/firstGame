@@ -20,7 +20,7 @@ module.exports = {
 	devtool: 'source-map',
 	entry: ['pixi.js', './src/index.js'],
 	output: {
-		filename: 'build/game.js'
+		filename: 'app/game.js'
 	},
 	resolve: {
 		extensions: ["", ".js"]
@@ -38,6 +38,10 @@ module.exports = {
 				include: path.join(__dirname, 'node_modules', 'pixi.js'),
 				loader: 'json',
 			},
+			// {
+			// 	test: require.resolve('createjs-easeljs'),
+			// 	loader: 'imports?this=>window!exports?window.createjs'
+			// },
 			{
 				test: /\.js$/,
 				exclude: path.join(__dirname, 'node_modules'),

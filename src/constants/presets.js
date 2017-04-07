@@ -23,14 +23,14 @@ presets.settings = {
 		}
 	},
 	timeScale: {
-		time: 10,
+		time: 35,
 		changeColorPer: 0.25,
 		fps: 60,
-		lastTime: 3,
-		viewResTime: 3
+		lastTime: 5,
+		viewResTime: 5
 	},
 	history: {
-		rollTime: 13 // timeScale.time + timeScale.lastTime
+		rollTime: 40 // timeScale.time + timeScale.lastTime
 	}
 };
 
