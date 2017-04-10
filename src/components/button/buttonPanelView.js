@@ -1,6 +1,5 @@
 import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
 import presets from './../../constants/presets';
-import {gameSounds} from '../../services/resourseLoader';
 
 export default class ButtonView {
 	constructor(btnType, config) {
@@ -39,7 +38,7 @@ export default class ButtonView {
 	onClick(){
 		this.btnDefault();
 
-		gameSounds.play('sound02');
+		presets.gameSounds.play('sound02');
 
 		if(this.onClickCb) {
 			this.onClickCb.call(this.cbCtx, 'lol');

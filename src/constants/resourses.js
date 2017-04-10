@@ -7,6 +7,7 @@ const resourses = {
 		'bg_numbers.json',
 		'blights.json',
 		'buttons.json',
+		'bet.json',
 		'chips.json',
 		'fields.json',
 		'timer.json',
@@ -30,6 +31,11 @@ const resourses = {
 			a14: 'a14',
 			a15: 'a15',
 			a16: 'a16'
+		},
+		bet: {
+			bet1: 'bet1',
+			bet2: 'bet2',
+			bet3: 'bet3'
 		},
 		chips: {
 			chip0:      'chip0',

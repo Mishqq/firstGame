@@ -2,12 +2,10 @@ let presets = {};
 
 let limits = {min: 100, max: 30000};
 
-let spriteGroups = ['chips', 'anums', 'bgNumbers', 'blights', 'buttons', 'fields', 'timer'];
-
+/**
+ * Хранилище спрайтов
+ */
 presets.spriteStore = {};
-spriteGroups.forEach((item)=>{
-	presets.spriteStore[item] = {};
-});
 
 
 /**
@@ -49,13 +47,14 @@ presets.positions = {
 	buttons: {
 		btnCancel:      {x: 180, y: 934},
 		btnClear:       {x: 350, y: 934},
-		btnRepeat:      {x: 1470, y: 934},
-		btnX2:          {x: 1590, y: 934}
+		btnRepeat:      {x: 1430, y: 934},
+		btnX2:          {x: 1550, y: 934}
 	},
 	fields: {
 		big: {x: 200, y: 370},
 		small: {x: 1200, y: 300}
 	},
+	betButton: {x: 1615, y: 770},
 	timeScale: {x: 725, y: 347},
 	infoPanel: {
 		main: {x: 250, y: 120},

@@ -1,7 +1,6 @@
 import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
 import presets from './../../constants/presets';
 import {_hf} from '../../services/helpFunctions';
-import {gameSounds} from '../../services/resourseLoader';
 
 export default class ChipView {
 	constructor(chipType, config) {
@@ -65,7 +64,7 @@ export default class ChipView {
 	}
 
 	chipTouchStart(){
-		gameSounds.play('sound02');
+		presets.gameSounds.play('sound02');
 		// chipTouchStart в ChipController
 		this.cfg.touchStart.call(this.cfg.ctx, this.chipValue);
 	}

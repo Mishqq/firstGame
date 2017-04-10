@@ -5,7 +5,7 @@ export default class betButtonController {
 		// Конфиг, пришедший от контроллера выше
 		this._cfg = cfgFromGameCtrl;
 
-		this.btn = new betButtonView();
+		this.btn = new betButtonView({click: this.click, ctx: this});
 	}
 
 	get pixiSprite(){
@@ -21,6 +21,7 @@ export default class betButtonController {
 	}
 
 	click(){
-
+		// betBtnClick in GameController
+		this._cfg.betBtnClick.call( this._cfg.ctx )
 	}
 }

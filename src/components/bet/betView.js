@@ -2,7 +2,6 @@ import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
 import presets from './../../constants/presets';
 import {_hf} from '../../services/helpFunctions'
 import {TweenMax, Power2, TimelineLite} from "gsap";
-import {gameSounds} from '../../services/resourseLoader';
 
 let smallChipTypes = {
 	chipSm0: presets.data.chipValues.chip0,
@@ -17,7 +16,7 @@ export default class BetView {
 	constructor(config, value) {
 		this.cfg = config;
 
-		gameSounds.play('sound01');
+		presets.gameSounds.play('sound01');
 
 		this._summ = (value) ? value : 0;
 
@@ -69,7 +68,7 @@ export default class BetView {
 	}
 
 	onTouchStart(event){
-		gameSounds.play('sound02');
+		presets.gameSounds.play('sound02');
 		// метод touchStart в BetController
 		this.cfg.touchStart.call(this.cfg.ctx, event, true);
 	}
@@ -111,7 +110,7 @@ export default class BetView {
 			spriteContainer.children[ spriteContainer.children.length-1 ].addChild(chipValueText);
 		}
 
-		gameSounds.play('sound01');
+		presets.gameSounds.play('sound01');
 
 		this.cfg.updateBetModel.call(this.cfg.ctx);
 	}

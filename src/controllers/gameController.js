@@ -1,7 +1,7 @@
 import PIXI from 'pixi.js';
 import plugins from './../plugins';
 import Game from './../Game';
-import {assetLoader, gameSounds} from '../services/resourseLoader'
+import {assetLoader} from '../services/resourseLoader'
 import presets from './../constants/presets'
 
 import GameStore from '../services/gameStore';
@@ -17,6 +17,7 @@ import BetController        from './../components/bet/betController';
 import TimeScaleController  from './../components/timeScale/timeScaleController';
 import infoPanelController  from './../components/infoPanel/infoPanelController';
 import betPanelController   from './../components/betPanel/betPanelController';
+import betButtonController  from './../components/betButton/betButtonController';
 import historyController    from './../components/history/historyController';
 
 /**
@@ -25,6 +26,8 @@ import historyController    from './../components/history/historyController';
 export default class GameController {
 	constructor(){
 		this.game = new Game(presets.settings.game);
+
+		this.confirmedBets = {};
 	}
 
 	init(){
@@ -77,6 +80,9 @@ export default class GameController {
 			});
 
 			// Плавающая фишка
+			this._cmpCtrls.betBtn = new betButtonController({betBtnClick: this.betBtnClick, ctx: this});
+
+			// Плавающая фишка
 			this._cmpCtrls.fChip = new FloatChipController({setBet: this.setBet, ctx: this});
 
 			// Шкала-таймер
@@ -123,6 +129,8 @@ export default class GameController {
 		this._cmpCtrls.timeScale.start();
 
 		this._cmpCtrls.historyCtrl.play();
+
+		this._cmpCtrls.betBtn.enable();
 	}
 
 	onTouchMove(event){
@@ -260,7 +268,6 @@ export default class GameController {
 	 * Метод лочит панель фишек и кнопок по истечению времени
 	 */
 	lockTable(){
-		console.log('Вызываем методы блокировки фишек и кнопок ➠ ');
 		this.clearTableBet();
 
 		this.stage.interactive = false;
@@ -269,13 +276,15 @@ export default class GameController {
 		this.buttonsController.disablePanel();
 		this._cmpCtrls.gameField.disableField();
 
+		this._cmpCtrls.betBtn.disable();
+
 		for(let key in this.gameStore.betsCtrl)
 			this.gameStore.betsCtrl[key].disableMove();
 
 		setTimeout(() => {
 			for(let key in this.gameStore.betsCtrl){
 				this.gameStore.betsCtrl[key].clearBet();
-				gameSounds.play('sound03');
+				presets.gameSounds.play('sound03');
 			}
 		}, 2000);
 
@@ -295,7 +304,7 @@ export default class GameController {
 
 		// Рассчет выигрыша
 		let win = this.calculateWin(number);
-		if(win) gameSounds.play('sound06');
+		if(win) presets.gameSounds.play('sound06');
 
 		setTimeout(() => {
 			if(win) this._cmpCtrls.betPanelCtrl.updateInfoPanelView({fldWin: win});
@@ -371,5 +380,22 @@ export default class GameController {
 
 			ctrl.updateBetView(value);
 		}
+	}
+
+	betBtnClick(){
+		this.confirmedBets = {};
+
+		this.clearTableBet();
+
+		this.stage.interactive = false;
+
+		this.chipsController.disablePanel();
+		this.buttonsController.disablePanel();
+		this._cmpCtrls.gameField.disableField();
+
+		for(let key in this.gameStore.betsCtrl)
+			this.gameStore.betsCtrl[key].disableMove();
+
+		this._cmpCtrls.betBtn.disable();
 	}
 }

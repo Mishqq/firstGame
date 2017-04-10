@@ -28298,7 +28298,11 @@
 	
 	var _betPanelController2 = _interopRequireDefault(_betPanelController);
 	
-	var _historyController = __webpack_require__(170);
+	var _betButtonController = __webpack_require__(170);
+	
+	var _betButtonController2 = _interopRequireDefault(_betButtonController);
+	
+	var _historyController = __webpack_require__(172);
 	
 	var _historyController2 = _interopRequireDefault(_historyController);
 	
@@ -28314,6 +28318,8 @@
 			_classCallCheck(this, GameController);
 	
 			this.game = new _Game2.default(_presets2.default.settings.game);
+	
+			this.confirmedBets = {};
 		}
 	
 		_createClass(GameController, [{
@@ -28368,6 +28374,9 @@
 					});
 	
 					// Плавающая фишка
+					_this._cmpCtrls.betBtn = new _betButtonController2.default({ betBtnClick: _this.betBtnClick, ctx: _this });
+	
+					// Плавающая фишка
 					_this._cmpCtrls.fChip = new _floatChipController2.default({ setBet: _this.setBet, ctx: _this });
 	
 					// Шкала-таймер
@@ -28409,6 +28418,8 @@
 				}this._cmpCtrls.timeScale.start();
 	
 				this._cmpCtrls.historyCtrl.play();
+	
+				this._cmpCtrls.betBtn.enable();
 			}
 		}, {
 			key: 'onTouchMove',
@@ -28565,7 +28576,6 @@
 			value: function lockTable() {
 				var _this3 = this;
 	
-				console.log('Вызываем методы блокировки фишек и кнопок ➠ ');
 				this.clearTableBet();
 	
 				this.stage.interactive = false;
@@ -28574,12 +28584,14 @@
 				this.buttonsController.disablePanel();
 				this._cmpCtrls.gameField.disableField();
 	
+				this._cmpCtrls.betBtn.disable();
+	
 				for (var key in this.gameStore.betsCtrl) {
 					this.gameStore.betsCtrl[key].disableMove();
 				}setTimeout(function () {
 					for (var _key2 in _this3.gameStore.betsCtrl) {
 						_this3.gameStore.betsCtrl[_key2].clearBet();
-						_resourseLoader.gameSounds.play('sound03');
+						_presets2.default.gameSounds.play('sound03');
 					}
 				}, 2000);
 	
@@ -28604,7 +28616,7 @@
 	
 				// Рассчет выигрыша
 				var win = this.calculateWin(number);
-				if (win) _resourseLoader.gameSounds.play('sound06');
+				if (win) _presets2.default.gameSounds.play('sound06');
 	
 				setTimeout(function () {
 					if (win) _this4._cmpCtrls.betPanelCtrl.updateInfoPanelView({ fldWin: win });
@@ -28692,6 +28704,23 @@
 	
 					ctrl.updateBetView(value);
 				}
+			}
+		}, {
+			key: 'betBtnClick',
+			value: function betBtnClick() {
+				this.confirmedBets = {};
+	
+				this.clearTableBet();
+	
+				this.stage.interactive = false;
+	
+				this.chipsController.disablePanel();
+				this.buttonsController.disablePanel();
+				this._cmpCtrls.gameField.disableField();
+	
+				for (var key in this.gameStore.betsCtrl) {
+					this.gameStore.betsCtrl[key].disableMove();
+				}this._cmpCtrls.betBtn.disable();
 			}
 		}]);
 	
@@ -28807,7 +28836,7 @@
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.gameSounds = exports.assetLoader = undefined;
+	exports.assetLoader = undefined;
 	
 	var _pixi = __webpack_require__(1);
 	
@@ -28828,7 +28857,7 @@
 	/**
 	 * Звуки
 	 */
-	var gameSounds = {};
+	_presets2.default.gameSounds = {};
 	// import 'yuki-createjs'
 	
 	var soundPath = './assets/audio/';
@@ -28837,7 +28866,7 @@
 		soundsArr.push({ src: "0" + i + ".ogg", id: "sound0" + i });
 	}var p1 = new Promise(function (resolve, reject) {
 		createjs.Sound.on("fileload", function () {
-			exports.gameSounds = gameSounds = createjs.Sound;
+			_presets2.default.gameSounds = createjs.Sound;
 			resolve();
 		});
 	});
@@ -28872,6 +28901,8 @@
 			for (var key in _resourses2.default.namesMap) {
 				var spriteGroup = _resourses2.default.namesMap[key]; // anums, chips, bgNumbers...
 	
+				_presets2.default.spriteStore[key] = {};
+	
 				for (var keyInGroup in spriteGroup) {
 					// keyInGroup for chips: chip0, chipSm0, chip1...
 					_presets2.default.spriteStore[key][keyInGroup] = _pixi2.default.utils.TextureCache[spriteGroup[keyInGroup]];
@@ -28890,7 +28921,6 @@
 	};
 	
 	exports.assetLoader = assetLoader;
-	exports.gameSounds = gameSounds;
 
 /***/ },
 /* 140 */
@@ -28905,7 +28935,7 @@
 		path: {
 			assets: './assets/'
 		},
-		loadAssets: ['anums.json', 'bg_numbers.json', 'blights.json', 'buttons.json', 'chips.json', 'fields.json', 'timer.json', 'info.xml'],
+		loadAssets: ['anums.json', 'bg_numbers.json', 'blights.json', 'buttons.json', 'bet.json', 'chips.json', 'fields.json', 'timer.json', 'info.xml'],
 		namesMap: {
 			anums: {
 				a1: 'a1',
@@ -28924,6 +28954,11 @@
 				a14: 'a14',
 				a15: 'a15',
 				a16: 'a16'
+			},
+			bet: {
+				bet1: 'bet1',
+				bet2: 'bet2',
+				bet3: 'bet3'
 			},
 			chips: {
 				chip0: 'chip0',
@@ -29013,12 +29048,10 @@
 	
 	var limits = { min: 100, max: 30000 };
 	
-	var spriteGroups = ['chips', 'anums', 'bgNumbers', 'blights', 'buttons', 'fields', 'timer'];
-	
+	/**
+	 * Хранилище спрайтов
+	 */
 	presets.spriteStore = {};
-	spriteGroups.forEach(function (item) {
-		presets.spriteStore[item] = {};
-	});
 	
 	/**
 	 * Настройки для компонентов
@@ -29058,13 +29091,14 @@
 		buttons: {
 			btnCancel: { x: 180, y: 934 },
 			btnClear: { x: 350, y: 934 },
-			btnRepeat: { x: 1470, y: 934 },
-			btnX2: { x: 1590, y: 934 }
+			btnRepeat: { x: 1430, y: 934 },
+			btnX2: { x: 1550, y: 934 }
 		},
 		fields: {
 			big: { x: 200, y: 370 },
 			small: { x: 1200, y: 300 }
 		},
+		betButton: { x: 1615, y: 770 },
 		timeScale: { x: 725, y: 347 },
 		infoPanel: {
 			main: { x: 250, y: 120 },
@@ -46066,8 +46100,6 @@
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
-	var _resourseLoader = __webpack_require__(139);
-	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -46111,7 +46143,7 @@
 			value: function onClick() {
 				this.btnDefault();
 	
-				_resourseLoader.gameSounds.play('sound02');
+				_presets2.default.gameSounds.play('sound02');
 	
 				if (this.onClickCb) {
 					this.onClickCb.call(this.cbCtx, 'lol');
@@ -46387,8 +46419,6 @@
 	
 	var _helpFunctions = __webpack_require__(144);
 	
-	var _resourseLoader = __webpack_require__(139);
-	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -46448,7 +46478,7 @@
 		}, {
 			key: 'chipTouchStart',
 			value: function chipTouchStart() {
-				_resourseLoader.gameSounds.play('sound02');
+				_presets2.default.gameSounds.play('sound02');
 				// chipTouchStart в ChipController
 				this.cfg.touchStart.call(this.cfg.ctx, this.chipValue);
 			}
@@ -46871,8 +46901,6 @@
 	
 	var _gsap = __webpack_require__(150);
 	
-	var _resourseLoader = __webpack_require__(139);
-	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -46893,7 +46921,7 @@
 	
 			this.cfg = config;
 	
-			_resourseLoader.gameSounds.play('sound01');
+			_presets2.default.gameSounds.play('sound01');
 	
 			this._summ = value ? value : 0;
 	
@@ -46941,7 +46969,7 @@
 		}, {
 			key: 'onTouchStart',
 			value: function onTouchStart(event) {
-				_resourseLoader.gameSounds.play('sound02');
+				_presets2.default.gameSounds.play('sound02');
 				// метод touchStart в BetController
 				this.cfg.touchStart.call(this.cfg.ctx, event, true);
 			}
@@ -46986,7 +47014,7 @@
 					spriteContainer.children[spriteContainer.children.length - 1].addChild(chipValueText);
 				}
 	
-				_resourseLoader.gameSounds.play('sound01');
+				_presets2.default.gameSounds.play('sound01');
 	
 				this.cfg.updateBetModel.call(this.cfg.ctx);
 			}
@@ -48164,7 +48192,172 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _historyView = __webpack_require__(171);
+	var _betButtonView = __webpack_require__(171);
+	
+	var _betButtonView2 = _interopRequireDefault(_betButtonView);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var betButtonController = function () {
+		function betButtonController(cfgFromGameCtrl) {
+			_classCallCheck(this, betButtonController);
+	
+			// Конфиг, пришедший от контроллера выше
+			this._cfg = cfgFromGameCtrl;
+	
+			this.btn = new _betButtonView2.default({ click: this.click, ctx: this });
+		}
+	
+		_createClass(betButtonController, [{
+			key: 'disable',
+			value: function disable() {
+				return this.btn.disable();
+			}
+		}, {
+			key: 'enable',
+			value: function enable() {
+				return this.btn.enable();
+			}
+		}, {
+			key: 'click',
+			value: function click() {
+				// betBtnClick in GameController
+				this._cfg.betBtnClick.call(this._cfg.ctx);
+			}
+		}, {
+			key: 'pixiSprite',
+			get: function get() {
+				return this.btn.getPixiSprite;
+			}
+		}]);
+	
+		return betButtonController;
+	}();
+	
+	exports.default = betButtonController;
+
+/***/ },
+/* 171 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _PIXIabbr = __webpack_require__(145);
+	
+	var _presets = __webpack_require__(141);
+	
+	var _presets2 = _interopRequireDefault(_presets);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var betButtonView = function () {
+		function betButtonView(config) {
+			var _this = this;
+	
+			_classCallCheck(this, betButtonView);
+	
+			this._cfg = config;
+	
+			// Контейнер для фишки с тенью и текстом
+			var spriteContainer = new _PIXIabbr._pxC();
+			this._spriteContainer = spriteContainer;
+	
+			spriteContainer.interactive = true;
+			spriteContainer.buttonMode = true;
+	
+			this.btnStates = { default: '', hover: '', disable: '' };
+	
+			spriteContainer.position = _presets2.default.positions.betButton;
+	
+			this.btnStates.default = new _PIXIabbr._pxS(_presets2.default.spriteStore.bet.bet1);
+			this.btnStates.disable = new _PIXIabbr._pxS(_presets2.default.spriteStore.bet.bet2);
+			this.btnStates.hover = new _PIXIabbr._pxS(_presets2.default.spriteStore.bet.bet3);
+	
+			this.btnStates.disable.x = -3;
+			this.btnStates.hover.x = -6;
+	
+			this.btnStates.hover.visible = false;
+			this.btnStates.disable.visible = false;
+	
+			['touchstart', 'muosedown', 'pointerdown'].forEach(function (event) {
+				_this._spriteContainer.on(event, function () {
+					_this.btnStates.default.visible = false;
+					_this.btnStates.hover.visible = true;
+				});
+			});
+	
+			['touchend', 'muoseup', 'pointerup'].forEach(function (event) {
+				_this._spriteContainer.on(event, _this.click, _this);
+			});
+	
+			for (var key in this.btnStates) {
+				spriteContainer.addChild(this.btnStates[key]);
+			}
+		}
+	
+		_createClass(betButtonView, [{
+			key: 'disable',
+			value: function disable() {
+				this.btnStates.default.visible = false;
+				this.btnStates.hover.visible = false;
+				this.btnStates.disable.visible = true;
+	
+				this._spriteContainer.interactive = false;
+				this._spriteContainer.buttonMode = false;
+			}
+		}, {
+			key: 'enable',
+			value: function enable() {
+				this.btnStates.default.visible = true;
+				this.btnStates.hover.visible = false;
+				this.btnStates.disable.visible = false;
+	
+				this._spriteContainer.interactive = true;
+				this._spriteContainer.buttonMode = true;
+			}
+		}, {
+			key: 'click',
+			value: function click() {
+				this.btnStates.default.visible = true;
+				this.btnStates.hover.visible = false;
+	
+				this._cfg.click.call(this._cfg.ctx);
+			}
+		}, {
+			key: 'getPixiSprite',
+			get: function get() {
+				return this._spriteContainer;
+			}
+		}]);
+	
+		return betButtonView;
+	}();
+	
+	exports.default = betButtonView;
+
+/***/ },
+/* 172 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _historyView = __webpack_require__(173);
 	
 	var _historyView2 = _interopRequireDefault(_historyView);
 	
@@ -48198,7 +48391,7 @@
 	exports.default = historyController;
 
 /***/ },
-/* 171 */
+/* 173 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';

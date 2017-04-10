@@ -7,7 +7,7 @@ import 'yuki-createjs/lib/soundjs-0.6.2.combined'
 /**
  * Звуки
  */
-let gameSounds = {};
+presets.gameSounds = {};
 let soundPath = './assets/audio/';
 let soundsArr = [];
 for(let i=1; i<=8; i+=1)
@@ -15,7 +15,7 @@ for(let i=1; i<=8; i+=1)
 
 let p1 = new Promise((resolve, reject) => {
 	createjs.Sound.on("fileload", ()=>{
-		gameSounds = createjs.Sound;
+		presets.gameSounds = createjs.Sound;
 		resolve();
 	});
 });
@@ -51,6 +51,8 @@ let p2 = new Promise((resolve, reject) => {
 		for(let key in resourses.namesMap){
 			let spriteGroup = resourses.namesMap[key]; // anums, chips, bgNumbers...
 
+			presets.spriteStore[key] = {};
+
 			for(let keyInGroup in spriteGroup){
 				// keyInGroup for chips: chip0, chipSm0, chip1...
 				presets.spriteStore[key][keyInGroup] = PIXI.utils.TextureCache[ spriteGroup[keyInGroup] ];
@@ -69,4 +71,4 @@ let assetLoader = (callback)=>{
 	});
 };
 
-export {assetLoader, gameSounds};
+export {assetLoader};
