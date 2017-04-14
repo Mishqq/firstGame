@@ -57,8 +57,7 @@ function colorType(map, num){
 	for(let key in map)
 		if(~map[key].indexOf(num)) color = key;
 
-	if(num === 'zero' || num === 0) num = '0';
-	if(num === 'doubleZero') num = '00';
+	if(num === 37) num = '00';
 
 	return color;
 }

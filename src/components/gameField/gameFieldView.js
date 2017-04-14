@@ -70,7 +70,7 @@ export default class GameFieldView {
 		this.ringSprites = {};
 		this.greenSquare = {};
 		for(let key in pointMap){
-			if(key === 'zero' || key === 'doubleZero') {
+			if(+key === 0 || +key === 37) {
 				this.drawGreenSquare(pointMap[key], key);
 			} else {
 				this.drawCircle(pointMap[key], key);
@@ -87,7 +87,7 @@ export default class GameFieldView {
 
 	showHints(arr){
 		arr.forEach((cellType)=>{
-			cellType === 'zero' || cellType === 'doubleZero' ?
+			cellType === 0 || cellType === 37 ?
 				this.showZeroSquare(cellType) :
 				this.showCircles(cellType);
 		})

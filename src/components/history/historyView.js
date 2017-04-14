@@ -86,7 +86,7 @@ export default class historyView {
 		let _a = this._hisSprites;
 		_a.rollNumSprite = new _pxS(presets.spriteStore.bgNumbers[ _hf.colorType(colorBigNumMap, num) ]);
 
-		let text = (num === 'zero') ? '0' : (num === 'doubleZero') ? '00' : num;
+		let text = (num === 37) ? '00' : num;
 		_hf.addTextToSprite(_a.rollNumSprite, {x: 84, y: 84}, text, presets.textStyles.historyPanel.big);
 
 		_a.rollNumAnimation.visible = false;
@@ -104,7 +104,7 @@ export default class historyView {
 		_hs.numTape.unshift(newNum);
 		this._spriteContainer.addChildAt( newNum, 0 );
 
-		let text = (num === 'zero') ? '0' : (num === 'doubleZero') ? '00' : num;
+		let text = (num === 37) ? '00' : num;
 		_hf.addTextToSprite(newNum, {x: 32, y: 32}, text, presets.textStyles.historyPanel.small);
 
 		// Сдвигаем все вниз

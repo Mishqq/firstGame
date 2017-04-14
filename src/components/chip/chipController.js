@@ -7,36 +7,42 @@ export default class ChipController {
 	constructor(configFromGameCtrl) {
 		this.cfg = configFromGameCtrl;
 
-		this._chips = {};
+		// this._chips = {};
+		//
+		// ['chip0', 'chip1', 'chip2', 'chip3', 'chip4'].forEach((item)=>{
+		// 	let chip = new ChipView(item, {click: this.onClick, touchStart: this.chipTouchStart, ctx: this});
+		// 	this._chips[item] = chip;
+		// });
 
-		['chip0', 'chip1', 'chip2', 'chip3', 'chip4'].forEach((item)=>{
-			let chip = new ChipView(item, {click: this.onClick, touchStart: this.chipTouchStart, ctx: this});
-			this._chips[item] = chip;
-		});
+		this._chipsView = new ChipView({click: this.onClick, touchStart: this.chipTouchStart, ctx: this});
 	}
 
 	get chips(){
-		return this._chips
+		return this._chipsView._chips
+	}
+
+	get pixiSprite(){
+		return this._chipsView.pixiSprite
 	}
 
 	onClick(price){
 		let chipType = this.returnChipType(price),
-		thisChip = this.chips[chipType];
+			thisChip = this.chips[chipType];
 
-		for(let key in this.chips){
-			if(this.chips[key] === thisChip){
-				thisChip.active ?
-					thisChip.setDefault() :
-					thisChip.setActive();
-			} else if(this.chips[key].active) {
-				this.chips[key].setDefault();
-			}
+		if(this._chipsView.activeChip === thisChip){
+			this._chipsView.setDefault(this._chipsView.activeChip)
+		} else {
+			if(this._chipsView.activeChip)
+				this._chipsView.setDefault(this._chipsView.activeChip);
+
+			this._chipsView.setActive(thisChip)
 		}
 
-		let chip = thisChip.active ? thisChip.chipData() : undefined;
+		let chipData = this._chipsView.activeChip ?
+			this._chipsView.chipData(this._chipsView.activeChip) : undefined;
 
 		// chipClick в gameController
-		this.cfg.click.call(this.cfg.ctx, chip);
+		this.cfg.click.call(this.cfg.ctx, chipData);
 	}
 
 	chipTouchStart(price){
@@ -47,16 +53,12 @@ export default class ChipController {
 		this.cfg.touchStart.call(this.cfg.ctx, chip);
 	}
 
-	disablePanel(){
-		for(let key in this.chips){
-			this.chips[key].disableChip();
-		}
+	disable(){
+		this._chipsView.disableChips();
 	}
 
-	enablePanel(){
-		for(let key in this.chips){
-			this.chips[key].enableChip();
-		}
+	enable(){
+		this._chipsView.enableChips();
 	}
 
 	/**
@@ -71,18 +73,15 @@ export default class ChipController {
 		return chipType;
 	}
 
+	chipData(chip){
+		return this._chipsView.chipData(chip);
+	}
+
 	/**
 	 * Возвращает объект активной фишки
 	 * @returns {*}
 	 */
 	getActiveChip(){
-		let chipActive;
-
-		for(let chip in this.chips){
-			if(this.chips[chip].active)
-				chipActive = this.chips[chip];
-		}
-
-		return chipActive;
+		return this._chipsView.activeChip;
 	}
 }

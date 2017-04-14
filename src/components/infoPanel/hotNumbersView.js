@@ -65,8 +65,7 @@ export default class hotNumPanel {
 		for(let key in map)
 			if(~map[key].indexOf(obj.number)) color = key;
 
-		if(obj.number === 'zero') obj.number = '0';
-		if(obj.number === 'doubleZero') obj.number = '00';
+		if(obj.number === 37) obj.number = '00';
 
 		let numCnt = new _pxC(),
 			bg = new _pxS( presets.spriteStore.bgNumbers[color] ),

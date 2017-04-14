@@ -2,92 +2,148 @@ import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
 import presets from './../../constants/presets';
 
 export default class ButtonView {
-	constructor(btnType, config) {
-		this.onClickCb = (config.onClickCb) ? config.onClickCb : undefined;
-		this.cbCtx = (config.ctx) ? config.ctx : this;
+	constructor(config) {
+		this._cfg = config;
 
 		// Контейнер для фишки с тенью и текстом
-		let spriteContainer = new _pxC();
-		this._spriteContainer = spriteContainer;
+		this._spriteContainer = new _pxC();
 
-		spriteContainer.interactive = true;
-		spriteContainer.buttonMode = true;
+		this._buttons = {};
 
-		spriteContainer.x = presets.positions.buttons[btnType].x;
-		spriteContainer.y = presets.positions.buttons[btnType].y;
+		for(let key in config){
+			if(key === 'ctx') return;
 
-		if(btnType === 'btnCancel' || btnType === 'btnClear'){
-			this._sqrBtn = this.squareBtnCreate(btnType);
-		} else {
-			this._rndBtn = this.roundBtnCreate(btnType);
+			this._buttons[key] = new _pxC();
+			let _b = this._buttons[key];
+
+			_b.x = presets.positions.buttons[key].x;
+			_b.y = presets.positions.buttons[key].y;
+
+			// Opt-in to interactivity
+			_b.interactive = true;
+			// Shows hand cursor
+			_b.buttonMode = true;
+
+			let btn;
+			if(key === 'btnCancel' || key === 'btnClear'){
+				btn = this.squareBtnCreate(key);
+				_b._btnViewType = 'square';
+			} else {
+				btn = this.roundBtnCreate(key);
+				_b._btnViewType = 'round';
+			}
+
+			_b._btnType = key;
+			_b._childSprites = {};
+			for(let key in btn){
+				_b._childSprites[key] = btn[key];
+				_b.addChild(btn[key]);
+			}
+
+			['tap', 'click', 'pointertap'].forEach((event)=>{
+				_b.on(event, this.onClick, this);
+			});
+
+			['touchstart', 'mousedown', 'pointerdown'].forEach((event)=>{
+				_b.on(event, this.btnSelect, this);
+			});
+
+			this._spriteContainer.addChild(_b);
 		}
-
-		['tap', 'click', 'pointertap'].forEach((event)=>{
-			spriteContainer.on(event, this.onClick, this);
-		});
-
-		['touchstart', 'mousedown', 'pointerdown'].forEach((event)=>{
-			spriteContainer.on(event, this.onTouchStart, this);
-		});
 	}
 
 	get getPixiSprite(){
-		return  this._spriteContainer;
+		return this._spriteContainer;
 	}
 
-	onClick(){
-		this.btnDefault();
+	/**
+	 * ======================================== touch events =====================================
+	 */
+	onClick(event){
+		let btn = event.target,
+			btnType = btn._btnType;
 
 		presets.gameSounds.play('sound02');
+		this.btnDefault(btn);
 
-		if(this.onClickCb) {
-			this.onClickCb.call(this.cbCtx, 'lol');
-		} else {
-			console.log('this default click on button sprite');
+		this._cfg[btnType].call(this._cfg.ctx);
+	}
+
+
+	/**
+	 * ======================================== view states =======================================
+	 */
+	btnDefault(btn){
+		let type = btn._btnViewType, _ch = btn._childSprites;
+
+		btn.interactive = true;
+		btn.buttonMode = true;
+
+		if(type === 'square'){
+			_ch.icoDef.visible = true;
+			_ch.icoDis.visible = false;
+			_ch.text.alpha = 1;
+		} else if(type === 'round') {
+			_ch.stateDis.visible = false;
+		}
+
+		_ch.stateDef.visible = true;
+		_ch.stateSel.visible = false;
+	}
+
+	btnAllDefault(){
+		for(let key in this._buttons){
+			let btn = this._buttons[key],
+				btnType = btn._btnViewType;
+
+			btn.interactive = true;
+			btn.buttonMode = true;
+
+			if(btnType === 'square'){
+				btn._childSprites.icoDef.visible = true;
+				btn._childSprites.icoDis.visible = false;
+				btn._childSprites.text.alpha = 1;
+			} else if(btnType === 'round') {
+				btn._childSprites.stateDis.visible = false;
+			}
+
+			btn._childSprites.stateDef.visible = true;
+			btn._childSprites.stateSel.visible = false;
 		}
 	}
 
-	onTouchStart(){
-		this.btnSelect();
-	}
+	btnSelect(event){
+		let btn = event.target, type = btn._btnViewType, _ch = btn._childSprites;
 
-	btnDefault(){
-		this._spriteContainer.interactive = true;
-		this._spriteContainer.buttonMode = true;
-		if(this._sqrBtn){
-			this._sqrBtn.stateDef.visible = true;
-			this._sqrBtn.icoDef.visible = true;
-			this._sqrBtn.stateSel.visible = false;
-			this._sqrBtn.icoDis.visible = false;
-			this._sqrBtn.text.alpha = 1;
-		} else {
-			this._rndBtn.stateDef.visible = true;
-			this._rndBtn.stateSel.visible = false;
-			this._rndBtn.stateDis.visible = false;
-		}
-	}
+		_ch.stateDef.visible = false;
+		_ch.stateSel.visible = true;
 
-	btnSelect(){
-		if(this._sqrBtn){
-			this._sqrBtn.stateDef.visible = false;
-			this._sqrBtn.stateSel.visible = true;
-		} else {
-			this._rndBtn.stateDef.visible = false;
-			this._rndBtn.stateSel.visible = true;
+		if(type === 'square'){
+			_ch.stateDef.visible = false;
+			_ch.stateSel.visible = true;
+		} else if(type === 'round') {
+			_ch.stateDef.visible = false;
+			_ch.stateSel.visible = true;
 		}
 	}
 
 	btnDisable(){
-		this._spriteContainer.interactive = false;
-		this._spriteContainer.buttonMode = false;
-		if(this._sqrBtn){
-			this._sqrBtn.icoDef.visible = false;
-			this._sqrBtn.icoDis.visible = true;
-			this._sqrBtn.text.alpha = 0.5;
-		} else {
-			this._rndBtn.stateDef.visible = false;
-			this._rndBtn.stateSel.visible = false;
-			this._rndBtn.stateDis.visible = true;
+		for(let key in this._buttons){
+			let btn = this._buttons[key],
+				btnType = btn._btnViewType;
+
+			btn.interactive = false;
+			btn.buttonMode = false;
+
+			if(btnType === 'square'){
+				btn._childSprites.icoDef.visible = false;
+				btn._childSprites.icoDis.visible = true;
+				btn._childSprites.text.alpha = 0.5;
+			} else if(btnType === 'round') {
+				btn._childSprites.stateDef.visible = false;
+				btn._childSprites.stateSel.visible = false;
+				btn._childSprites.stateDis.visible = true;
+			}
 		}
 	}
 
@@ -109,7 +165,7 @@ export default class ButtonView {
 		icoDis.visible = false;
 
 		[stateDef, stateSel, icoDef, icoDis, text].forEach((item)=>{
-			this._spriteContainer.addChild(item);
+			// this._spriteContainer.addChild(item);
 			item.anchor.set(0.5);
 		});
 
@@ -135,7 +191,7 @@ export default class ButtonView {
 		stateDis.visible = false;
 
 		[stateDef, stateSel, stateDis].forEach((item)=>{
-			this._spriteContainer.addChild(item);
+			// this._spriteContainer.addChild(item);
 			item.anchor.set(0.5);
 		});
 

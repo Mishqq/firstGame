@@ -95,7 +95,11 @@ export default class GameFieldController {
 				{x: cell.center.x + presets.positions.fields.big.x,
 					y: cell.center.y + presets.positions.fields.big.y};
 
-			return {center: center, numbers: cell.c};
+			let obj = {center: center, numbers: cell.c, type: cell.type};
+			if(cell.dozen) obj.dozen = cell.dozen;
+			if(cell.column) obj.column = cell.column;
+
+			return obj;
 		} else if(cell && cell.cells) {
 			// Если к ячейке привязаны координаты других ячеек ~~SnakeBet
 			let centers = [];
@@ -105,18 +109,22 @@ export default class GameFieldController {
 					{x: item.center.x + presets.positions.fields.big.x,
 						y: item.center.y + presets.positions.fields.big.y};
 
-				centers.push({center: center, numbers: item.c})
+				let obj = {center: center, numbers: item.c, type: item.type};
+				if(item.dozen) obj.dozen = item.dozen;
+				if(item.column) obj.column = item.column;
+
+				centers.push(obj)
 			});
 
 			return centers;
 		}
 	}
 
-	disableField(){
+	disable(){
 		this._gameFieldBig.disableField();
 	}
 
-	enableField(){
+	enable(){
 		this._gameFieldBig.enableField();
 	}
 }

@@ -4,7 +4,12 @@ export default class BetController {
 	constructor(configByGameCtrl) {
 		this.cfg = configByGameCtrl;
 
-		this._numbers = this.cfg.type;
+		this._numbers = this.cfg.numbers;
+
+		this._type = this.cfg.type;
+
+		if(this.cfg.dozen) this._dozen = this.cfg.dozen;
+		if(this.cfg.column) this._column = this.cfg.column;
 
 		let config = {
 			pos: configByGameCtrl.pos,
@@ -23,6 +28,18 @@ export default class BetController {
 
 	get balance(){
 		return this._betView.balance;
+	}
+
+	get numbers(){
+		return this._numbers;
+	}
+
+	get type(){
+		return this._type;
+	}
+
+	get moreType(){
+		return (this._dozen || this._column || undefined);
 	}
 
 	touchStart(event, betTouchStart){
@@ -75,9 +92,5 @@ export default class BetController {
 
 	clearBet(){
 		this._betView.clearBet();
-	}
-
-	get numbers(){
-		return this._numbers;
 	}
 }
