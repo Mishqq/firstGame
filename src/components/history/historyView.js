@@ -10,7 +10,7 @@ let colorBigNumMap = {
 };
 
 export default class historyView {
-	constructor(config, callbacks) {
+	constructor(config, callbacks, bets) {
 		this.cb = callbacks;
 
 		this.rolledNum = undefined;
@@ -31,6 +31,10 @@ export default class historyView {
 
 		this.createRollField();
 		this.rollPlay();
+
+		bets.forEach((item) => {
+			this.addNum(item, false);
+		});
 
 		spriteContainer.addChild( this._hisSprites.rollNumAnimation );
 	}
@@ -59,8 +63,8 @@ export default class historyView {
 	rollPlay(){
 		let _a = this._hisSprites;
 
-		if(this.rolledNum){
-			this.addNum(this.rolledNum);
+		if(!isNaN(this.rolledNum)){
+			this.addNum(this.rolledNum, true);
 			this.rolledNum = undefined;
 			_a.rollNumAnimation.visible = true;
 			this._spriteContainer.removeChild(_a.rollNumSprite);
@@ -70,7 +74,7 @@ export default class historyView {
 		_a.rollNumAnimation.gotoAndPlay(0);
 
 		setTimeout(() => {
-			// this.viewRollResult( 12 );
+			// this.viewRollResult( 0 );
 			this.viewRollResult( _hf.randEl(presets.data.history.rollNumbers) );
 			_a.rollNumAnimation.gotoAndStop(0);
 
@@ -97,7 +101,7 @@ export default class historyView {
 	}
 
 
-	addNum(num){
+	addNum(num, animate){
 		let _hs = this._hisSprites;
 
 		let newNum = new _pxS(presets.spriteStore.bgNumbers[ _hf.colorType(presets.data.colorNumMap, num) ]);
@@ -110,7 +114,8 @@ export default class historyView {
 		// Сдвигаем все вниз
 		_hs.numTape.forEach((item, idx) => {
 			let newY = 170 + 65*idx;
-			let tween = new TweenLite(item, 1, {y: newY});
+			// let tween = new TweenLite(item, 1, {y: newY});
+			animate ? new TweenLite(item, 1, {y: newY}) : item.y = newY;
 		});
 	}
 }

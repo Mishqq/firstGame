@@ -14,7 +14,9 @@ export default class ChipController {
 		// 	this._chips[item] = chip;
 		// });
 
-		this._chipsView = new ChipView({click: this.onClick, touchStart: this.chipTouchStart, ctx: this});
+		this._chipsView = new ChipView({
+			click: this.onClick, touchStart: this.chipTouchStart, ctx: this
+		});
 	}
 
 	get chips(){
@@ -25,7 +27,9 @@ export default class ChipController {
 		return this._chipsView.pixiSprite
 	}
 
-	onClick(price){
+	onClick(event, price){
+		event.stopPropagation();
+
 		let chipType = this.returnChipType(price),
 			thisChip = this.chips[chipType];
 
@@ -38,11 +42,8 @@ export default class ChipController {
 			this._chipsView.setActive(thisChip)
 		}
 
-		let chipData = this._chipsView.activeChip ?
-			this._chipsView.chipData(this._chipsView.activeChip) : undefined;
-
-		// chipClick в gameController
-		this.cfg.click.call(this.cfg.ctx, chipData);
+		// chipTouchStart в gameController
+		this.cfg.touchEnd.call(this.cfg.ctx);
 	}
 
 	chipTouchStart(price){
@@ -81,6 +82,15 @@ export default class ChipController {
 	 * Возвращает объект активной фишки
 	 * @returns {*}
 	 */
+	getActiveChipData(){
+		return this._chipsView.activeChip ?
+			{value: this._chipsView.activeChip._chipValue} : undefined;
+	}
+
+	setDefault(){
+		if(this._chipsView.activeChip) this._chipsView.setDefault(this._chipsView.activeChip);
+	}
+
 	getActiveChip(){
 		return this._chipsView.activeChip;
 	}

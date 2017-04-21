@@ -28222,7 +28222,39 @@
 	
 	var _serverMessages2 = _interopRequireDefault(_serverMessages);
 	
+	var _helpFunctions = __webpack_require__(144);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var server_confirm_bets = void 0;
+	var msgMapFn = function msgMapFn(data) {
+		data = JSON.parse(data);
+	
+		// Эмуляция удачного/неудачного ответа с сервера
+		// if(data.kind !== "init_msg"){
+		// 	let rand_server_msg = _hf.randEl([false, true]);
+		// 	data.kind = rand_server_msg ?  'bets_ok_msg' : 'error_msg';
+		// }
+	
+		if (data.kind === "init_msg") {
+	
+			gameCtrl.init(data.auth);
+		} else if (data.kind === "auth_msg") {} else if (data.kind === "rand_msg") {} else if (data.kind === "bets_msg") {
+	
+			console.log('Делаем ставки ➠ ');
+			gameCtrl.setServerBets(data.bets);
+		} else if (data.kind === "bets_ok_msg") {
+	
+			console.log('Ставка прошла ➠ ');
+			gameCtrl.confirmBets(true);
+		} else if (data.kind === "error_msg") {
+	
+			console.log('Ставка не прошла ➠ ');
+			gameCtrl.confirmBets(false);
+		} else if (data.kind === "exit_msg") {} else if (data.kind === "srv_lost_msg") {} else if (data.kind === "loaded_msg") {} else if (data.kind === "exited_msg") {} else {
+			console.log('Not founded message type');
+		}
+	};
 	
 	// Server emulate
 	if (!window.cppObj) {
@@ -28235,23 +28267,26 @@
 			} };
 	
 		cppObj.fromJs = function (data) {
-			console.log('fromJs data', data);
+			server_confirm_bets = data;
+			cppObj.toJs.connect(function () {
+				console.log('data ➠ ', server_confirm_bets);
+				msgMapFn(server_confirm_bets);
+				server_confirm_bets = '';
+			});
 		};
 	}
 	
 	var gameCtrl = new _gameController2.default(cppObj.fromJs);
 	
-	cppObj.toJs.connect(function (data) {
-		// data = JSON.parse( JSON.stringify(serverMessages.init_msg) );
-	
-		data = _serverMessages2.default.init_msg;
-	
-		if (data.kind === "init_msg") {
-			gameCtrl.init({ user: data.auth, games: data.games });
-		} else if (data.kind === "auth_msg") {} else if (data.kind === "rand_msg") {} else if (data.kind === "bets_msg") {} else if (data.kind === "bets_ok_msg") {} else if (data.kind === "error_msg") {} else if (data.kind === "exit_msg") {} else if (data.kind === "srv_lost_msg") {} else if (data.kind === "loaded_msg") {} else if (data.kind === "exited_msg") {} else {
-			console.log('Not founded message type');
-		}
+	cppObj.toJs.connect(function () {
+		msgMapFn(JSON.stringify(_serverMessages2.default.init_msg));
 	});
+	
+	setTimeout(function () {
+		cppObj.toJs.connect(function () {
+			msgMapFn(JSON.stringify(_serverMessages2.default.bets_msg));
+		});
+	}, 2000);
 
 /***/ },
 /* 135 */
@@ -28282,9 +28317,9 @@
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
-	var _gameStore = __webpack_require__(143);
+	var _gameModel = __webpack_require__(143);
 	
-	var _gameStore2 = _interopRequireDefault(_gameStore);
+	var _gameModel2 = _interopRequireDefault(_gameModel);
 	
 	var _helpFunctions = __webpack_require__(144);
 	
@@ -28336,9 +28371,18 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
+	// Сокращения для удобства
+	var _gm = void 0,
+	    // gameModel
+	_cmp = void 0,
+	    // components // храним контроллеры компонентов
+	_stg = void 0; // stage
+	
+	
 	/**
 	 * Плохо оно само получится ©
 	 */
+	
 	var GameController = function () {
 		function GameController(fromJs) {
 			_classCallCheck(this, GameController);
@@ -28356,32 +28400,48 @@
 				// Component controller instances collection
 				this._cmpCtrls = {};
 	
-				var game = this.game,
-				    stage = game.stage;
+				this._touchEvents = {
+					betStart: false,
+					betEnd: false,
+					chipStart: false,
+					move: false
+				};
 	
-				this.gameStore = new _gameStore2.default({
-					balance: _presets2.default.data.betPanel.fldBalance
-				});
+				var game = this.game;
+				this.stage = game.stage;
 	
-				this.stage = stage;
+				this.gameModel = new _gameModel2.default({ balance: _presets2.default.data.betPanel.fldBalance });
+	
+				_gm = this.gameModel, _cmp = this._cmpCtrls;
+	
+				_stg = this.stage;
 	
 				/**
 	    * background
 	    */
 				var bg = new _background2.default();
-				stage.addChild(bg);
-				stage.interactive = true;
+				_stg.addChild(bg);
+				_stg.interactive = true;
 	
-				['mousemove', 'touchmove', 'pointermove'].forEach(function (event) {
-					stage.on(event, _this.onTouchMove, _this);
+				_presets2.default.events.start.forEach(function (event) {
+					_stg.on(event, _this.onTouchStart, _this);
+				});
+	
+				_presets2.default.events.move.forEach(function (event) {
+					_stg.on(event, _this.onTouchMove, _this);
+				});
+	
+				_presets2.default.events.end.forEach(function (event) {
+					_stg.on(event, _this.onTouchEnd, _this);
 				});
 	
 				// Игровое поле
-				this._cmpCtrls.gameField = new _gameFieldController2.default({ setBet: this.setBet, checkChips: this.checkChips, ctx: this });
+				_cmp.gameField = new _gameFieldController2.default({ checkChips: this.checkActiveChip, ctx: this });
 	
 				// Прогружаем все json-атласы
 				(0, _resourseLoader.assetLoader)(function () {
-					_this._cmpCtrls.chips = new _chipController2.default({ click: _this.chipClick, touchStart: _this.chipTouchStart, ctx: _this });
+					_cmp.chips = new _chipController2.default({ touchEnd: _this.chipTouchEnd, touchStart: _this.chipTouchStart, ctx: _this
+					});
 	
 					// Панель кнопок
 					var buttonsController = new _buttonPanelController2.default({
@@ -28391,224 +28451,164 @@
 						btnX2: _this.btnX2,
 						ctx: _this
 					});
-					_this._cmpCtrls.buttons = buttonsController;
+					_cmp.buttons = buttonsController;
 	
 					// Плавающая фишка
-					_this._cmpCtrls.betBtn = new _betButtonController2.default({ betBtnClick: _this.betBtnClick, ctx: _this });
+					_cmp.betBtn = new _betButtonController2.default({ betBtnClick: _this.betBtnClick, ctx: _this });
 	
 					// Плавающая фишка
-					_this._cmpCtrls.fChip = new _floatChipController2.default({ setBet: _this.setBet, ctx: _this });
+					// _cmp.fChip = new FloatChipController({setBet: this.floatChipCallback, ctx: this});
 	
 					// Шкала-таймер
-					_this._cmpCtrls.timeScale = new _timeScaleController2.default({ lockTable: _this.lockTable, ctx: _this });
-					_this._cmpCtrls.timeScale.start();
+					_cmp.timeScale = new _timeScaleController2.default({ lockTable: _this.lockTable, ctx: _this });
+					_cmp.timeScale.start();
 	
 					// Панель с информацией о лимитах, горячих/холодных номерах
-					_this._cmpCtrls.infoPanel = new _infoPanelController2.default(_presets2.default.data.infoPanel);
+					_cmp.infoPanel = new _infoPanelController2.default(_presets2.default.data.infoPanel);
 	
 					// Панель с информацией о выигрыше/ставке/балансе
-					_this._cmpCtrls.betPanelCtrl = new _betPanelController2.default(_presets2.default.data.betPanel);
+					var betPanelCfg = !initConfig ? _presets2.default.data.betPanel : { fldBet: 0, fldWin: initConfig.total_win, fldBalance: initConfig.balance };
+					_cmp.betPanelCtrl = new _betPanelController2.default(betPanelCfg);
 	
 					// Панель с рулеткой и лентой истории
-					_this._cmpCtrls.historyCtrl = new _historyController2.default(_presets2.default.settings.history, { rollCb: _this.rollNumber, ctx: _this });
+					_cmp.historyCtrl = new _historyController2.default(_presets2.default.settings.history, { rollCb: _this.rollNumber, ctx: _this }, initConfig.balls);
 	
-					for (var key in _this._cmpCtrls) {
-						stage.addChild(_this._cmpCtrls[key].pixiSprite);
+					for (var key in _cmp) {
+						_stg.addChild(_cmp[key].pixiSprite);
 					}game.start();
 				}, this);
 			}
 		}, {
+			key: 'checkActiveChip',
+			value: function checkActiveChip() {
+				return _gm.activeChip;
+			}
+		}, {
 			key: 'restartGame',
 			value: function restartGame() {
-				var _gs = this.gameStore,
-				    _cfb = _gs.confirmBets;
-	
-				_gs.activeChip = undefined;
-				_gs.betTouchStart = false;
-				_cfb.length = 0;
+				_gm.resetModel();
 	
 				// Прописываем новый баланс. Добавляем в историю номер предыдущего розыгрыша
-	
-				this._cmpCtrls.betPanelCtrl.updateInfoPanelView({ fldBet: 0 });
-	
+				_cmp.betPanelCtrl.updateInfoPanelView({ fldBet: 0 });
 				this.interactiveSwitcher(true);
-	
-				this._cmpCtrls.timeScale.start();
-				this._cmpCtrls.historyCtrl.play();
+				_cmp.timeScale.start();
+				_cmp.historyCtrl.play();
 			}
 		}, {
-			key: 'setBet',
+			key: 'changeBets',
 	
 	
 			/**
-	   * ==================================== Методы работы с моделью и данными =======================================
+	   * ========================================== Работа с моделью/данными =========================================
 	   */
 			/**
-	   * Эта функция является коллбеком, который вызывается по событию touchEnd у компонента bet
-	   * (betView.touchEnd -> betCtrl.touchEnd -> onTouchEnd)
-	   * Описание:
-	   * Функция определяет, было ли событие touchEnd совершено над игровым полем.
-	   * Если да, то вычисляем координаты и создаём новый экземпляр компонента Bet с данными координатами
-	   * (возвращаемые координаты являются локальными для игрового поля, т.е. комп. gameField)
-	   *
-	   * Проверка существующей ставки:
-	   * После того как пришли координаты для комп Bet, создаём объект, в котором ключём будут
-	   * являться наши координаты, а значением - экземпляр контроллера комп Bet. Когда в следующий
-	   * раз мы получим эти же координаты, то проверим, существует ли по ним контроллер. Если да,
-	   * то просто вызываем в нём функцию update
-	   *
-	   * @param event
+	   * Создание/апдейт ставки
 	   */
-			value: function setBet(event) {
+			value: function changeBets(pos4Bet, value, globalPos) {
 				var _this2 = this;
 	
-				this.gameStore.betTouchStart = false;
+				if (!pos4Bet) return;
 	
-				var pos4Bet = this.getDataForBet(event.data.global, true),
-				    chip = this.gameStore.activeChip;
+				var betsChange = function betsChange(item) {
+					var pos = !globalPos ? item.center : { x: item.center.x + _presets2.default.positions.fields.big.x,
+						y: item.center.y + _presets2.default.positions.fields.big.y };
 	
-				if (!chip && this._cmpCtrls.chips.getActiveChip()) {
-					chip = this._cmpCtrls.chips.chipData(this._cmpCtrls.chips.getActiveChip());
-				}
+					var betStoreId = pos.x + '_' + pos.y;
 	
-				if (pos4Bet && chip) {
-					if (_helpFunctions._hf.getClass(pos4Bet) === 'array') {
-						pos4Bet.forEach(function (item) {
-							_this2.createUpdateBet(item);
-						});
+					if (_gm.betsCtrl[betStoreId]) {
+						_gm.betsCtrl[betStoreId].updateBet(value);
 					} else {
-						this.createUpdateBet(pos4Bet);
+						var cfg = { pos: pos, info: item, value: value, callback: _this2.betCallback, ctx: _this2 };
+						_gm.betsCtrl[betStoreId] = new _betController2.default(cfg);
+						_this2.stage.addChild(_gm.betsCtrl[betStoreId].betSprite);
 					}
-				}
+				};
 	
-				this.gameStore.activeChip = undefined;
+				// Ячейки типа snake / обычные ячейки
+				_helpFunctions._hf.getClass(pos4Bet) === 'array' ? pos4Bet.forEach(function (item) {
+					betsChange(item);
+				}) : betsChange(pos4Bet);
 	
-				this.clearTableBet();
 				this.updateBetModel();
 			}
-		}, {
-			key: 'createUpdateBet',
-	
 	
 			/**
-	   * Работает, не трогать
-	   * @param pos4Bet
-	   */
-			value: function createUpdateBet(pos4Bet) {
-				var betsCtrl = this.gameStore.betsCtrl,
-				    chip = this.gameStore.activeChip;
-	
-				// Костылим короч
-				var _ch = this._cmpCtrls.chips.getActiveChip();
-				if (!chip) chip = { value: _ch._chipValue, type: _ch._chipType };
-	
-				var betStoreId = pos4Bet.center.x + '_' + pos4Bet.center.y;
-				var currentValue = chip.value;
-	
-				if (betsCtrl[betStoreId]) {
-					betsCtrl[betStoreId].updateBetView(currentValue);
-				} else {
-					var configForBetCtrl = {
-						pos: pos4Bet.center, numbers: pos4Bet.numbers, value: currentValue,
-						limits: _presets2.default.limits, type: pos4Bet.type,
-						setBet: this.setBet,
-						touchStart: this.betTouchStart,
-						delBet: this.deleteBet,
-						ctx: this };
-	
-					if (pos4Bet.dozen) configForBetCtrl.dozen = pos4Bet.dozen;
-					if (pos4Bet.column) configForBetCtrl.column = pos4Bet.column;
-	
-					var betController = new _betController2.default(configForBetCtrl);
-					this.stage.addChild(betController.betSprite);
-	
-					betsCtrl[betStoreId] = betController;
-				}
-			}
-		}, {
-			key: 'getDataForBet',
-	
-	
-			/**
-	   * Метод возвращает объект с координатами для ставки
+	   * Метод возвращает объект ячейки поля по координатам
 	   * @param pos
 	   * @param global - использовать глобальный координаты или координаты игрового поля (true | false)
 	   * @returns {x|y}
 	   */
+	
+		}, {
+			key: 'getDataForBet',
 			value: function getDataForBet(pos, global) {
-				return this._cmpCtrls.gameField.getDataForBet(pos, global);
+				return _cmp.gameField.getDataForBet(pos, global);
 			}
 		}, {
-			key: 'deleteBet',
+			key: 'getPositionForBet',
 	
 	
 			/**
-	   * Удаление ставки (удаление контроллера в коллекции)
-	   * @param betCtrl
+	   * Возвращаем объект ячейки поля по ставке
+	   * @param betType
+	   * @param betData
+	   * @returns {*}
 	   */
-			value: function deleteBet(betCtrl) {
-				for (var ctrl in this.gameStore.betsCtrl) {
-					if (this.gameStore.betsCtrl[ctrl] === betCtrl) delete this.gameStore.betsCtrl[ctrl];
-				}
+			value: function getPositionForBet(betType, betData) {
+				return _cmp.gameField.getPositionForBet(betType, betData);
 			}
 		}, {
 			key: 'updateBetModel',
 	
 	
 			/**
-	   * Синхронизируем изменение вьюхи и коллекцию ставок
-	   * (не коллекцию контроллеров компонентов ставок)
+	   * Обновление информации на панели ставок/баланса,выигрыша после изменения ставок
 	   */
 			value: function updateBetModel() {
 				var bet = 0;
-				for (var key in this.gameStore.betsCtrl) {
-					bet += this.gameStore.betsCtrl[key].balance;
-				}this._cmpCtrls.betPanelCtrl.updateInfoPanelView({ fldBet: bet });
-			}
-		}, {
-			key: 'calculateWin',
-	
-	
-			/**
-	   * Рассчёт выигрыша
-	   */
-			value: function calculateWin(winNum) {
-				var _gs = this.gameStore,
-				    _cfb = _gs.confirmBets,
-				    _k = _presets2.default.coefficients;
-	
-				var win = 0;
-	
-				_cfb.forEach(function (item) {
-					if (~item.numbers.indexOf(winNum)) win += item.balance * _k[item.numbers.length];
-				});
-	
-				return win;
-			}
-		}, {
-			key: 'fromJsMag',
-	
-	
-			/**
-	   * Генератор сообщения о ставках для fromJs
-	   */
-			value: function fromJsMag() {
-				var _gs = this.gameStore,
-				    _cfb = _gs.confirmBets;
-	
-				var msg = { kind: 'bets_msg', bets: [] };
-				_cfb.forEach(function (item) {
-					var obj = { price: item.balance, content: { kind: item.type } };
-	
-					if (item.type === 'dozen' || item.type === 'column') {
-						obj.content[item.type] = item[item.type];
-					} else if (item.type === 'numbers') {
-						obj.content.numbers = item.numbers;
+				for (var key in _gm.betsCtrl) {
+					if (_gm.betsCtrl[key].balance === 0) {
+						_stg.removeChild(_gm.betsCtrl[key].betSprite);
+						delete _gm.betsCtrl[key];
+					} else {
+						bet += _gm.betsCtrl[key].balance;
 					}
-					msg.bets.push(obj);
-				});
+				}
 	
-				return JSON.stringify(msg);
+				_cmp.betPanelCtrl.updateInfoPanelView({ fldBet: bet });
+			}
+		}, {
+			key: 'confirmBets',
+	
+	
+			/**
+	   * Обработчик подтверждения ставок от сервера
+	   */
+			value: function confirmBets(betsServerStatus) {
+				if (!betsServerStatus) {
+					this.btnClear();
+	
+					_gm.deleteConfirmBets();
+					_gm.deleteBetsCtrl();
+	
+					this.interactiveSwitcher(true);
+				}
+			}
+	
+			/**
+	   * Делаем ставки по данным с сервера
+	   */
+	
+		}, {
+			key: 'setServerBets',
+			value: function setServerBets(bets) {
+				var _this3 = this;
+	
+				bets.forEach(function (bet) {
+					var cell = _this3.getPositionForBet(bet.content.kind, bet.content[bet.content.kind]);
+	
+					_this3.changeBets(cell, bet.price, true);
+				});
 			}
 	
 			/**
@@ -28621,8 +28621,7 @@
 		}, {
 			key: 'clearTableBet',
 			value: function clearTableBet() {
-				this._cmpCtrls.fChip.hideFloatChip();
-				this._cmpCtrls.gameField.hideHints();
+				_cmp.gameField.hideHints();
 			}
 		}, {
 			key: 'lockTable',
@@ -28632,23 +28631,26 @@
 	   * Метод лочит панель фишек и кнопок по истечению времени
 	   */
 			value: function lockTable() {
-				var _this3 = this;
-	
-				this.clearTableBet();
+				var _this4 = this;
 	
 				this.interactiveSwitcher(false);
 	
+				this.clearTableBet();
+				this.removeFloatChip();
+	
+				_cmp.chips.setDefault();
+	
 				setTimeout(function () {
-					for (var key in _this3.gameStore.betsCtrl) {
-						_this3.gameStore.betsCtrl[key].clearBet();
+					for (var key in _gm.betsCtrl) {
+						_gm.betsCtrl[key].clearBet();
 						_presets2.default.gameSounds.play('sound03');
 					}
 				}, 2000);
 	
 				setTimeout(function () {
-					_this3.btnClear();
+					_this4.btnClear();
 	
-					_this3.restartGame();
+					_this4.restartGame();
 				}, _presets2.default.settings.timeScale.viewResTime * 1000);
 			}
 	
@@ -28660,24 +28662,56 @@
 		}, {
 			key: 'rollNumber',
 			value: function rollNumber(number) {
-				var _this4 = this;
-	
-				this._cmpCtrls.gameField.showWinNum(number);
+				_cmp.gameField.showWinNum(number);
 	
 				// Рассчет выигрыша
-				var win = this.calculateWin(number);
+				var win = _gm.calculateWin(number);
 				if (win) _presets2.default.gameSounds.play('sound06');
 	
 				setTimeout(function () {
-					if (win) _this4._cmpCtrls.betPanelCtrl.updateInfoPanelView({ fldWin: win });
+					if (win) _cmp.betPanelCtrl.updateInfoPanelView({ fldWin: win });
 	
-					_this4._cmpCtrls.gameField.hideWinNum();
+					_cmp.gameField.hideWinNum();
 				}, 3000);
+			}
+	
+			/**
+	   * Удаление плавающей фишки
+	   */
+	
+		}, {
+			key: 'removeFloatChip',
+			value: function removeFloatChip() {
+				if (this.fChip) {
+					_stg.removeChild(this.fChip.pixiSprite);
+					_gm.activeChip = undefined;
+					delete this.fChip;
+				}
 			}
 	
 			/**
 	   * ===========================   Интерактивные события  ================================
 	   */
+			/**
+	   * Коллбек для компонента ставок
+	   */
+	
+		}, {
+			key: 'betCallback',
+			value: function betCallback(type, data) {
+				if (type === 'change') {
+	
+					this.updateBetModel();
+				} else if (type === 'touchStart') {
+	
+					this.touchEvents.betStart = true;
+					_gm.touchBet = data;
+				}
+			}
+		}, {
+			key: 'onTouchStart',
+			value: function onTouchStart(event) {}
+	
 			/**
 	   * событие touchmove по всей сцене
 	   * @param event
@@ -28686,73 +28720,72 @@
 		}, {
 			key: 'onTouchMove',
 			value: function onTouchMove(event) {
-				var fChip = this._cmpCtrls.fChip,
-				    betsCtrl = this.gameStore.betsCtrl;
-	
-				if (this.gameStore.activeChip && !this.gameStore.betTouchStart) {
-					// Если у нас есть активный тип ставки и если тачстарт начался не на существующей ставке
-					fChip.viewFloatChip(this.gameStore.activeChip.value);
-					fChip.setPosition(event.data.global);
-				} else if (this.gameStore.betTouchStart) {
-					// Если тачстарт начался с существующей ставки
-					var pos4Bet = this.getDataForBet(event.data.global, true);
-					var betStoreId = pos4Bet.center.x + '_' + pos4Bet.center.y;
-	
-					var value = betsCtrl[betStoreId].getTopChipValue();
-	
-					betsCtrl[betStoreId].updateBetView(-value);
-					this.gameStore.activeChip = { value: value };
-	
-					this.gameStore.betTouchStart = false;
+				if (this.fChip) {
+					this.fChip.setPosition(event.data.global);
+					return false;
 				}
+	
+				if (this.touchEvents.betStart) {
+					var value = _gm.touchBet.getTopChipValue();
+					_gm.touchBet.updateBet(-value);
+					_gm.activeChip = { value: value };
+				}
+	
+				if (_gm.activeChip) {
+					this.fChip = new _floatChipController2.default({ value: _gm.activeChip.value });
+					_stg.addChild(this.fChip.pixiSprite);
+				}
+	
+				this.touchEvents = 'reset';
 			}
 		}, {
-			key: 'betTouchStart',
+			key: 'onTouchEnd',
 	
 	
 			/**
-	   * Тачстарт начался с существующей ставки
+	   * touchEnd по сцене. Создаёт ставку и скрывает плавающую фишку/скрывает подсказки
 	   */
-			value: function betTouchStart() {
-				this.gameStore.betTouchStart = true;
+			value: function onTouchEnd(event) {
+				var activeChip = _gm.activeChip || _cmp.chips.getActiveChipData();
+	
+				if (activeChip) {
+					var pos4Bet = this.getDataForBet(event.data.global, true);
+					this.changeBets(pos4Bet, activeChip.value);
+				}
+	
+				_gm.activeChip = undefined;
+				this.removeFloatChip();
+				this.clearTableBet();
 			}
-		}, {
-			key: 'chipClick',
-	
-	
-			/**
-	   * Клик по фишке на панели фишек
-	   * @param chip
-	   */
-			value: function chipClick(chip) {
-				this.gameStore.activeChip = chip;
-			}
-		}, {
-			key: 'chipTouchStart',
-	
 	
 			/**
 	   * Тачстарт начался с панели фишек
 	   * @param chip
 	   */
+	
+		}, {
+			key: 'chipTouchStart',
 			value: function chipTouchStart(chip) {
-				this.gameStore.activeChip = chip;
+				this.touchEvents.chipStart = true;
+				_gm.activeChip = chip;
 			}
 		}, {
-			key: 'checkChips',
+			key: 'chipTouchEnd',
 	
 	
 			/**
-	   * Проверка на активную фишку
-	   * @returns {undefined|*|{value: *}}
+	   * Для того, чтобы не рисовалист подсказки при touchMove на игровом поле и активной фишке на панели фишек
 	   */
-			value: function checkChips() {
-				return this.gameStore.activeChip;
+			value: function chipTouchEnd() {
+				_gm.activeChip = undefined;
 			}
 		}, {
 			key: 'btnCancel',
 	
 	
+			/**
+	   * ===========================   Коллбеки  ================================
+	   */
 			/**
 	   * Событие кнопки "отменить" (передаётся коллбеком)
 	   */
@@ -28767,14 +28800,9 @@
 	   * Событие кнопки "очистить" (передаётся коллбеком)
 	   */
 			value: function btnClear() {
-				for (var key in this.gameStore.betsCtrl) {
-					var ctrl = this.gameStore.betsCtrl[key];
-					ctrl.betSprite.removeChildren();
-	
-					this.stage.removeChild(ctrl.betSprite);
-	
-					delete this.gameStore.betsCtrl[key];
-				}
+				for (var key in _gm.betsCtrl) {
+					_stg.removeChild(_gm.betsCtrl[key].betSprite);
+				}_gm.deleteBetsCtrl();
 			}
 		}, {
 			key: 'btnRepeat',
@@ -28794,11 +28822,8 @@
 	   * Событие кнопки "удвоить ставки" (передаётся коллбеком)
 	   */
 			value: function btnX2() {
-				for (var key in this.gameStore.betsCtrl) {
-					var ctrl = this.gameStore.betsCtrl[key],
-					    value = ctrl.balance;
-	
-					ctrl.updateBetView(value);
+				for (var key in _gm.betsCtrl) {
+					_gm.betsCtrl[key].updateBet(_gm.betsCtrl[key].balance);
 				}
 			}
 		}, {
@@ -28809,20 +28834,11 @@
 	   * Событие кнопки "BET" (передаётся коллбеком)
 	   */
 			value: function betBtnClick() {
-				var _gs = this.gameStore,
-				    _cfb = _gs.confirmBets;
+				if (_gm.isEmptyBetsCtrl) return false;
 	
-				for (var key in _gs.betsCtrl) {
-					var bet = _gs.betsCtrl[key];
+				_gm.calculateConfirmBets();
 	
-					var obj = { numbers: bet.numbers, balance: bet.balance, type: bet.type };
-					if (bet.moreType) obj[bet.type] = bet.moreType;
-					_cfb.push(obj);
-				}
-	
-				this.clearTableBet();
-	
-				this.fromJs(this.fromJsMag());
+				// this.fromJs(_gm.fromJsMessage());
 	
 				this.interactiveSwitcher(false);
 			}
@@ -28837,17 +28853,27 @@
 			value: function interactiveSwitcher(status) {
 				status = !!status;
 	
-				this.stage.interactive = status;
+				_stg.interactive = status;
 	
-				for (var key in this._cmpCtrls) {
-					if (this._cmpCtrls[key].disable && status) this._cmpCtrls[key].enable();
-					if (this._cmpCtrls[key].disable && !status) this._cmpCtrls[key].disable();
+				for (var key in _cmp) {
+					if (_cmp[key].disable && status) _cmp[key].enable();
+					if (_cmp[key].disable && !status) _cmp[key].disable();
 				}
 	
-				for (var _key in this.gameStore.betsCtrl) {
-					if (status) this.gameStore.betsCtrl[_key].enableMove();
-					if (!status) this.gameStore.betsCtrl[_key].disableMove();
+				for (var _key in _gm.betsCtrl) {
+					if (status) _gm.betsCtrl[_key].enableMove();
+					if (!status) _gm.betsCtrl[_key].disableMove();
 				}
+			}
+		}, {
+			key: 'touchEvents',
+			get: function get() {
+				return this._touchEvents;
+			},
+			set: function set(event) {
+				for (var key in this._touchEvents) {
+					this._touchEvents[key] = false;
+				}this._touchEvents[event] = event !== 'reset';
 			}
 		}]);
 	
@@ -29166,7 +29192,7 @@
 /* 141 */
 /***/ function(module, exports) {
 
-	"use strict";
+	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 		value: true
@@ -29179,6 +29205,12 @@
 	 * Хранилище спрайтов
 	 */
 	presets.spriteStore = {};
+	
+	presets.events = {
+		start: ['mousedown', 'touchstart', 'pointerdown'],
+		move: ['mousemove', 'touchmove', 'pointermove'],
+		end: ['mouseup', 'touchend', 'pointerup']
+	};
 	
 	/**
 	 * Настройки для компонентов
@@ -29193,14 +29225,14 @@
 			}
 		},
 		timeScale: {
-			time: 35,
+			time: 15,
 			changeColorPer: 0.25,
 			fps: 60,
-			lastTime: 5,
+			lastTime: 2,
 			viewResTime: 5
 		},
 		history: {
-			rollTime: 40 // timeScale.time + timeScale.lastTime
+			rollTime: 17 // timeScale.time + timeScale.lastTime
 		}
 	};
 	
@@ -29268,11 +29300,11 @@
 			chip4: 3000
 		},
 		floatChipTypes: {
-			100: "fChip0",
-			500: "fChip1",
-			1000: "fChip2",
-			2000: "fChip3",
-			3000: "fChip4"
+			100: "chipSm0",
+			500: "chipSm1",
+			1000: "chipSm2",
+			2000: "chipSm3",
+			3000: "chipSm4"
 		},
 		infoPanel: {
 			limitsPanel: { max: limits.max, min: limits.min },
@@ -29329,14 +29361,14 @@
 	presets.limits = {
 		min: limits.min,
 		max: limits.max,
-		1: { min: limits.min || 100, max: 5000 },
-		2: { min: limits.min || 100, max: 5000 },
-		3: { min: limits.min || 100, max: 5000 },
-		4: { min: limits.min || 100, max: 5000 },
-		5: { min: limits.min || 100, max: 5000 },
-		6: { min: limits.min || 100, max: 5000 },
-		12: { min: limits.min || 100, max: 5000 },
-		18: { min: limits.min || 100, max: 5000 }
+		1: { min: limits.min || 100, max: 4000 },
+		2: { min: limits.min || 100, max: 8000 },
+		3: { min: limits.min || 100, max: 12000 },
+		4: { min: limits.min || 100, max: 16000 },
+		5: { min: limits.min || 100, max: 20000 },
+		6: { min: limits.min || 100, max: 24000 },
+		12: { min: limits.min || 100, max: 28000 },
+		18: { min: limits.min || 100, max: 30000 }
 	};
 	
 	presets.coefficients = {
@@ -37370,8 +37402,10 @@
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
-			value: true
+		value: true
 	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
 	var _presets = __webpack_require__(141);
 	
@@ -37381,19 +37415,124 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var GameStore = function GameStore(config) {
-			_classCallCheck(this, GameStore);
+	var GameModel = function () {
+		function GameModel(config) {
+			_classCallCheck(this, GameModel);
 	
-			this.confirmBets = [];
-	
-			this.states = {};
-	
-			this.betsCtrl = {};
+			this._betsCtrls = {};
+			this._cmpCtrls = {};
+			this._confirmBets = [];
 	
 			this.balance = config.balance;
-	};
+		}
 	
-	exports.default = GameStore;
+		_createClass(GameModel, [{
+			key: 'deleteBetsCtrl',
+			value: function deleteBetsCtrl() {
+				this.betsCtrl = {};
+			}
+		}, {
+			key: 'calculateConfirmBets',
+			value: function calculateConfirmBets() {
+				for (var key in this.betsCtrl) {
+					var bet = this.betsCtrl[key];
+	
+					var obj = { numbers: bet.numbers, balance: bet.balance, type: bet.type };
+					if (bet.moreType) obj[bet.type] = bet.moreType;
+	
+					this.confirmBets.push(obj);
+				}
+			}
+		}, {
+			key: 'deleteConfirmBets',
+			value: function deleteConfirmBets() {
+				this.confirmBets.length = 0;
+			}
+	
+			/**
+	   * Сброс модели: обнуляем ставки и подтверждённые ставки
+	   */
+	
+		}, {
+			key: 'resetModel',
+			value: function resetModel() {
+				this.activeChip = undefined;
+				this.betTouchStart = false;
+				this.deleteConfirmBets();
+				this.deleteBetsCtrl();
+			}
+	
+			/**
+	   * Генератор сообщения о ставках для fromJs
+	   */
+	
+		}, {
+			key: 'fromJsMessage',
+			value: function fromJsMessage() {
+				var _cfb = this.confirmBets;
+	
+				var msg = { kind: 'bets_msg', bets: [] };
+				_cfb.forEach(function (item) {
+					var obj = { price: item.balance, content: { kind: item.type } };
+	
+					if (item.type === 'dozen' || item.type === 'column') {
+						obj.content[item.type] = item[item.type];
+					} else if (item.type === 'numbers') {
+						obj.content.numbers = item.numbers;
+					}
+					msg.bets.push(obj);
+				});
+	
+				return JSON.stringify(msg);
+			}
+	
+			/**
+	   * Рассчёт выигрыша
+	   */
+	
+		}, {
+			key: 'calculateWin',
+			value: function calculateWin(winNum) {
+				var _k = _presets2.default.coefficients,
+				    winSum = 0;
+	
+				this.confirmBets.forEach(function (item) {
+					if (~item.numbers.indexOf(winNum)) winSum += item.balance * _k[item.numbers.length];
+				});
+	
+				return winSum;
+			}
+		}, {
+			key: 'betsCtrl',
+			get: function get() {
+				return this._betsCtrls;
+			},
+			set: function set(newBetsCtrl) {
+				this._betsCtrls = newBetsCtrl;
+			}
+		}, {
+			key: 'isEmptyBetsCtrl',
+			get: function get() {
+				var isEmpty = true;
+	
+				for (var key in this.betsCtrl) {
+					if (this.betsCtrl[key]) isEmpty = false;
+				}return isEmpty;
+			}
+		}, {
+			key: 'confirmBets',
+			get: function get() {
+				return this._confirmBets;
+			},
+			set: function set(confirmBets) {
+				this._confirmBets = confirmBets;
+			}
+		}]);
+	
+		return GameModel;
+	}();
+	
+	exports.default = GameModel;
 
 /***/ },
 /* 144 */
@@ -37502,6 +37641,36 @@
 	
 		return type;
 	}
+	
+	// Warn if overriding existing method
+	if (Array.prototype.equals) console.warn("Overriding existing Array.prototype.equals. Possible causes: New API defines the method, there's a framework conflict or you've got double inclusions in your code.");
+	// attach the .equals method to Array's prototype to call it on any array
+	Array.prototype.equals = function (array, full) {
+		// if the other array is a falsy value, return
+		if (!array) return false;
+	
+		// compare lengths - can save a lot of time
+		if (this.length != array.length) return false;
+	
+		if (full) {
+			this.sort();
+			array.sort();
+		}
+	
+		for (var i = 0, l = this.length; i < l; i++) {
+			// Check if we have nested arrays
+			if (this[i] instanceof Array && array[i] instanceof Array) {
+				// recurse into the nested arrays
+				if (!this[i].equals(array[i])) return false;
+			} else if (this[i] != array[i]) {
+				// Warning - two different object instances will never be equal: {x:20} != {x:20}
+				return false;
+			}
+		}
+		return true;
+	};
+	// Hide method from for-in loops
+	Object.defineProperty(Array.prototype, "equals", { enumerable: false });
 	
 	var _hf = {
 		isPosInBounds: isPosInBounds,
@@ -37622,21 +37791,10 @@
 	
 			this.cfg = configByGameCtrl;
 	
-			this._gameFieldBig = new _gameFieldView2.default({ click: this.onClick, hover: this.hoverAreas, ctx: this });
+			this._gameFieldBig = new _gameFieldView2.default({ hover: this.hoverAreas, ctx: this });
 		}
 	
-		/**
-	  * Вешаем коллбек на клик по большому игровому полю
-	  * @param event
-	  */
-	
-	
 		_createClass(GameFieldController, [{
-			key: 'onClick',
-			value: function onClick(event) {
-				this.cfg.setBet.call(this.cfg.ctx, event);
-			}
-		}, {
 			key: 'showHints',
 			value: function showHints(arr) {
 				this._gameFieldBig.showHints(arr);
@@ -37693,7 +37851,7 @@
 	
 				this.hideHints();
 	
-				if (cell && cell.c.length) this.showHints(cell.c);
+				if (cell && cell.numbers.length) this.showHints(cell.numbers);
 			}
 	
 			/**
@@ -37721,7 +37879,7 @@
 					var center = !global ? cell.center : { x: cell.center.x + _presets2.default.positions.fields.big.x,
 						y: cell.center.y + _presets2.default.positions.fields.big.y };
 	
-					var obj = { center: center, numbers: cell.c, type: cell.type };
+					var obj = { center: center, numbers: cell.numbers, type: cell.type };
 					if (cell.dozen) obj.dozen = cell.dozen;
 					if (cell.column) obj.column = cell.column;
 	
@@ -37734,7 +37892,7 @@
 						var center = !global ? item.center : { x: item.center.x + _presets2.default.positions.fields.big.x,
 							y: item.center.y + _presets2.default.positions.fields.big.y };
 	
-						var obj = { center: center, numbers: item.c, type: item.type };
+						var obj = { center: center, numbers: item.numbers, type: item.type };
 						if (item.dozen) obj.dozen = item.dozen;
 						if (item.column) obj.column = item.column;
 	
@@ -37743,6 +37901,25 @@
 	
 					return centers;
 				}
+			}
+		}, {
+			key: 'getPositionForBet',
+			value: function getPositionForBet(betType, betData) {
+				var cell = void 0;
+	
+				_gameFieldCellMap.clickAreas.forEach(function (item) {
+					if (betType === 'numbers') {
+						if (item.numbers.equals(betData, true)) cell = item;
+					} else if (betType === 'dozen') {
+						if (item.dozen === betData) cell = item;
+					} else if (betType === 'column') {
+						if (item.column === betData) cell = item;
+					} else if (betType === '1to18' || betType === '19to36' || betType === 'even' || betType === 'odd' || betType === 'red' || betType === 'black') {
+						cell = item;
+					}
+				});
+	
+				return cell;
 			}
 		}, {
 			key: 'disable',
@@ -37812,11 +37989,7 @@
 			// Shows hand cursor
 			spriteContainer.buttonMode = true;
 	
-			['tap', 'click', 'pointertap'].forEach(function (event) {
-				spriteContainer.on(event, _this.onClick, _this);
-			});
-	
-			['mousemove', 'touchmove', 'pointermove'].forEach(function (event) {
+			_presets2.default.events.move.forEach(function (event) {
 				spriteContainer.on(event, _this.hoverAreas, _this);
 			});
 	
@@ -37832,23 +38005,12 @@
 		}
 	
 		_createClass(GameFieldView, [{
-			key: 'onClick',
+			key: 'devModeInteractiveAreas',
 	
-	
-			/**
-	   * Функция отработки по клику
-	   * @param event
-	   */
-			value: function onClick(event) {
-				this.cfg.click.call(this.cfg.ctx, event);
-			}
 	
 			/**
 	   * Отрисовка областей на поле для режима отладки
 	   */
-	
-		}, {
-			key: 'devModeInteractiveAreas',
 			value: function devModeInteractiveAreas() {
 				var _this2 = this;
 	
@@ -38076,12 +38238,12 @@
 				// draw a rectangle
 				graphics.drawRect(area.x, area.y, area.w, area.h);
 	
-				if (area.c && area.c.length) {
+				if (area.numbers && area.numbers.length) {
 					var str = '';
-					if (area.c.length > 2) {
-						str = area.c[0] + '...' + area.c[area.c.length - 1];
+					if (area.numbers.length > 2) {
+						str = area.numbers[0] + '...' + area.numbers[area.numbers.length - 1];
 					} else {
-						area.c.forEach(function (item) {
+						area.numbers.forEach(function (item) {
 							str += item;
 						});
 					}
@@ -38124,35 +38286,35 @@
 	// Размер ячейки
 	var cs = { w: 53, h: 53, evs: 184, odds: 132 };
 	
-	var clickAreas = [{ type: 'numbers', x: 0, y: 0, w: 80, h: 158, c: [37] }, //zero
-	{ type: 'numbers', x: 0, y: 158, w: 80, h: 158, c: [0] }, //zeroZero
-	{ type: 'column', column: 1, x: 1363, y: 0, w: 78, h: 105, c: [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36] }, //2b1_row1
-	{ type: 'column', column: 2, x: 1363, y: 105, w: 78, h: 105, c: [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35] }, //2b1_row2
-	{ type: 'column', column: 3, x: 1363, y: 210, w: 78, h: 105, c: [1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34] }, //2b1_row3
-	{ type: 'dozen', dozen: 1, x: 105, y: 341, w: 420, h: 52, c: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] }, //1st12
-	{ type: 'dozen', dozen: 2, x: 525, y: 341, w: 420, h: 52, c: [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24] }, //2st12
-	{ type: 'dozen', dozen: 3, x: 945, y: 341, w: 420, h: 52, c: [25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36] }, //3st12
-	{ type: '1to18', x: 105, y: 393, w: 210, h: 76, c: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] }, //1to18
-	{ type: '19to36', x: 1155, y: 393, w: 210, h: 76, c: [19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36] }, //19to36
-	{ type: 'even', x: 315, y: 393, w: 210, h: 76, c: [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36] }, //even
-	{ type: 'odd', x: 945, y: 393, w: 210, h: 76, c: [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35] }, //odd
-	{ type: 'red', x: 525, y: 393, w: 210, h: 76, c: [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36] }, //red
-	{ type: 'black', x: 735, y: 393, w: 210, h: 76, c: [2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35] }, //black
+	var clickAreas = [{ type: 'numbers', x: 0, y: 0, w: 80, h: 158, numbers: [37] }, //zero
+	{ type: 'numbers', x: 0, y: 158, w: 80, h: 158, numbers: [0] }, //zeroZero
+	{ type: 'column', column: 1, x: 1363, y: 0, w: 78, h: 105, numbers: [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36] }, //2b1_row1
+	{ type: 'column', column: 2, x: 1363, y: 105, w: 78, h: 105, numbers: [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35] }, //2b1_row2
+	{ type: 'column', column: 3, x: 1363, y: 210, w: 78, h: 105, numbers: [1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34] }, //2b1_row3
+	{ type: 'dozen', dozen: 1, x: 105, y: 341, w: 420, h: 52, numbers: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] }, //1st12
+	{ type: 'dozen', dozen: 2, x: 525, y: 341, w: 420, h: 52, numbers: [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24] }, //2st12
+	{ type: 'dozen', dozen: 3, x: 945, y: 341, w: 420, h: 52, numbers: [25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36] }, //3st12
+	{ type: '1to18', x: 105, y: 393, w: 210, h: 76, numbers: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] }, //1to18
+	{ type: '19to36', x: 1155, y: 393, w: 210, h: 76, numbers: [19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36] }, //19to36
+	{ type: 'even', x: 315, y: 393, w: 210, h: 76, numbers: [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36] }, //even
+	{ type: 'odd', x: 945, y: 393, w: 210, h: 76, numbers: [1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35] }, //odd
+	{ type: 'red', x: 525, y: 393, w: 210, h: 76, numbers: [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36] }, //red
+	{ type: 'black', x: 735, y: 393, w: 210, h: 76, numbers: [2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35] }, //black
 	
 	// zero, doubleZero + 1,2,3 ~ "Корзина"
-	{ type: 'numbers', x: 80, y: 290, w: cs.w, h: cs.h, c: [0, 37, 1, 2, 3] }, { type: 'numbers', x: 80, y: 238, w: cs.w, h: cs.h, c: [0, 1] }, { type: 'numbers', x: 80, y: 186, w: cs.w, h: cs.h, c: [0, 1, 2] }, { type: 'numbers', x: 80, y: 134, w: cs.w, h: cs.h, c: [0, 37, 2] }, { type: 'numbers', x: 80, y: 82, w: cs.w, h: cs.h, c: [37, 2, 3] }, { type: 'numbers', x: 80, y: 0, w: cs.w, h: cs.h + 30, c: [37, 3] },
+	{ type: 'numbers', x: 80, y: 290, w: cs.w, h: cs.h, numbers: [0, 37, 1, 2, 3] }, { type: 'numbers', x: 80, y: 238, w: cs.w, h: cs.h, numbers: [0, 1] }, { type: 'numbers', x: 80, y: 186, w: cs.w, h: cs.h, numbers: [0, 1, 2] }, { type: 'numbers', x: 80, y: 134, w: cs.w, h: cs.h, numbers: [0, 37, 2] }, { type: 'numbers', x: 80, y: 82, w: cs.w, h: cs.h, numbers: [37, 2, 3] }, { type: 'numbers', x: 80, y: 0, w: cs.w, h: cs.h + 30, numbers: [37, 3] },
 	
 	// 34,35,36
-	{ type: 'numbers', x: 1287, y: 290, w: 53, h: cs.h, c: [34, 35, 36] }, { type: 'numbers', x: 1287, y: 238, w: 78, h: cs.h, c: [34] }, { type: 'numbers', x: 1287, y: 186, w: 78, h: cs.h, c: [34, 35] }, { type: 'numbers', x: 1287, y: 134, w: 78, h: cs.h, c: [35] }, { type: 'numbers', x: 1287, y: 82, w: 78, h: cs.h, c: [35, 36] }, { type: 'numbers', x: 1287, y: 0, w: 78, h: cs.h + 30, c: [36] }];
+	{ type: 'numbers', x: 1287, y: 290, w: 53, h: cs.h, numbers: [34, 35, 36] }, { type: 'numbers', x: 1287, y: 238, w: 78, h: cs.h, numbers: [34] }, { type: 'numbers', x: 1287, y: 186, w: 78, h: cs.h, numbers: [34, 35] }, { type: 'numbers', x: 1287, y: 134, w: 78, h: cs.h, numbers: [35] }, { type: 'numbers', x: 1287, y: 82, w: 78, h: cs.h, numbers: [35, 36] }, { type: 'numbers', x: 1287, y: 0, w: 78, h: cs.h + 30, numbers: [36] }];
 	
 	// templates for other field cells
 	var rows = {
-		odd: [{ type: 'numbers', x: cs.odds, y: 290, w: cs.w - 1, h: cs.h, c: [1, 2, 3] }, { type: 'numbers', x: cs.odds, y: 238, w: cs.w - 1, h: cs.h, c: [1] }, { type: 'numbers', x: cs.odds, y: 186, w: cs.w - 1, h: cs.h, c: [1, 2] }, { type: 'numbers', x: cs.odds, y: 134, w: cs.w - 1, h: cs.h, c: [2] }, { type: 'numbers', x: cs.odds, y: 82, w: cs.w - 1, h: cs.h, c: [2, 3] }, { type: 'numbers', x: cs.odds, y: 0, w: cs.w - 1, h: cs.h + 30, c: [3] }],
-		even: [{ type: 'numbers', x: cs.evs, y: 290, w: cs.w, h: cs.h, c: [1, 2, 3, 4, 5, 6] }, { type: 'numbers', x: cs.evs, y: 238, w: cs.w, h: cs.h, c: [1, 4] }, { type: 'numbers', x: cs.evs, y: 186, w: cs.w, h: cs.h, c: [1, 2, 4, 5] }, { type: 'numbers', x: cs.evs, y: 134, w: cs.w, h: cs.h, c: [2, 5] }, { type: 'numbers', x: cs.evs, y: 82, w: cs.w, h: cs.h, c: [2, 3, 5, 6] }, { type: 'numbers', x: cs.evs, y: 0, w: cs.w, h: cs.h + 30, c: [3, 6] }]
+		odd: [{ type: 'numbers', x: cs.odds, y: 290, w: cs.w - 1, h: cs.h, numbers: [1, 2, 3] }, { type: 'numbers', x: cs.odds, y: 238, w: cs.w - 1, h: cs.h, numbers: [1] }, { type: 'numbers', x: cs.odds, y: 186, w: cs.w - 1, h: cs.h, numbers: [1, 2] }, { type: 'numbers', x: cs.odds, y: 134, w: cs.w - 1, h: cs.h, numbers: [2] }, { type: 'numbers', x: cs.odds, y: 82, w: cs.w - 1, h: cs.h, numbers: [2, 3] }, { type: 'numbers', x: cs.odds, y: 0, w: cs.w - 1, h: cs.h + 30, numbers: [3] }],
+		even: [{ type: 'numbers', x: cs.evs, y: 290, w: cs.w, h: cs.h, numbers: [1, 2, 3, 4, 5, 6] }, { type: 'numbers', x: cs.evs, y: 238, w: cs.w, h: cs.h, numbers: [1, 4] }, { type: 'numbers', x: cs.evs, y: 186, w: cs.w, h: cs.h, numbers: [1, 2, 4, 5] }, { type: 'numbers', x: cs.evs, y: 134, w: cs.w, h: cs.h, numbers: [2, 5] }, { type: 'numbers', x: cs.evs, y: 82, w: cs.w, h: cs.h, numbers: [2, 3, 5, 6] }, { type: 'numbers', x: cs.evs, y: 0, w: cs.w, h: cs.h + 30, numbers: [3, 6] }]
 	};
 	
 	function addCellToField(originObj, dx, idx, idxInRow) {
-		var originObjEx = { x: originObj.x + dx, c: originObj.c.map(function (originObj) {
+		var originObjEx = { x: originObj.x + dx, numbers: originObj.numbers.map(function (originObj) {
 				return originObj + 3 * idx;
 			}) };
 		if (idxInRow === 5) {
@@ -38185,9 +38347,9 @@
 		if (!cell.center) cell.center = { x: cell.x + cell.w / 2, y: cell.y + cell.h / 2 };
 	});
 	
-	var snakeCell = { x: 1340, y: 290, w: 54, h: 52, c: [1, 5, 9, 12, 14, 16, 19, 23, 27, 30, 32, 34], cells: [] };
+	var snakeCell = { x: 1340, y: 290, w: 54, h: 52, numbers: [1, 5, 9, 12, 14, 16, 19, 23, 27, 30, 32, 34], cells: [] };
 	clickAreas.forEach(function (item) {
-		var _c = item.c,
+		var _c = item.numbers,
 		    _l = _c.length,
 		    _cn = _c[0];
 		if (_l === 1) {
@@ -46444,12 +46606,16 @@
 			// 	this._chips[item] = chip;
 			// });
 	
-			this._chipsView = new _chipView2.default({ click: this.onClick, touchStart: this.chipTouchStart, ctx: this });
+			this._chipsView = new _chipView2.default({
+				click: this.onClick, touchStart: this.chipTouchStart, ctx: this
+			});
 		}
 	
 		_createClass(ChipController, [{
 			key: 'onClick',
-			value: function onClick(price) {
+			value: function onClick(event, price) {
+				event.stopPropagation();
+	
 				var chipType = this.returnChipType(price),
 				    thisChip = this.chips[chipType];
 	
@@ -46461,10 +46627,8 @@
 					this._chipsView.setActive(thisChip);
 				}
 	
-				var chipData = this._chipsView.activeChip ? this._chipsView.chipData(this._chipsView.activeChip) : undefined;
-	
-				// chipClick в gameController
-				this.cfg.click.call(this.cfg.ctx, chipData);
+				// chipTouchStart в gameController
+				this.cfg.touchEnd.call(this.cfg.ctx);
 			}
 		}, {
 			key: 'chipTouchStart',
@@ -46511,6 +46675,16 @@
 	   * @returns {*}
 	   */
 	
+		}, {
+			key: 'getActiveChipData',
+			value: function getActiveChipData() {
+				return this._chipsView.activeChip ? { value: this._chipsView.activeChip._chipValue } : undefined;
+			}
+		}, {
+			key: 'setDefault',
+			value: function setDefault() {
+				if (this._chipsView.activeChip) this._chipsView.setDefault(this._chipsView.activeChip);
+			}
 		}, {
 			key: 'getActiveChip',
 			value: function getActiveChip() {
@@ -46618,7 +46792,7 @@
 			key: 'chipTouchEnd',
 			value: function chipTouchEnd(event) {
 				// onClick в ChipController
-				this.cfg.click.call(this.cfg.ctx, event.target._chipValue);
+				this.cfg.click.call(this.cfg.ctx, event, event.target._chipValue);
 			}
 		}, {
 			key: 'chipTouchStart',
@@ -46724,31 +46898,10 @@
 	
 			this.cfg = configByGameCtrl;
 	
-			this._floatChipsSprite = new _floatChipView2.default({ touchEnd: this.touchEnd, ctx: this });
+			this._floatChipsSprite = new _floatChipView2.default({ value: this.cfg.value });
 		}
 	
 		_createClass(FloatChipController, [{
-			key: 'hideFloatChip',
-			value: function hideFloatChip() {
-				this._floatChipsSprite.hideFloatChips();
-			}
-		}, {
-			key: 'touchEnd',
-			value: function touchEnd(event) {
-				// setBet в gameController
-				this.cfg.setBet.call(this.cfg.ctx, event);
-			}
-	
-			/**
-	   * Вызываются из gameController
-	   */
-	
-		}, {
-			key: 'viewFloatChip',
-			value: function viewFloatChip(value) {
-				this._floatChipsSprite.viewFloatChip(_presets2.default.data.floatChipTypes[value], value);
-			}
-		}, {
 			key: 'setPosition',
 			value: function setPosition(pos) {
 				this._floatChipsSprite.setPosition(pos);
@@ -46757,6 +46910,11 @@
 			key: 'pixiSprite',
 			get: function get() {
 				return this._floatChipsSprite.floatChipContainer;
+			}
+		}, {
+			key: 'value',
+			get: function get() {
+				return this._floatChipsSprite.value;
 			}
 		}]);
 	
@@ -46783,42 +46941,37 @@
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
+	var _helpFunctions = __webpack_require__(144);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var FloatChipView = function () {
 		function FloatChipView(config) {
-			var _this = this;
-	
 			_classCallCheck(this, FloatChipView);
 	
 			this.cfg = config;
 	
-			this.onTouchEndCb = config.onTouchEndCb ? config.onTouchEndCb : undefined;
-			this.cbCtx = config.ctx ? config.ctx : this;
+			this._value = config.value;
 	
 			// Контейнер для плавающей фишки
 			this._floatChipsContainer = new _PIXIabbr._pxC();
 			this._floatChipsContainer.x = 50;
 			this._floatChipsContainer.y = 50;
-			this._floatChipsContainer.visible = false;
+			// this._floatChipsContainer.visible = false;
 			this._floatChipsContainer.interactive = true;
 	
-			['touchend', 'mouseup', 'pointerup'].forEach(function (event) {
-				_this._floatChipsContainer.on(event, _this.onTouchEnd, _this);
-			});
+			var chipType = _presets2.default.data.floatChipTypes[config.value];
 	
-			['chipSm0', 'chipSm1', 'chipSm2', 'chipSm3', 'chipSm4'].forEach(function (chipType) {
-				var floatChipSprite = new _PIXIabbr._pxS(_presets2.default.spriteStore.chips[chipType]);
-				// floatChipSprite.visible = false;
-				floatChipSprite.anchor.set(0.5);
-				_this._floatChipsContainer.addChild(floatChipSprite);
-			});
+			var floatChipSprite = new _PIXIabbr._pxS(_presets2.default.spriteStore.chips[chipType]);
+			// floatChipSprite.visible = false;
+			floatChipSprite.anchor.set(0.5);
+			this._floatChipsContainer.addChild(floatChipSprite);
 	
 			// Значение на фишке
-			var chipValueText = new _PIXIabbr._pxT(';)', _presets2.default.textStyles.floatChipTextStyle);
-			chipValueText.visible = false;
+			var chipValueText = new _PIXIabbr._pxT(_helpFunctions._hf.formatChipValue(config.value), _presets2.default.textStyles.floatChipTextStyle);
+			// chipValueText.visible = false;
 			this._floatChipsContainer.addChild(chipValueText);
 			chipValueText.anchor.x = 0.5;
 			chipValueText.anchor.y = 0.55;
@@ -46831,74 +46984,26 @@
 	
 	
 		_createClass(FloatChipView, [{
-			key: 'onTouchEnd',
-			value: function onTouchEnd(event) {
-				// touchEnd в FloatChipController
-				this.cfg.touchEnd.call(this.cfg.ctx, event);
-			}
+			key: 'setPosition',
 	
-			/**
-	   * Функция показывает плавающую фишку
-	   * @param type - тип показываемой фишки
-	   * @param text - устанавливаемый текст
-	   */
-	
-		}, {
-			key: 'viewFloatChip',
-			value: function viewFloatChip(type, value) {
-				var arr = ['fChip0', 'fChip1', 'fChip2', 'fChip3', 'fChip4'],
-				    idx = arr.indexOf(type);
-	
-				this.hideFloatChips();
-	
-				this._floatChipsContainer.visible = true;
-				this._floatChipsContainer.children[idx].visible = true;
-	
-				this._floatChipsContainer.children[5].text = this.formatChipValue(value);
-				this._floatChipsContainer.children[5].visible = true;
-			}
-	
-			/**
-	   * Скрывает все фишки и текст с тенью
-	   */
-	
-		}, {
-			key: 'hideFloatChips',
-			value: function hideFloatChips() {
-				this._floatChipsContainer.children.forEach(function (fChip) {
-					fChip.visible = false;
-				});
-			}
 	
 			/**
 	   * Установка позиции контейнера со спрайтом фишки
 	   * @param pos - {x: Number, y: Number}
 	   */
-	
-		}, {
-			key: 'setPosition',
 			value: function setPosition(pos) {
 				this._floatChipsContainer.x = pos.x;
 				this._floatChipsContainer.y = pos.y;
-			}
-	
-			/**
-	   * Форматирование значения ставки
-	   * @param value
-	   * @returns {string}
-	   */
-	
-		}, {
-			key: 'formatChipValue',
-			value: function formatChipValue(value) {
-				var str = value;
-				str = str.toString();
-				return str.length > 3 ? str.substring(0, 1) + 'K' : value;
 			}
 		}, {
 			key: 'floatChipContainer',
 			get: function get() {
 				return this._floatChipsContainer;
+			}
+		}, {
+			key: 'value',
+			get: function get() {
+				return this._value;
 			}
 		}]);
 	
@@ -46923,6 +47028,10 @@
 	
 	var _betView2 = _interopRequireDefault(_betView);
 	
+	var _presets = __webpack_require__(141);
+	
+	var _presets2 = _interopRequireDefault(_presets);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -46931,65 +47040,20 @@
 		function BetController(configByGameCtrl) {
 			_classCallCheck(this, BetController);
 	
-			this.cfg = configByGameCtrl;
+			this._numbers = configByGameCtrl.info.numbers;
+			this._type = configByGameCtrl.info.type;
+			this._moreType = configByGameCtrl.info[configByGameCtrl.info.type];
 	
-			this._numbers = this.cfg.numbers;
+			var config = configByGameCtrl;
+			config.limits = _presets2.default.limits[this._numbers.length];
 	
-			this._type = this.cfg.type;
-	
-			if (this.cfg.dozen) this._dozen = this.cfg.dozen;
-			if (this.cfg.column) this._column = this.cfg.column;
-	
-			var config = {
-				pos: configByGameCtrl.pos,
-				touchStart: this.touchStart,
-				updateBetModel: this.updateBetModel,
-				touchEnd: this.onTouchEnd,
-				ctx: this
-			};
-	
-			this._betView = new _betView2.default(config, configByGameCtrl.value);
+			this._betView = new _betView2.default(config);
 		}
 	
 		_createClass(BetController, [{
-			key: 'touchStart',
-			value: function touchStart(event, betTouchStart) {
-				// betTouchStart в gameController
-				this.cfg.touchStart.call(this.cfg.ctx, event, betTouchStart);
-			}
-		}, {
-			key: 'updateBetView',
-			value: function updateBetView(value) {
-				var limit = this.cfg.limits[this._numbers.length];
-	
-				if (value > 0 && this.balance === limit.max) return false;
-	
-				if (this.balance + value > limit.max) value = limit.max - this.balance;
-	
+			key: 'updateBet',
+			value: function updateBet(value) {
 				this._betView.updateBet(value);
-			}
-	
-			/**
-	   * Вызывается вьюхой
-	   */
-	
-		}, {
-			key: 'updateBetModel',
-			value: function updateBetModel() {
-				if (this._betView.balance === 0) {
-					console.log('удаляем ставку');
-	
-					// метод deleteBet в gameController
-					this.cfg.delBet.call(this.cfg.ctx, this);
-				} else {
-					console.log('апдейтим модель ставки');
-				}
-			}
-		}, {
-			key: 'onTouchEnd',
-			value: function onTouchEnd(event) {
-				// метод setBet в gameController
-				this.cfg.setBet.call(this.cfg.ctx, event);
 			}
 		}, {
 			key: 'getTopChipValue',
@@ -47034,7 +47098,7 @@
 		}, {
 			key: 'moreType',
 			get: function get() {
-				return this._dozen || this._column || undefined;
+				return this._moreType;
 			}
 		}]);
 	
@@ -47077,32 +47141,31 @@
 		chipSm4: _presets2.default.data.chipValues.chip4
 	};
 	
+	var _cb = void 0,
+	    _ctx = void 0;
+	
 	var BetView = function () {
-		function BetView(config, value) {
+		function BetView(config) {
 			var _this = this;
 	
 			_classCallCheck(this, BetView);
 	
 			this.cfg = config;
+			this.limits = this.cfg.limits;
+			_cb = this.cfg.callback, _ctx = this.cfg.ctx;
 	
 			_presets2.default.gameSounds.play('sound01');
 	
-			this._summ = value ? value : 0;
+			this._summ = 0;
 	
 			var chipType = 'chipSm0';
 			for (var smChipKey in smallChipTypes) {
-				if (smallChipTypes[smChipKey] === value) chipType = smChipKey;
+				if (smallChipTypes[smChipKey] === config.value) chipType = smChipKey;
 			}this._betContainer = new _PIXIabbr._pxC();
 			this._betContainer.x = config.pos.x;
 			this._betContainer.y = config.pos.y;
 	
 			this._betContainer.interactive = true;
-	
-			var betSprite = new _PIXIabbr._pxS(_presets2.default.spriteStore.chips[chipType]);
-			betSprite.anchor.set(0.5);
-	
-			var chipValueText = new _PIXIabbr._pxT(_helpFunctions._hf.formatChipValue(value), _presets2.default.textStyles.chipSmTextStyle);
-			chipValueText.anchor.set(0.5);
 	
 			['touchstart', 'mousedown', 'pointerdown'].forEach(function (event) {
 				_this._betContainer.on(event, _this.onTouchStart, _this);
@@ -47112,30 +47175,19 @@
 				_this._betContainer.on(event, _this.onTouchEnd, _this);
 			});
 	
-			this._betContainer.addChild(betSprite);
-			this._betContainer.addChild(chipValueText);
+			this.updateBet(config.value);
 		}
 	
 		_createClass(BetView, [{
-			key: 'onTouchEnd',
-	
-	
-			/**
-	   * Функция вызывается при окончании движения ставки на уже существующем спрайте.
-	   * Тут есть небольшой косяк: вьюха будет знать о модели, т.к. данную функцию
-	   * нельзя вызвать ниоткуда, кроме как событиями 'touchend','mouseup','pointerup' (PIXI-events)
-	   * @param event
-	   */
-			value: function onTouchEnd(event) {
-				// метод touchEnd в BetController
-				this.cfg.touchEnd.call(this.cfg.ctx, event);
+			key: 'onTouchStart',
+			value: function onTouchStart() {
+				_cb.call(_ctx, 'touchStart', this); // метод betCallback в BetController
 			}
 		}, {
-			key: 'onTouchStart',
-			value: function onTouchStart(event) {
+			key: 'onTouchEnd',
+			value: function onTouchEnd() {
 				_presets2.default.gameSounds.play('sound02');
-				// метод touchStart в BetController
-				this.cfg.touchStart.call(this.cfg.ctx, event, true);
+				_cb.call(_ctx, 'touchEnd', this); // метод betCallback в BetController
 			}
 	
 			/**
@@ -47147,7 +47199,11 @@
 		}, {
 			key: 'updateBet',
 			value: function updateBet(value) {
-				this._summ += value;
+				var _temp = this._summ;
+	
+				this._summ + value > this.limits.max ? this._summ = this.limits.max : this._summ += value;
+	
+				if (this._summ && this._summ > _temp) _presets2.default.gameSounds.play('sound02');
 	
 				var spriteContainer = this.betViewContainer;
 	
@@ -47178,9 +47234,7 @@
 					spriteContainer.children[spriteContainer.children.length - 1].addChild(chipValueText);
 				}
 	
-				_presets2.default.gameSounds.play('sound01');
-	
-				this.cfg.updateBetModel.call(this.cfg.ctx);
+				_cb.call(_ctx, 'change', this);
 			}
 	
 			/**
@@ -48451,14 +48505,14 @@
 			this.btnStates.hover.visible = false;
 			this.btnStates.disable.visible = false;
 	
-			['touchstart', 'muosedown', 'pointerdown'].forEach(function (event) {
+			['touchstart', 'mousedown', 'pointerdown'].forEach(function (event) {
 				_this._spriteContainer.on(event, function () {
 					_this.btnStates.default.visible = false;
 					_this.btnStates.hover.visible = true;
 				});
 			});
 	
-			['touchend', 'muoseup', 'pointerup'].forEach(function (event) {
+			['touchend', 'mouseup', 'pointerup'].forEach(function (event) {
 				_this._spriteContainer.on(event, _this.click, _this);
 			});
 	
@@ -48528,11 +48582,11 @@
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var historyController = function () {
-		function historyController(config, callbacks) {
+		function historyController(config, callbacks, bets) {
 			_classCallCheck(this, historyController);
 	
 			// Конфиг, пришедший от контроллера выше
-			this.historyView = new _historyView2.default(config, callbacks);
+			this.historyView = new _historyView2.default(config, callbacks, bets || []);
 		}
 	
 		_createClass(historyController, [{
@@ -48585,7 +48639,9 @@
 	};
 	
 	var historyView = function () {
-		function historyView(config, callbacks) {
+		function historyView(config, callbacks, bets) {
+			var _this = this;
+	
 			_classCallCheck(this, historyView);
 	
 			this.cb = callbacks;
@@ -48608,6 +48664,10 @@
 	
 			this.createRollField();
 			this.rollPlay();
+	
+			bets.forEach(function (item) {
+				_this.addNum(item, false);
+			});
 	
 			spriteContainer.addChild(this._hisSprites.rollNumAnimation);
 		}
@@ -48636,12 +48696,12 @@
 		}, {
 			key: 'rollPlay',
 			value: function rollPlay() {
-				var _this = this;
+				var _this2 = this;
 	
 				var _a = this._hisSprites;
 	
-				if (this.rolledNum) {
-					this.addNum(this.rolledNum);
+				if (!isNaN(this.rolledNum)) {
+					this.addNum(this.rolledNum, true);
 					this.rolledNum = undefined;
 					_a.rollNumAnimation.visible = true;
 					this._spriteContainer.removeChild(_a.rollNumSprite);
@@ -48651,11 +48711,11 @@
 				_a.rollNumAnimation.gotoAndPlay(0);
 	
 				setTimeout(function () {
-					// this.viewRollResult( 12 );
-					_this.viewRollResult(_helpFunctions._hf.randEl(_presets2.default.data.history.rollNumbers));
+					// this.viewRollResult( 0 );
+					_this2.viewRollResult(_helpFunctions._hf.randEl(_presets2.default.data.history.rollNumbers));
 					_a.rollNumAnimation.gotoAndStop(0);
 	
-					_this.cb.rollCb.call(_this.cb.ctx, _this.rolledNum);
+					_this2.cb.rollCb.call(_this2.cb.ctx, _this2.rolledNum);
 				}, this.rollTime * 1000);
 			}
 	
@@ -48681,7 +48741,7 @@
 			}
 		}, {
 			key: 'addNum',
-			value: function addNum(num) {
+			value: function addNum(num, animate) {
 				var _hs = this._hisSprites;
 	
 				var newNum = new _PIXIabbr._pxS(_presets2.default.spriteStore.bgNumbers[_helpFunctions._hf.colorType(_presets2.default.data.colorNumMap, num)]);
@@ -48694,7 +48754,8 @@
 				// Сдвигаем все вниз
 				_hs.numTape.forEach(function (item, idx) {
 					var newY = 170 + 65 * idx;
-					var tween = new TweenLite(item, 1, { y: newY });
+					// let tween = new TweenLite(item, 1, {y: newY});
+					animate ? new TweenLite(item, 1, { y: newY }) : item.y = newY;
 				});
 			}
 		}, {
@@ -48732,12 +48793,14 @@
 			kind: "init_msg",
 			lang: "ru",
 			auth: {
-				kind: "by_card",
-				balance: 123.45,
-				bonus: 12.34,
-				nickname: "Ведро Гвоздей"
+				game_id: 54321,
+				total_win: 2500,
+				balance: 291440,
+				game_state: 2,
+				end_bets_expected: "",
+				balls: [28, 14, 7, 12, 9, 37]
 			},
-			games: [{ game_kind: 1, end_bets_expected: "2017-04-12T12:34:56Z" }, { game_kind: 2, end_bets_expected: "2017-04-12T13:34:56Z" }, { game_kind: 3, end_bets_expected: "2017-04-12T14:34:56Z" }, { game_kind: 4, end_bets_expected: "2017-04-12T15:34:56Z" }, { game_kind: 5, end_bets_expected: "2017-04-12T16:34:56Z" }]
+			game_data: {}
 		},
 		auth_msg: {
 			kind: "auth_msg",
@@ -48768,11 +48831,25 @@
 		bets_msg: {
 			kind: "bets_msg",
 			bets: [{
-				price: 250,
+				price: 300,
 				bonus: false,
 				content: {
 					kind: "numbers",
-					numbers: [15, 20, 26]
+					numbers: [5, 4]
+				}
+			}, {
+				price: 300,
+				bonus: false,
+				content: {
+					kind: "numbers",
+					numbers: [25, 26, 28, 29]
+				}
+			}, {
+				price: 500,
+				bonus: false,
+				content: {
+					kind: "dozen",
+					dozen: 1
 				}
 			}]
 		},

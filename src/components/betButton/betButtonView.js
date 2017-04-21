@@ -26,14 +26,14 @@ export default class betButtonView {
 		this.btnStates.hover.visible = false;
 		this.btnStates.disable.visible = false;
 
-		['touchstart', 'muosedown', 'pointerdown'].forEach((event)=>{
+		['touchstart', 'mousedown', 'pointerdown'].forEach((event)=>{
 			this._spriteContainer.on(event, ()=>{
 				this.btnStates.default.visible = false;
 				this.btnStates.hover.visible = true;
 			});
 		});
 
-		['touchend', 'muoseup', 'pointerup'].forEach((event)=>{
+		['touchend', 'mouseup', 'pointerup'].forEach((event)=>{
 			this._spriteContainer.on(event, this.click, this);
 		});
 

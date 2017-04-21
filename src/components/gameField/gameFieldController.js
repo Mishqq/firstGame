@@ -6,15 +6,7 @@ export default class GameFieldController {
 	constructor(configByGameCtrl) {
 		this.cfg = configByGameCtrl;
 
-		this._gameFieldBig = new GameFieldView({click: this.onClick, hover: this.hoverAreas, ctx: this});
-	}
-
-	/**
-	 * Вешаем коллбек на клик по большому игровому полю
-	 * @param event
-	 */
-	onClick(event){
-		this.cfg.setBet.call(this.cfg.ctx, event);
+		this._gameFieldBig = new GameFieldView({hover: this.hoverAreas, ctx: this});
 	}
 
 	get pixiSprite(){
@@ -69,7 +61,7 @@ export default class GameFieldController {
 
 		this.hideHints();
 
-		if(cell && cell.c.length) this.showHints(cell.c);
+		if(cell && cell.numbers.length) this.showHints(cell.numbers);
 	}
 
 	/**
@@ -95,7 +87,7 @@ export default class GameFieldController {
 				{x: cell.center.x + presets.positions.fields.big.x,
 					y: cell.center.y + presets.positions.fields.big.y};
 
-			let obj = {center: center, numbers: cell.c, type: cell.type};
+			let obj = {center: center, numbers: cell.numbers, type: cell.type};
 			if(cell.dozen) obj.dozen = cell.dozen;
 			if(cell.column) obj.column = cell.column;
 
@@ -109,7 +101,7 @@ export default class GameFieldController {
 					{x: item.center.x + presets.positions.fields.big.x,
 						y: item.center.y + presets.positions.fields.big.y};
 
-				let obj = {center: center, numbers: item.c, type: item.type};
+				let obj = {center: center, numbers: item.numbers, type: item.type};
 				if(item.dozen) obj.dozen = item.dozen;
 				if(item.column) obj.column = item.column;
 
@@ -118,6 +110,26 @@ export default class GameFieldController {
 
 			return centers;
 		}
+	}
+
+	getPositionForBet(betType, betData){
+		let cell;
+
+		clickAreas.forEach((item) => {
+			if(betType === 'numbers'){
+				if(item.numbers.equals(betData, true)) cell = item;
+			} else if(betType === 'dozen'){
+				if(item.dozen === betData) cell = item;
+			} else if(betType === 'column'){
+				if(item.column === betData) cell = item;
+			} else if(betType === '1to18' || betType === '19to36'
+				|| betType === 'even' || betType === 'odd'
+				|| betType === 'red' || betType === 'black'){
+				cell = item;
+			}
+		});
+
+		return cell;
 	}
 
 	disable(){

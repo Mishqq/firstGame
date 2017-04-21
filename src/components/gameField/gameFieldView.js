@@ -19,11 +19,7 @@ export default class GameFieldView {
 		// Shows hand cursor
 		spriteContainer.buttonMode = true;
 
-		['tap', 'click', 'pointertap'].forEach((event)=>{
-			spriteContainer.on(event, this.onClick, this);
-		});
-
-		['mousemove', 'touchmove', 'pointermove'].forEach((event)=>{
+		presets.events.move.forEach((event)=>{
 			spriteContainer.on(event, this.hoverAreas, this);
 		});
 
@@ -44,14 +40,6 @@ export default class GameFieldView {
 
 	get pixiContainer(){
 		return this._spriteContainer;
-	}
-
-	/**
-	 * Функция отработки по клику
-	 * @param event
-	 */
-	onClick(event){
-		this.cfg.click.call(this.cfg.ctx, event);
 	}
 
 	/**
@@ -249,12 +237,12 @@ export default class GameFieldView {
 		// draw a rectangle
 		graphics.drawRect(area.x, area.y, area.w, area.h);
 
-		if(area.c && area.c.length){
+		if(area.numbers && area.numbers.length){
 			let str = '';
-			if(area.c.length > 2){
-				str = area.c[0] + '...' + area.c[ area.c.length-1 ]
+			if(area.numbers.length > 2){
+				str = area.numbers[0] + '...' + area.numbers[ area.numbers.length-1 ]
 			} else {
-				area.c.forEach((item)=>{ str += item });
+				area.numbers.forEach((item)=>{ str += item });
 			}
 
 

@@ -1,25 +1,16 @@
 import BetView from './betView';
+import presets from './../../constants/presets';
 
 export default class BetController {
 	constructor(configByGameCtrl) {
-		this.cfg = configByGameCtrl;
+		this._numbers = configByGameCtrl.info.numbers;
+		this._type = configByGameCtrl.info.type;
+		this._moreType = configByGameCtrl.info[ configByGameCtrl.info.type ];
 
-		this._numbers = this.cfg.numbers;
+		let config = configByGameCtrl;
+		config.limits = presets.limits[ this._numbers.length ];
 
-		this._type = this.cfg.type;
-
-		if(this.cfg.dozen) this._dozen = this.cfg.dozen;
-		if(this.cfg.column) this._column = this.cfg.column;
-
-		let config = {
-			pos: configByGameCtrl.pos,
-			touchStart: this.touchStart,
-			updateBetModel: this.updateBetModel,
-			touchEnd: this.onTouchEnd,
-			ctx: this
-		};
-
-		this._betView = new BetView(config, configByGameCtrl.value);
+		this._betView = new BetView(config);
 	}
 
 	get betSprite(){
@@ -39,43 +30,11 @@ export default class BetController {
 	}
 
 	get moreType(){
-		return (this._dozen || this._column || undefined);
+		return this._moreType;
 	}
 
-	touchStart(event, betTouchStart){
-		// betTouchStart в gameController
-		this.cfg.touchStart.call(this.cfg.ctx, event, betTouchStart);
-	}
-
-	updateBetView(value){
-		let limit = this.cfg.limits[ this._numbers.length ];
-
-		if(value > 0 && this.balance === limit.max)
-			return false;
-
-		if(this.balance + value > limit.max)
-			value = limit.max - this.balance;
-
-		this._betView.updateBet(value);
-	}
-
-	/**
-	 * Вызывается вьюхой
-	 */
-	updateBetModel(){
-		if(this._betView.balance === 0){
-			console.log('удаляем ставку');
-
-			// метод deleteBet в gameController
-			this.cfg.delBet.call(this.cfg.ctx, this);
-		} else {
-			console.log('апдейтим модель ставки');
-		}
-	}
-
-	onTouchEnd(event){
-		// метод setBet в gameController
-		this.cfg.setBet.call(this.cfg.ctx, event);
+	updateBet(value){
+		this._betView.updateBet(value)
 	}
 
 	getTopChipValue(){

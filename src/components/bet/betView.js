@@ -11,30 +11,27 @@ let smallChipTypes = {
 	chipSm4: presets.data.chipValues.chip4
 };
 
+let _cb, _ctx;
 
 export default class BetView {
-	constructor(config, value) {
+	constructor(config) {
 		this.cfg = config;
+		this.limits = this.cfg.limits;
+		_cb = this.cfg.callback, _ctx = this.cfg.ctx;
 
 		presets.gameSounds.play('sound01');
 
-		this._summ = (value) ? value : 0;
+		this._summ = 0;
 
 		let chipType = 'chipSm0';
 		for(let smChipKey in smallChipTypes)
-			if(smallChipTypes[smChipKey] === value) chipType = smChipKey;
+			if(smallChipTypes[smChipKey] === config.value) chipType = smChipKey;
 
 		this._betContainer = new _pxC();
 		this._betContainer.x = config.pos.x;
 		this._betContainer.y = config.pos.y;
 
 		this._betContainer.interactive = true;
-
-		let betSprite = new _pxS( presets.spriteStore.chips[chipType] );
-		betSprite.anchor.set(0.5);
-
-		let chipValueText = new _pxT( _hf.formatChipValue(value), presets.textStyles.chipSmTextStyle );
-		chipValueText.anchor.set(0.5);
 
 		['touchstart', 'mousedown', 'pointerdown'].forEach((event)=>{
 			this._betContainer.on(event, this.onTouchStart, this);
@@ -44,33 +41,24 @@ export default class BetView {
 			this._betContainer.on(event, this.onTouchEnd, this);
 		});
 
-		this._betContainer.addChild(betSprite);
-		this._betContainer.addChild(chipValueText);
+		this.updateBet(config.value);
 	}
 
 	get betViewContainer(){
 		return this._betContainer;
 	}
 
-	/**
-	 * Функция вызывается при окончании движения ставки на уже существующем спрайте.
-	 * Тут есть небольшой косяк: вьюха будет знать о модели, т.к. данную функцию
-	 * нельзя вызвать ниоткуда, кроме как событиями 'touchend','mouseup','pointerup' (PIXI-events)
-	 * @param event
-	 */
-	onTouchEnd(event){
-		// метод touchEnd в BetController
-		this.cfg.touchEnd.call(this.cfg.ctx, event)
-	}
-
 	get balance(){
 		return this._summ;
 	}
 
-	onTouchStart(event){
+	onTouchStart(){
+		_cb.call(_ctx, 'touchStart', this); // метод betCallback в BetController
+	}
+
+	onTouchEnd(){
 		presets.gameSounds.play('sound02');
-		// метод touchStart в BetController
-		this.cfg.touchStart.call(this.cfg.ctx, event, true);
+		_cb.call(_ctx, 'touchEnd', this); // метод betCallback в BetController
 	}
 
 	/**
@@ -79,7 +67,11 @@ export default class BetView {
 	 * @param value - значение, на которое нало увеличить ставку
 	 */
 	updateBet(value){
-		this._summ += value;
+		let _temp = this._summ;
+
+		(this._summ + value > this.limits.max) ? this._summ = this.limits.max : this._summ += value;
+
+		if(this._summ && this._summ > _temp) presets.gameSounds.play('sound02');
 
 		let spriteContainer = this.betViewContainer;
 
@@ -110,9 +102,7 @@ export default class BetView {
 			spriteContainer.children[ spriteContainer.children.length-1 ].addChild(chipValueText);
 		}
 
-		presets.gameSounds.play('sound01');
-
-		this.cfg.updateBetModel.call(this.cfg.ctx);
+		_cb.call(_ctx, 'change', this);
 	}
 
 	/**

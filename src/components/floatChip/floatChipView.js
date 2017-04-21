@@ -1,34 +1,30 @@
 import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
 import presets from './../../constants/presets';
+import {_hf} from './../../services/helpFunctions';
 
 export default class FloatChipView {
 	constructor(config) {
 		this.cfg = config;
 
-		this.onTouchEndCb = (config.onTouchEndCb) ? config.onTouchEndCb : undefined;
-		this.cbCtx = (config.ctx) ? config.ctx : this;
+		this._value = config.value;
 
 		// Контейнер для плавающей фишки
 		this._floatChipsContainer = new _pxC();
 		this._floatChipsContainer.x = 50;
 		this._floatChipsContainer.y = 50;
-		this._floatChipsContainer.visible = false;
+		// this._floatChipsContainer.visible = false;
 		this._floatChipsContainer.interactive = true;
 
-		['touchend', 'mouseup', 'pointerup'].forEach((event)=>{
-			this._floatChipsContainer.on(event, this.onTouchEnd, this);
-		});
+		let chipType = presets.data.floatChipTypes[ config.value ];
 
-		['chipSm0', 'chipSm1', 'chipSm2', 'chipSm3', 'chipSm4'].forEach((chipType)=>{
-			let floatChipSprite = new _pxS( presets.spriteStore.chips[chipType] );
-			// floatChipSprite.visible = false;
-			floatChipSprite.anchor.set(0.5);
-			this._floatChipsContainer.addChild(floatChipSprite);
-		});
+		let floatChipSprite = new _pxS( presets.spriteStore.chips[chipType] );
+		// floatChipSprite.visible = false;
+		floatChipSprite.anchor.set(0.5);
+		this._floatChipsContainer.addChild(floatChipSprite);
 
 		// Значение на фишке
-		let chipValueText = new _pxT(';)', presets.textStyles.floatChipTextStyle);
-		chipValueText.visible = false;
+		let chipValueText = new _pxT( _hf.formatChipValue(config.value), presets.textStyles.floatChipTextStyle);
+		// chipValueText.visible = false;
 		this._floatChipsContainer.addChild(chipValueText);
 		chipValueText.anchor.x = 0.5;
 		chipValueText.anchor.y = 0.55;
@@ -42,36 +38,8 @@ export default class FloatChipView {
 		return this._floatChipsContainer;
 	}
 
-	onTouchEnd(event){
-		// touchEnd в FloatChipController
-		this.cfg.touchEnd.call(this.cfg.ctx, event);
-	}
-
-	/**
-	 * Функция показывает плавающую фишку
-	 * @param type - тип показываемой фишки
-	 * @param text - устанавливаемый текст
-	 */
-	viewFloatChip(type, value){
-		let arr = ['fChip0', 'fChip1', 'fChip2', 'fChip3', 'fChip4'],
-			idx = arr.indexOf(type);
-
-		this.hideFloatChips();
-
-		this._floatChipsContainer.visible = true;
-		this._floatChipsContainer.children[idx].visible = true;
-
-		this._floatChipsContainer.children[5].text = this.formatChipValue(value);
-		this._floatChipsContainer.children[5].visible = true;
-	}
-
-	/**
-	 * Скрывает все фишки и текст с тенью
-	 */
-	hideFloatChips(){
-		this._floatChipsContainer.children.forEach((fChip)=>{
-			fChip.visible = false;
-		})
+	get value(){
+		return this._value;
 	}
 
 	/**
@@ -81,16 +49,5 @@ export default class FloatChipView {
 	setPosition(pos){
 		this._floatChipsContainer.x = pos.x;
 		this._floatChipsContainer.y = pos.y;
-	}
-
-	/**
-	 * Форматирование значения ставки
-	 * @param value
-	 * @returns {string}
-	 */
-	formatChipValue(value){
-		let str = value;
-		str = str.toString();
-		return (str.length > 3) ? str.substring(0, 1) + 'K' : value;
 	}
 }

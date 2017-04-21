@@ -69,7 +69,7 @@ export default class ChipView {
 
 	chipTouchEnd(event){
 		// onClick в ChipController
-		this.cfg.click.call(this.cfg.ctx, event.target._chipValue);
+		this.cfg.click.call(this.cfg.ctx, event, event.target._chipValue);
 	}
 
 	chipTouchStart(event){

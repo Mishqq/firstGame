@@ -1,9 +1,9 @@
 import historyView from './historyView';
 
 export default class historyController {
-	constructor(config, callbacks) {
+	constructor(config, callbacks, bets) {
 		// Конфиг, пришедший от контроллера выше
-		this.historyView = new historyView(config, callbacks);
+		this.historyView = new historyView(config, callbacks, bets || []);
 	}
 
 	get pixiSprite(){

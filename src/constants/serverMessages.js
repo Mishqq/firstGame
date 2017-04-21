@@ -12,18 +12,14 @@ const serverMessages = {
 		kind: "init_msg",
 		lang: "ru",
 		auth: {
-			kind: "by_card",
-			balance: 123.45,
-			bonus: 12.34,
-			nickname: "Ведро Гвоздей"
+			game_id: 54321,
+			total_win: 2500,
+			balance: 291440,
+			game_state: 2,
+			end_bets_expected: "",
+			balls: [28, 14, 7, 12, 9, 37]
 		},
-		games: [
-			{game_kind: 1, end_bets_expected: "2017-04-12T12:34:56Z"},
-			{game_kind: 2, end_bets_expected: "2017-04-12T13:34:56Z"},
-			{game_kind: 3, end_bets_expected: "2017-04-12T14:34:56Z"},
-			{game_kind: 4, end_bets_expected: "2017-04-12T15:34:56Z"},
-			{game_kind: 5, end_bets_expected: "2017-04-12T16:34:56Z"}
-		]
+		game_data: {}
 	},
 	auth_msg: {
 		kind: "auth_msg",
@@ -55,11 +51,27 @@ const serverMessages = {
 		kind: "bets_msg",
 		bets: [
 			{
-				price: 250,
+				price: 300,
 				bonus: false,
 				content: {
 					kind: "numbers",
-					numbers: [15, 20, 26]
+					numbers: [5, 4]
+				}
+			},
+			{
+				price: 300,
+				bonus: false,
+				content: {
+					kind: "numbers",
+					numbers: [25, 26, 28, 29]
+				}
+			},
+			{
+				price: 500,
+				bonus: false,
+				content: {
+					kind: "dozen",
+					dozen: 1
 				}
 			}
 		]

@@ -8,6 +8,13 @@ let limits = {min: 100, max: 30000};
 presets.spriteStore = {};
 
 
+presets.events = {
+	start:    ['mousedown', 'touchstart', 'pointerdown'],
+	move:   ['mousemove', 'touchmove', 'pointermove'],
+	end:  ['mouseup', 'touchend', 'pointerup']
+};
+
+
 /**
  * Настройки для компонентов
  */
@@ -21,14 +28,14 @@ presets.settings = {
 		}
 	},
 	timeScale: {
-		time: 35,
+		time: 15,
 		changeColorPer: 0.25,
 		fps: 60,
-		lastTime: 5,
+		lastTime: 2,
 		viewResTime: 5
 	},
 	history: {
-		rollTime: 40 // timeScale.time + timeScale.lastTime
+		rollTime: 17 // timeScale.time + timeScale.lastTime
 	}
 };
 
@@ -98,11 +105,11 @@ presets.data = {
 		chip4: 3000
 	},
 	floatChipTypes: {
-		100:    "fChip0",
-		500:    "fChip1",
-		1000:   "fChip2",
-		2000:   "fChip3",
-		3000:   "fChip4"
+		100:    "chipSm0",
+		500:    "chipSm1",
+		1000:   "chipSm2",
+		2000:   "chipSm3",
+		3000:   "chipSm4"
 	},
 	infoPanel: {
 		limitsPanel: {max: limits.max, min: limits.min},
@@ -188,14 +195,14 @@ presets.texts = {
 presets.limits = {
 	min: limits.min,
 	max: limits.max,
-	1:  {min: limits.min || 100, max: 5000},
-	2:  {min: limits.min || 100, max: 5000},
-	3:  {min: limits.min || 100, max: 5000},
-	4:  {min: limits.min || 100, max: 5000},
-	5:  {min: limits.min || 100, max: 5000},
-	6:  {min: limits.min || 100, max: 5000},
-	12: {min: limits.min || 100, max: 5000},
-	18: {min: limits.min || 100, max: 5000}
+	1:  {min: limits.min || 100, max: 4000},
+	2:  {min: limits.min || 100, max: 8000},
+	3:  {min: limits.min || 100, max: 12000},
+	4:  {min: limits.min || 100, max: 16000},
+	5:  {min: limits.min || 100, max: 20000},
+	6:  {min: limits.min || 100, max: 24000},
+	12: {min: limits.min || 100, max: 28000},
+	18: {min: limits.min || 100, max: 30000}
 };
 
 presets.coefficients = {
