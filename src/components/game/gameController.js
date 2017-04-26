@@ -2,6 +2,7 @@ import plugins from '../../plugins';
 import Game from '../../Game';
 import {assetLoader} from '../../services/resourseLoader'
 import presets from '../../constants/presets'
+import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
 
 import GameModel from './gameModel';
 import {_hf} from '../../services/helpFunctions';
@@ -114,6 +115,8 @@ export default class GameController {
 			for(let key in _cmp)
 				_stg.addChild(_cmp[key].pixiSprite);
 
+			_stg.addChild(this.betsCnt = new _pxC());
+
 			game.start();
 		}, this);
 	};
@@ -165,7 +168,10 @@ export default class GameController {
 			} else {
 				let cfg = {pos: pos, info: item, value: value, callback: this.betCallback, ctx: this};
 				_gm.betsCtrl[betStoreId] = new BetController(cfg);
-				this.stage.addChild(_gm.betsCtrl[betStoreId].betSprite);
+
+				this.betsCnt.addChild(_gm.betsCtrl[betStoreId].betSprite);
+				// Сортировка bet'ов, чтобы фишки налезали друг на друга правильно
+				this.betsCnt.children.sort((a, b) => {return a.y > b.y});
 			}
 		};
 
@@ -320,6 +326,12 @@ export default class GameController {
 
 			this.touchEvents.betStart = true;
 			_gm.touchBet = data;
+
+		} else if(type === 'touchEnd'){
+
+			_gm.touchBet = undefined;
+			_gm.activeChip = undefined;
+			this.touchEvents = 'reset';
 
 		}
 	}

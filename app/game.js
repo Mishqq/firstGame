@@ -28222,7 +28222,7 @@
 	
 	var _serverMessages2 = _interopRequireDefault(_serverMessages);
 	
-	var _helpFunctions = __webpack_require__(144);
+	var _helpFunctions = __webpack_require__(145);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -28317,11 +28317,13 @@
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
-	var _gameModel = __webpack_require__(143);
+	var _PIXIabbr = __webpack_require__(143);
+	
+	var _gameModel = __webpack_require__(144);
 	
 	var _gameModel2 = _interopRequireDefault(_gameModel);
 	
-	var _helpFunctions = __webpack_require__(144);
+	var _helpFunctions = __webpack_require__(145);
 	
 	var _background = __webpack_require__(146);
 	
@@ -28475,7 +28477,9 @@
 	
 					for (var key in _cmp) {
 						_stg.addChild(_cmp[key].pixiSprite);
-					}game.start();
+					}_stg.addChild(_this.betsCnt = new _PIXIabbr._pxC());
+	
+					game.start();
 				}, this);
 			}
 		}, {
@@ -28520,7 +28524,12 @@
 					} else {
 						var cfg = { pos: pos, info: item, value: value, callback: _this2.betCallback, ctx: _this2 };
 						_gm.betsCtrl[betStoreId] = new _betController2.default(cfg);
-						_this2.stage.addChild(_gm.betsCtrl[betStoreId].betSprite);
+	
+						_this2.betsCnt.addChild(_gm.betsCtrl[betStoreId].betSprite);
+						// Сортировка bet'ов, чтобы фишки налезали друг на друга правильно
+						_this2.betsCnt.children.sort(function (a, b) {
+							return a.y > b.y;
+						});
 					}
 				};
 	
@@ -28706,6 +28715,11 @@
 	
 					this.touchEvents.betStart = true;
 					_gm.touchBet = data;
+				} else if (type === 'touchEnd') {
+	
+					_gm.touchBet = undefined;
+					_gm.activeChip = undefined;
+					this.touchEvents = 'reset';
 				}
 			}
 		}, {
@@ -37404,6 +37418,39 @@
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
+	exports._pxEx = exports._pxG = exports._pxTr = exports._pxT = exports._pxS = exports._pxC = exports._p = undefined;
+	
+	var _pixi = __webpack_require__(1);
+	
+	var _pixi2 = _interopRequireDefault(_pixi);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var _p = _pixi2.default,
+	    _pxC = _p.Container,
+	    _pxS = _p.Sprite,
+	    _pxT = _p.Text,
+	    _pxTr = _p.Texture,
+	    _pxG = _p.Graphics,
+	    _pxEx = _p.extras;
+	
+	exports._p = _p;
+	exports._pxC = _pxC;
+	exports._pxS = _pxS;
+	exports._pxT = _pxT;
+	exports._pxTr = _pxTr;
+	exports._pxG = _pxG;
+	exports._pxEx = _pxEx;
+
+/***/ },
+/* 144 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
@@ -37535,7 +37582,7 @@
 	exports.default = GameModel;
 
 /***/ },
-/* 144 */
+/* 145 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -37545,7 +37592,7 @@
 	});
 	exports._hf = undefined;
 	
-	var _PIXIabbr = __webpack_require__(145);
+	var _PIXIabbr = __webpack_require__(143);
 	
 	/**
 	 * Проверка принадлежности по координатам
@@ -37683,39 +37730,6 @@
 	};
 	
 	exports._hf = _hf;
-
-/***/ },
-/* 145 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	exports._pxEx = exports._pxG = exports._pxTr = exports._pxT = exports._pxS = exports._pxC = exports._p = undefined;
-	
-	var _pixi = __webpack_require__(1);
-	
-	var _pixi2 = _interopRequireDefault(_pixi);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	var _p = _pixi2.default,
-	    _pxC = _p.Container,
-	    _pxS = _p.Sprite,
-	    _pxT = _p.Text,
-	    _pxTr = _p.Texture,
-	    _pxG = _p.Graphics,
-	    _pxEx = _p.extras;
-	
-	exports._p = _p;
-	exports._pxC = _pxC;
-	exports._pxS = _pxS;
-	exports._pxT = _pxT;
-	exports._pxTr = _pxTr;
-	exports._pxG = _pxG;
-	exports._pxEx = _pxEx;
 
 /***/ },
 /* 146 */
@@ -37955,7 +37969,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(145);
+	var _PIXIabbr = __webpack_require__(143);
 	
 	var _presets = __webpack_require__(141);
 	
@@ -46324,7 +46338,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(145);
+	var _PIXIabbr = __webpack_require__(143);
 	
 	var _presets = __webpack_require__(141);
 	
@@ -46719,13 +46733,13 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(145);
+	var _PIXIabbr = __webpack_require__(143);
 	
 	var _presets = __webpack_require__(141);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
-	var _helpFunctions = __webpack_require__(144);
+	var _helpFunctions = __webpack_require__(145);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -46935,13 +46949,13 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(145);
+	var _PIXIabbr = __webpack_require__(143);
 	
 	var _presets = __webpack_require__(141);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
-	var _helpFunctions = __webpack_require__(144);
+	var _helpFunctions = __webpack_require__(145);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -47119,13 +47133,13 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(145);
+	var _PIXIabbr = __webpack_require__(143);
 	
 	var _presets = __webpack_require__(141);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
-	var _helpFunctions = __webpack_require__(144);
+	var _helpFunctions = __webpack_require__(145);
 	
 	var _gsap = __webpack_require__(150);
 	
@@ -47167,11 +47181,11 @@
 	
 			this._betContainer.interactive = true;
 	
-			['touchstart', 'mousedown', 'pointerdown'].forEach(function (event) {
+			_presets2.default.events.start.forEach(function (event) {
 				_this._betContainer.on(event, _this.onTouchStart, _this);
 			});
 	
-			['touchend', 'mouseup', 'pointerup'].forEach(function (event) {
+			_presets2.default.events.end.forEach(function (event) {
 				_this._betContainer.on(event, _this.onTouchEnd, _this);
 			});
 	
@@ -47398,7 +47412,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(145);
+	var _PIXIabbr = __webpack_require__(143);
 	
 	var _presets = __webpack_require__(141);
 	
@@ -47632,7 +47646,7 @@
 	// views
 	
 	
-	var _PIXIabbr = __webpack_require__(145);
+	var _PIXIabbr = __webpack_require__(143);
 	
 	var _presets = __webpack_require__(141);
 	
@@ -47727,13 +47741,13 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(145);
+	var _PIXIabbr = __webpack_require__(143);
 	
 	var _presets = __webpack_require__(141);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
-	var _helpFunctions = __webpack_require__(144);
+	var _helpFunctions = __webpack_require__(145);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -47815,13 +47829,13 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(145);
+	var _PIXIabbr = __webpack_require__(143);
 	
 	var _presets = __webpack_require__(141);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
-	var _helpFunctions = __webpack_require__(144);
+	var _helpFunctions = __webpack_require__(145);
 	
 	var _helpFunctions2 = _interopRequireDefault(_helpFunctions);
 	
@@ -47990,7 +48004,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(145);
+	var _PIXIabbr = __webpack_require__(143);
 	
 	var _presets = __webpack_require__(141);
 	
@@ -48159,7 +48173,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(145);
+	var _PIXIabbr = __webpack_require__(143);
 	
 	var _presets = __webpack_require__(141);
 	
@@ -48326,13 +48340,13 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(145);
+	var _PIXIabbr = __webpack_require__(143);
 	
 	var _presets = __webpack_require__(141);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
-	var _helpFunctions = __webpack_require__(144);
+	var _helpFunctions = __webpack_require__(145);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -48466,7 +48480,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(145);
+	var _PIXIabbr = __webpack_require__(143);
 	
 	var _presets = __webpack_require__(141);
 	
@@ -48618,13 +48632,13 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(145);
+	var _PIXIabbr = __webpack_require__(143);
 	
 	var _presets = __webpack_require__(141);
 	
 	var _presets2 = _interopRequireDefault(_presets);
 	
-	var _helpFunctions = __webpack_require__(144);
+	var _helpFunctions = __webpack_require__(145);
 	
 	var _gsap = __webpack_require__(150);
 	
@@ -48859,85 +48873,6 @@
 			bonus: 12.3
 		}
 	};
-	
-	//
-	//
-	// window.cppObj = {toJs: {connect: (toJs)=>{
-	//
-	// 	setTimeout(()=>{
-	//
-	// 		toJs(JSON.stringify({
-	// 			"kind": "init_msg",
-	// 			"lang": "ru",
-	// 			"licensee_id": 1,
-	// 			"auth": {
-	// 				"kind": "by_card",
-	// 				"balance": 123.45,
-	// 				"nickname": "Ведро Гвоздей"
-	// 			},
-	// 			"games": [
-	// 				{
-	// 					"game_kind": 1,
-	// 					"end_bets_expected": "2017-04-12T12:34:56Z"
-	// 				},
-	// 				{
-	// 					"game_kind": 2,
-	// 					"end_bets_expected": "2017-04-12T13:34:56Z"
-	// 				},
-	// 				{
-	// 					"game_kind": 3,
-	// 					"end_bets_expected": "2017-04-12T14:34:56Z"
-	// 				},
-	// 				{
-	// 					"game_kind": 4,
-	// 					"end_bets_expected": "2017-04-12T15:34:56Z"
-	// 				},
-	// 				{
-	// 					"game_kind": 5,
-	// 					"end_bets_expected": "2017-04-12T16:34:56Z"
-	// 				},
-	// 				{
-	// 					"game_kind": 6,
-	// 					"end_bets_expected": "2017-04-12T17:34:56Z"
-	// 				},
-	// 				{
-	// 					"game_kind": 7,
-	// 					"end_bets_expected": "2017-04-12T18:34:56Z"
-	// 				},
-	// 				{
-	// 					"game_kind": 8,
-	// 					"end_bets_expected": "2017-05-01T19:34:56Z"
-	// 				},
-	// 				{
-	// 					"game_kind": 9,
-	// 					"end_bets_expected": "2017-04-01T20:34:56Z"
-	// 				},
-	// 				{
-	// 					"game_kind": 10,
-	// 					"end_bets_expected": "2017-05-01T12:34:56Z"
-	// 				},
-	// 				{
-	// 					"game_kind": 11,
-	// 					"end_bets_expected": "2017-05-01T12:34:56Z"
-	// 				},
-	// 			]
-	// 		}));
-	//
-	// 	}, 1000);
-	//
-	// }}};
-	//
-	// cppObj.toJs.connect(data=>{
-	// 	data = JSON.parse(data);
-	//
-	// 	if(data.kind == "init_msg") {
-	// 		model.reinit({user: userFormat(data.auth), games: data.games});
-	// 	}
-	// 	else if(data.kind == "games_changed_msg") {
-	// 		model.games.change(data.games);
-	// 	}
-	//
-	// });
 	
 	exports.default = serverMessages;
 

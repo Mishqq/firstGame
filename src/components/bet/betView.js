@@ -33,11 +33,11 @@ export default class BetView {
 
 		this._betContainer.interactive = true;
 
-		['touchstart', 'mousedown', 'pointerdown'].forEach((event)=>{
+		presets.events.start.forEach((event)=>{
 			this._betContainer.on(event, this.onTouchStart, this);
 		});
 
-		['touchend', 'mouseup', 'pointerup'].forEach((event)=>{
+		presets.events.end.forEach((event)=>{
 			this._betContainer.on(event, this.onTouchEnd, this);
 		});
 
