@@ -28815,7 +28815,7 @@
 	   */
 			value: function btnClear() {
 				for (var key in _gm.betsCtrl) {
-					_stg.removeChild(_gm.betsCtrl[key].betSprite);
+					this.betsCnt.removeChild(_gm.betsCtrl[key].betSprite);
 				}_gm.deleteBetsCtrl();
 			}
 		}, {

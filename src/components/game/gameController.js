@@ -411,7 +411,8 @@ export default class GameController {
 	 */
 	btnClear(){
 		for(let key in _gm.betsCtrl)
-			_stg.removeChild(_gm.betsCtrl[key].betSprite);
+			this.betsCnt.removeChild(_gm.betsCtrl[key].betSprite);
+
 		_gm.deleteBetsCtrl();
 	};
 
