@@ -1,24 +1,25 @@
+import "babel-polyfill";
 import GameController from './components/game/gameController';
-import serverMessages from './constants/serverMessages';
+import Debugger from './debugger';
 import {_hf} from './services/helpFunctions';
 
-let server_confirm_bets;
-let msgMapFn = data=>{
-	data = JSON.parse( data );
+if(!window.cppObj) window.cppObj = new Debugger();
 
-	// Эмуляция удачного/неудачного ответа с сервера
-	// if(data.kind !== "init_msg"){
-	// 	let rand_server_msg = _hf.randEl([false, true]);
-	// 	data.kind = rand_server_msg ?  'bets_ok_msg' : 'error_msg';
-	// }
+let gameCtrl = new GameController((...ars)=>cppObj.fromJs(...ars));
+gameCtrl.init((...ars)=>cppObj.fromJs(...ars));
+
+let msgMapFn = dataFromServer=>{
+	let data = JSON.parse( dataFromServer );
 
 	if(data.kind === "init_msg") {
 
-		gameCtrl.init(data.auth);
+		gameCtrl.initMessageHandler(data.game_data, data.auth, data.bets);
 
 	} else if(data.kind === "auth_msg") {
 
 	} else if(data.kind === "rand_msg") {
+
+		gameCtrl.randMessageHandler(data.game_data);
 
 	} else if(data.kind === "bets_msg") {
 
@@ -27,16 +28,14 @@ let msgMapFn = data=>{
 
 	} else if(data.kind === "bets_ok_msg") {
 
-		console.log('Ставка прошла ➠ ');
-		gameCtrl.confirmBets(true);
+		gameCtrl.confirmBets(data);
 
 	} else if(data.kind === "error_msg") {
 
-		console.log('Ставка не прошла ➠ ');
-		gameCtrl.confirmBets(false);
+		gameCtrl.errorsHandler(data.error_code);
 
 	} else if(data.kind === "exit_msg") {
-
+		setTimeout(() => window.cppObj.fromJs(JSON.stringify({kind: "exited_msg"})), 1000);
 	} else if(data.kind === "srv_lost_msg") {
 
 	} else if(data.kind === "loaded_msg") {
@@ -48,34 +47,4 @@ let msgMapFn = data=>{
 	}
 };
 
-// Server emulate
-if(!window.cppObj) {
-	window.cppObj = {};
-
-	cppObj.toJs = {connect: (toJs)=>{
-		setTimeout(()=>{
-			toJs();
-		}, 1000);
-	}};
-
-	cppObj.fromJs = (data)=>{
-		server_confirm_bets = data;
-		cppObj.toJs.connect(()=>{
-			console.log('data ➠ ', server_confirm_bets);
-			msgMapFn(server_confirm_bets);
-			server_confirm_bets = '';
-		});
-	}
-}
-
-let gameCtrl = new GameController(cppObj.fromJs);
-
-cppObj.toJs.connect(()=>{
-	msgMapFn(JSON.stringify(serverMessages.init_msg));
-});
-
-setTimeout(() => {
-	cppObj.toJs.connect(()=>{
-		msgMapFn(JSON.stringify(serverMessages.bets_msg));
-	});
-}, 2000);
+cppObj.toJs.connect(msgMapFn);

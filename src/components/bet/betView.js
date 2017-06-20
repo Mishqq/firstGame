@@ -1,15 +1,10 @@
 import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
-import presets from './../../constants/presets';
+import {spriteStore, touchEvents, gameSounds} from './../../constants/presets';
+import settings from './settings';
 import {_hf} from '../../services/helpFunctions'
 import {TweenMax, Power2, TimelineLite} from "gsap";
 
-let smallChipTypes = {
-	chipSm0: presets.data.chipValues.chip0,
-	chipSm1: presets.data.chipValues.chip1,
-	chipSm2: presets.data.chipValues.chip2,
-	chipSm3: presets.data.chipValues.chip3,
-	chipSm4: presets.data.chipValues.chip4
-};
+let smallChipTypes = settings.values;
 
 let _cb, _ctx;
 
@@ -19,7 +14,7 @@ export default class BetView {
 		this.limits = this.cfg.limits;
 		_cb = this.cfg.callback, _ctx = this.cfg.ctx;
 
-		presets.gameSounds.play('sound01');
+		gameSounds.play('sound01');
 
 		this._summ = 0;
 
@@ -33,11 +28,11 @@ export default class BetView {
 
 		this._betContainer.interactive = true;
 
-		presets.events.start.forEach((event)=>{
+		touchEvents.start.forEach((event)=>{
 			this._betContainer.on(event, this.onTouchStart, this);
 		});
 
-		presets.events.end.forEach((event)=>{
+		touchEvents.end.forEach((event)=>{
 			this._betContainer.on(event, this.onTouchEnd, this);
 		});
 
@@ -57,7 +52,7 @@ export default class BetView {
 	}
 
 	onTouchEnd(){
-		presets.gameSounds.play('sound02');
+		gameSounds.play('sound02');
 		_cb.call(_ctx, 'touchEnd', this); // метод betCallback в BetController
 	}
 
@@ -71,7 +66,7 @@ export default class BetView {
 
 		(this._summ + value > this.limits.max) ? this._summ = this.limits.max : this._summ += value;
 
-		if(this._summ && this._summ > _temp) presets.gameSounds.play('sound02');
+		if(this._summ && this._summ > _temp) gameSounds.play('sound02');
 
 		let spriteContainer = this.betViewContainer;
 
@@ -87,7 +82,7 @@ export default class BetView {
 		let count=0;
 		sortChipSmTypeArr.forEach((chipSmType, idx)=>{
 			for(let i=0; i<betSprites[chipSmType]; i+=1){
-				let newSprite = new _pxS( presets.spriteStore.chips[chipSmType] );
+				let newSprite = new _pxS( spriteStore.chips[chipSmType] );
 				newSprite.anchor.set(0.5);
 				newSprite.y -= count*5;
 				spriteContainer.addChild(newSprite);
@@ -96,7 +91,7 @@ export default class BetView {
 		});
 
 		if(spriteContainer.children.length){
-			let chipValueText = new _pxT( _hf.formatChipValue(this._summ), presets.textStyles.chipSmTextStyle );
+			let chipValueText = new _pxT( _hf.formatChipValue(this._summ), settings.textStyles );
 			chipValueText.anchor.set(0.5, 0.6);
 
 			spriteContainer.children[ spriteContainer.children.length-1 ].addChild(chipValueText);
@@ -114,7 +109,7 @@ export default class BetView {
 		for(let key in smallChipTypes)
 			ranges.push( smallChipTypes[key] );
 
-		ranges.sort((a, b)=>{return a < b});
+		ranges.sort((a, b)=> b - a);
 
 		let q = {}; // объект вида {100: 1, 500:2} - одна фишка значения 100, две по 500
 		ranges.forEach((range)=>{

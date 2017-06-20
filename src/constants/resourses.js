@@ -7,6 +7,7 @@ const resourses = {
 		'bg_numbers.json',
 		'blights.json',
 		'buttons.json',
+        'buttons2.json',
 		'bet.json',
 		'chips.json',
 		'fields.json',
@@ -94,6 +95,10 @@ const resourses = {
 			icoClear:       "ico_clear",
 			icoClearDis:    "ico_clear_dis"
 		},
+        buttons2: {
+            btnExit:      	"btn_exit",
+            bgExit:   		"bg_exit",
+        },
 		fields: {
 			bonus:          "bonus",
 			bonusDis:       "bonus_dis",

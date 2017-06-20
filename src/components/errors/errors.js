@@ -1,0 +1,28 @@
+export default
+[
+	{type: "GE_SERVER_INTERNAL",      error_code: -1,  ru: "Сервер временно недоступен"},
+	{type: "GE_SERVER_INTERNAL",      error_code: 1,   ru: "Не удалось завершить действие"},
+	{type: "GE_HALL_BANNED",          error_code: 2,   ru: "Работа зала приостановлена"},
+	{type: "GE_UNKNOWN_GAME_KIND",    error_code: 3,   ru: "Игра недоступна"},
+	{type: "GE_CARD_NOT_FOUND",       error_code: 101, ru: "Карточка не найдена"},
+	{type: "GE_CARD_BLOCKED",         error_code: 102, ru: "Карточка заблокирована"},
+	{type: "GE_CARD_NOT_ASSIGNED",    error_code: 103, ru: "Карточка не привязана к аккаунту"},
+	{type: "GE_PHONE_NOT_FOUND",      error_code: 104, ru: "Номер телефона не найден"},
+	{type: "GE_WALLET_INACTIVE",      error_code: 105, ru: "Аккаунт не активирован"},
+	{type: "GE_WALLET_BLOCKED",       error_code: 106, ru: "Аккаунт заблокирован"},
+	{type: "GE_WRONG_PIN",            error_code: 107, ru: "Неверный пин-код"},
+	{type: "GE_GAMEPLACE_OCCUPIED",   error_code: 110, ru: "Место занято другим игроком"},
+	{type: "GE_CARD_WRONG_HALL",      error_code: 111, ru: "Карточка другого зала"},
+	{type: "GE_NOT_AUTHORIZED",       error_code: 201, ru: "Войдите в систему"},
+	{type: "GE_GAME_NOT_FINISHED",    error_code: 202, ru: "Дождитесь окончания игры"},
+	{type: "GE_UNALLOWED_GAME_KIND",  error_code: 203, ru: "Игра недоступна"},
+	{type: "GE_INVALID_TICKET",       error_code: 301, ru: "Некорректная квитанция"},
+	{type: "GE_TICKET_NOT_FOUND",     error_code: 302, ru: "Квитанция не найдена"},
+	{type: "GE_TICKET_WRONG_HALL",    error_code: 303, ru: "Квитанция другого зала"},
+	{type: "GE_TICKET_NOT_SOLD",      error_code: 304, ru: "Квитанция не продана на кассе"},
+	{type: "GE_TICKET_PLAYED",        error_code: 305, ru: "Квитанция уже играла"},
+	{type: "GE_TICKET_ON_ANOTHER_GP", error_code: 306, ru: "Квитанция зарегистрирована на другом месте"},
+	{type: "GE_TICKET_REG_IN_GAME",   error_code: 307, ru: "Регистрация квитанций закрыта"},
+	{type: "GE_BETTING_CLOSED",       error_code: 401, ru: "Прием ставок закрыт"},
+	{type: "GE_NOT_ENOUGH_MONEY",     error_code: 402, ru: "Недостаточно средств на балансе"}
+];

@@ -1,5 +1,6 @@
 import {_p, _pxC, _pxS, _pxT, _pxG, _pxEx} from './../../constants/PIXIabbr';
-import presets from './../../constants/presets';
+import {touchEvents} from './../../constants/presets';
+import settings from './settings';
 import {clickAreas, pointMap, winHintPos} from './gameFieldCellMap';
 import {TweenMax, Power2, TimelineLite} from "gsap";
 
@@ -11,15 +12,15 @@ export default class GameFieldView {
 		let spriteContainer = new _pxC();
 		this.pixiContainer = spriteContainer;
 
-		spriteContainer.x = presets.positions.fields.big.x;
-		spriteContainer.y = presets.positions.fields.big.y;
+		spriteContainer.x = settings.position.x;
+		spriteContainer.y = settings.position.y;
 
 		// Opt-in to interactivity
 		spriteContainer.interactive = true;
 		// Shows hand cursor
 		spriteContainer.buttonMode = true;
 
-		presets.events.move.forEach((event)=>{
+		touchEvents.move.forEach((event)=>{
 			spriteContainer.on(event, this.hoverAreas, this);
 		});
 
@@ -188,7 +189,7 @@ export default class GameFieldView {
 		this.winNumHints[key].visible = true;
 
 		// let tween = new TweenMax(this.winNumHints[key], 0.5, {alpha: 0.3, repeat: 20});
-		let tween = new TweenMax(this.winNumHints[key], 0.3, {alpha: 0.4, repeat: 20, yoyo: true});
+		let tween = new TweenMax(this.winNumHints[key], 0.3, {alpha: 0.4, repeat: -1, yoyo: true});
 	}
 
 	hideWinHint(){
@@ -246,7 +247,7 @@ export default class GameFieldView {
 			}
 
 
-			let text = new _pxT(str, presets.textStyles.filedClickAreaTextStyle);
+			let text = new _pxT(str, settings.textStyle);
 			text.rotation = -0.5;
 
 			text.anchor.set(0.50);

@@ -1,12 +1,13 @@
 import {_pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
-import presets from './../../constants/presets';
+import {spriteStore} from './../../constants/presets';
+import settings from './settings';
 
 export default class coldNumPanel {
 	constructor(numbers) {
 		this.numbers = numbers;
 
 		// Текст для этого блока
-		let texts = presets.texts.infoPanel.coldNumbers;
+		let texts = settings.texts.coldNumbers;
 
 		// Контейнер для фишки с тенью и текстом
 		this._spriteContainer = new _pxC();
@@ -14,8 +15,8 @@ export default class coldNumPanel {
 		// Добавление текста в ячейке
 		texts.forEach((item) => {
 			let newText = item.type === 'gradientText' ?
-				new _pxEx.BitmapText(item.text, presets.textStyles.infoPanel[item.type]) :
-				new _pxT(item.text, presets.textStyles.infoPanel[item.type]);
+				new _pxEx.BitmapText(item.text, settings.textStyle[item.type]) :
+				new _pxT(item.text, settings.textStyle[item.type]);
 
 			newText.position = {x: item.x || 0, y: item.y || 0};
 
@@ -60,16 +61,16 @@ export default class coldNumPanel {
 	 */
 	createNumber(obj){
 		let color,
-			map = presets.data.colorNumMap;
+			map = settings.numColor;
 		for(let key in map)
 			if(~map[key].indexOf(obj.number)) color = key;
 
 		if(obj.number === 37) obj.number = '00';
 
 		let numCnt = new _pxC(),
-			bg = new _pxS( presets.spriteStore.bgNumbers[color] ),
-			num = new _pxT(obj.number, presets.textStyles.infoPanel.number),
-			amount = new _pxT(obj.amount, presets.textStyles.infoPanel.amount);
+			bg = new _pxS( spriteStore.bgNumbers[color] ),
+			num = new _pxT(obj.number, settings.textStyle.number),
+			amount = new _pxT(obj.amount, settings.textStyle.amount);
 
 		num.position = {x: 33, y: 33};
 		num.anchor.set(0.5);

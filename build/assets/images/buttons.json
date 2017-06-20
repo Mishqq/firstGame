@@ -29,7 +29,7 @@
 },
 "btn_repeat_dis":
 {
-	"frame": {"x":232,"y":2,"w":108,"h":108},
+	"frame": {"x":234,"y":3,"w":108,"h":108},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":108,"h":108},
@@ -56,7 +56,7 @@
 },
 "btn_x2_dis":
 {
-	"frame": {"x":232,"y":112,"w":108,"h":108},
+	"frame": {"x":236,"y":112,"w":108,"h":108},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":108,"h":108},

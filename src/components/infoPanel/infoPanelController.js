@@ -1,9 +1,8 @@
 import infoPanelView from './infoPanelView';
-import presets from './../../constants/presets';
 
 export default class infoPanelController {
 	constructor(dataFromGameCtrl) {
-		this._infoPanel = new infoPanelView( dataFromGameCtrl || presets.data.infoPanel );
+		this._infoPanel = new infoPanelView( dataFromGameCtrl );
 	}
 
 	get pixiSprite(){

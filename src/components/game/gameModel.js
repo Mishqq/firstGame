@@ -1,12 +1,12 @@
-import presets from '../../constants/presets'
+import settings from './settings'
 
 export default class GameModel {
-	constructor(config){
+	constructor(){
 		this._betsCtrls = {};
 		this._cmpCtrls = {};
 		this._confirmBets = [];
 
-		this.balance = config.balance;
+		this._balance = 0;
 	}
 
 
@@ -17,6 +17,14 @@ export default class GameModel {
 	set betsCtrl(newBetsCtrl){
 		this._betsCtrls = newBetsCtrl;
 	}
+
+	get balance(){
+		return this._balance;
+	}
+	set balance(newBalance){
+		this._balance = newBalance;
+	}
+
 	deleteBetsCtrl(){
 		this.betsCtrl = {};
 	}
@@ -89,7 +97,7 @@ export default class GameModel {
 	 * Рассчёт выигрыша
 	 */
 	calculateWin(winNum){
-		let _k = presets.coefficients, winSum = 0;
+		let _k = settings.coefficients, winSum = 0;
 
 		this.confirmBets.forEach((item) => {
 			if(~item.numbers.indexOf(winNum)) winSum+= item.balance * _k[ item.numbers.length ];

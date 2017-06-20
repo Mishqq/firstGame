@@ -20,7 +20,7 @@ module.exports = {
 	devtool: 'source-map',
 	entry: ['pixi.js', './src/index.js'],
 	output: {
-		filename: 'app/game.js'
+		filename: 'build/game.js'
 	},
 	resolve: {
 		extensions: ["", ".js"]

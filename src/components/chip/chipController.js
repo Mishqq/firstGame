@@ -1,5 +1,5 @@
 import ChipView from './chipView';
-import presets from './../../constants/presets';
+import settings from './settings';
 
 //TODO: Переделатю вьюху: класс контейнера должен быть один, а не по количеству фишек
 
@@ -69,8 +69,8 @@ export default class ChipController {
 	 */
 	returnChipType(price){
 		let chipType;
-		for(let key in presets.data.chipValues)
-			if(presets.data.chipValues[key] === price) chipType = key;
+		for(let key in settings.values)
+			if(settings.values[key] === price) chipType = key;
 		return chipType;
 	}
 

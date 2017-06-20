@@ -1,5 +1,6 @@
 import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
-import presets from './../../constants/presets';
+import {spriteStore, gameSounds} from './../../constants/presets';
+import settings from './settings';
 import {_hf} from '../../services/helpFunctions';
 
 export default class ChipView {
@@ -10,35 +11,35 @@ export default class ChipView {
 		let spriteContainer = new _pxC();
 		this._spriteContainer = spriteContainer;
 
-		// spriteContainer.x = presets.positions.chips[chipType].x;
-		// spriteContainer.y = presets.positions.chips[chipType].y;
+		// spriteContainer.x = settings.position[chipType].x;
+		// spriteContainer.y = settings.position[chipType].y;
 
 		this._chips = {};
-		// let sprite = new _pxS( presets.spriteStore.chips[chipType] );
+		// let sprite = new _pxS( spriteStore.chips[chipType] );
 
 		['chip0', 'chip1', 'chip2', 'chip3', 'chip4'].forEach((item)=>{
 			this._chips[item] =new _pxC();
 			let _c = this._chips[item];
 
-			_c.x = presets.positions.chips[item].x;
-			_c.y = presets.positions.chips[item].y;
+			_c.x = settings.position[item].x;
+			_c.y = settings.position[item].y;
 
 			// Opt-in to interactivity
 			_c.interactive = true;
 			// Shows hand cursor
 			_c.buttonMode = true;
 
-			let chipSprite = new _pxS( presets.spriteStore.chips[item] );
+			let chipSprite = new _pxS( spriteStore.chips[item] );
 			chipSprite.anchor.set(0.5);
 
 			// Тень под фишкой
-			let shadow = new _pxS( presets.spriteStore.chips.chipShadow );
+			let shadow = new _pxS( spriteStore.chips.chipShadow );
 			shadow.anchor.set(0.5);
 
 			// Значение ставки на фишке
-			_c._chipValue = presets.data.chipValues[item];
+			_c._chipValue = settings.values[item];
 			_c._chipType = item;
-			let chipValueText = new _pxT( _hf.formatChipValue(_c._chipValue), presets.textStyles.chipTextStyle );
+			let chipValueText = new _pxT( _hf.formatChipValue(_c._chipValue), settings.textStyle );
 			chipValueText.anchor.set(0.5);
 
 			['touchend', 'mouseup', 'pointerup'].forEach((event)=>{
@@ -73,7 +74,7 @@ export default class ChipView {
 	}
 
 	chipTouchStart(event){
-		presets.gameSounds.play('sound02');
+		gameSounds.play('sound02');
 		// chipTouchStart в ChipController
 		this.cfg.touchStart.call(this.cfg.ctx, event.target._chipValue);
 	}

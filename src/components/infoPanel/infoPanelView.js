@@ -1,5 +1,5 @@
 import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
-import presets from './../../constants/presets';
+import settings from './settings';
 
 // views
 import limitsPanel from './limitsView'
@@ -13,8 +13,8 @@ export default class infoPanelView {
 		let spriteContainer = new _pxC();
 		this._spriteContainer = spriteContainer;
 
-		spriteContainer.x = presets.positions.infoPanel.main.x;
-		spriteContainer.y = presets.positions.infoPanel.main.y;
+		spriteContainer.x = settings.position.main.x;
+		spriteContainer.y = settings.position.main.y;
 
 		let bg = new _pxS.fromImage('./assets/images/bg_info.png');
 
@@ -37,7 +37,7 @@ export default class infoPanelView {
 
 		// Позиция каждой панели
 		for(let panel in this.panels)
-			this.panels[panel].sprite.position = presets.positions.infoPanel[panel]
+			this.panels[panel].sprite.position = settings.position[panel]
 
 		for(let key in this.panels)
 			spriteContainer.addChild( this.panels[key].sprite );

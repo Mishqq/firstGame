@@ -1,5 +1,6 @@
 import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
-import presets from './../../constants/presets';
+import {spriteStore} from './../../constants/presets';
+import settings from './settings';
 
 export default class betButtonView {
 	constructor(config) {
@@ -14,11 +15,11 @@ export default class betButtonView {
 
 		this.btnStates = {default: '', hover: '', disable: '',};
 
-		spriteContainer.position = presets.positions.betButton;
+		spriteContainer.position = settings.position;
 
-		this.btnStates.default = new _pxS( presets.spriteStore.bet.bet1 );
-		this.btnStates.disable = new _pxS( presets.spriteStore.bet.bet2 );
-		this.btnStates.hover = new _pxS( presets.spriteStore.bet.bet3 );
+		this.btnStates.default = new _pxS( spriteStore.bet.bet1 );
+		this.btnStates.disable = new _pxS( spriteStore.bet.bet2 );
+		this.btnStates.hover = new _pxS( spriteStore.bet.bet3 );
 
 		this.btnStates.disable.x = -3;
 		this.btnStates.hover.x = -6;

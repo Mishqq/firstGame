@@ -1,6 +1,6 @@
 import GameFieldView from './gameFieldView';
 import {clickAreas} from './gameFieldCellMap';
-import presets from './../../constants/presets';
+import settings from './settings';
 
 export default class GameFieldController {
 	constructor(configByGameCtrl) {
@@ -28,6 +28,8 @@ export default class GameFieldController {
 	}
 	hideWinNum(){
 		this._gameFieldBig.hideWinHint();
+
+		return this;
 	}
 
 
@@ -53,8 +55,8 @@ export default class GameFieldController {
 		// (не важно на что вешаем), то вычисляем координаты нужного поля относительно
 		// сцены вручную
 		let pos = {
-			x: event.data.global.x - presets.positions.fields.big.x,
-			y: event.data.global.y - presets.positions.fields.big.y
+			x: event.data.global.x - settings.position.x,
+			y: event.data.global.y - settings.position.y
 		};
 
 		let cell = this.getCellFromPos(pos);
@@ -74,8 +76,8 @@ export default class GameFieldController {
 	 */
 	getDataForBet(pos, global){
 		if(global){
-			pos.x -= presets.positions.fields.big.x;
-			pos.y -= presets.positions.fields.big.y;
+			pos.x -= settings.position.x;
+			pos.y -= settings.position.y;
 		}
 
 		let cell = this.getCellFromPos(pos);
@@ -84,8 +86,8 @@ export default class GameFieldController {
 			// Если к ячейке привязаны только её координаты
 
 			let center = !global ? cell.center :
-				{x: cell.center.x + presets.positions.fields.big.x,
-					y: cell.center.y + presets.positions.fields.big.y};
+				{x: cell.center.x + settings.position.x,
+					y: cell.center.y + settings.position.y};
 
 			let obj = {center: center, numbers: cell.numbers, type: cell.type};
 			if(cell.dozen) obj.dozen = cell.dozen;
@@ -98,8 +100,8 @@ export default class GameFieldController {
 
 			cell.cells.forEach((item) => {
 				let center = !global ? item.center :
-					{x: item.center.x + presets.positions.fields.big.x,
-						y: item.center.y + presets.positions.fields.big.y};
+					{x: item.center.x + settings.position.x,
+						y: item.center.y + settings.position.y};
 
 				let obj = {center: center, numbers: item.numbers, type: item.type};
 				if(item.dozen) obj.dozen = item.dozen;

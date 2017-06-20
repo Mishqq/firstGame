@@ -9,6 +9,10 @@ export default class ButtonController {
 		return this._btnView.getPixiSprite
 	}
 
+	lockClear(lockStatus){
+		return this._btnView.lockClear(lockStatus);
+	}
+
 	disable(){
 		this._btnView.btnDisable();
 	};

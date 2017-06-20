@@ -1,5 +1,6 @@
 import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
-import presets from './../../constants/presets';
+import {spriteStore, gameSounds} from './../../constants/presets';
+import settings from './settings';
 
 export default class ButtonView {
 	constructor(config) {
@@ -16,8 +17,8 @@ export default class ButtonView {
 			this._buttons[key] = new _pxC();
 			let _b = this._buttons[key];
 
-			_b.x = presets.positions.buttons[key].x;
-			_b.y = presets.positions.buttons[key].y;
+			_b.x = settings.position[key].x;
+			_b.y = settings.position[key].y;
 
 			// Opt-in to interactivity
 			_b.interactive = true;
@@ -63,7 +64,7 @@ export default class ButtonView {
 		let btn = event.target,
 			btnType = btn._btnType;
 
-		presets.gameSounds.play('sound02');
+		gameSounds.play('sound02');
 		this.btnDefault(btn);
 
 		this._cfg[btnType].call(this._cfg.ctx);
@@ -147,6 +148,16 @@ export default class ButtonView {
 		}
 	}
 
+	lockClear(lockStatus){
+		let btn = this._buttons.btnClear;
+
+		btn.interactive = !lockStatus;
+		btn.buttonMode = !lockStatus;
+		btn._childSprites.icoDef.visible = !lockStatus;
+		btn._childSprites.icoDis.visible = lockStatus;
+		btn._childSprites.text.alpha = lockStatus ? 0.5 : 1;
+	}
+
 
 	/**
 	 * Создание квадратных кнопок
@@ -155,11 +166,11 @@ export default class ButtonView {
 	squareBtnCreate(btnSquareType){
 		let type = (btnSquareType === 'btnCancel') ? 'cn' : 'cl';
 
-		let stateDef = new _pxS( presets.spriteStore.buttons['btnAction'] ),
-			stateSel = new _pxS( presets.spriteStore.buttons['btnActionSel'] ),
-			icoDef = new _pxS( presets.spriteStore.buttons[type === 'cn' ? 'icoCancel' : 'icoClear'] ),
-			icoDis = new _pxS( presets.spriteStore.buttons[type === 'cn' ? 'icoCancelDis' : 'icoClearDis'] ),
-			text = new _pxT( type === 'cn' ? presets.texts.button.cancel : presets.texts.button.clear, presets.textStyles.buttonStyle );
+		let stateDef = new _pxS( spriteStore.buttons['btnAction'] ),
+			stateSel = new _pxS( spriteStore.buttons['btnActionSel'] ),
+			icoDef = new _pxS( spriteStore.buttons[type === 'cn' ? 'icoCancel' : 'icoClear'] ),
+			icoDis = new _pxS( spriteStore.buttons[type === 'cn' ? 'icoCancelDis' : 'icoClearDis'] ),
+			text = new _pxT( type === 'cn' ? settings.texts.cancel : settings.texts.clear, settings.textStyle );
 
 		stateSel.visible = false;
 		icoDis.visible = false;
@@ -183,9 +194,9 @@ export default class ButtonView {
 	roundBtnCreate(btnSquareType){
 		let type = (btnSquareType === 'btnRepeat') ? 'rpt' : 'x2';
 
-		let stateDef = new _pxS( presets.spriteStore.buttons[type === 'rpt' ? 'btnRepeat' : 'btnX2'] ),
-			stateSel = new _pxS( presets.spriteStore.buttons[type === 'rpt' ? 'btnRepeatSel' : 'btnX2Sel'] ),
-			stateDis = new _pxS( presets.spriteStore.buttons[type === 'rpt' ? 'btnRepeatDis' : 'btnX2Dis'] );
+		let stateDef = new _pxS( spriteStore.buttons[type === 'rpt' ? 'btnRepeat' : 'btnX2'] ),
+			stateSel = new _pxS( spriteStore.buttons[type === 'rpt' ? 'btnRepeatSel' : 'btnX2Sel'] ),
+			stateDis = new _pxS( spriteStore.buttons[type === 'rpt' ? 'btnRepeatDis' : 'btnX2Dis'] );
 
 		stateSel.visible = false;
 		stateDis.visible = false;

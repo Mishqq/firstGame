@@ -1,5 +1,6 @@
 import {_p, _pxC, _pxS, _pxT, _pxEx, _pxG} from './../../constants/PIXIabbr';
-import presets from './../../constants/presets';
+import {spriteStore} from './../../constants/presets';
+import settings from './settings';
 
 export default class otherNumPanel {
 	constructor(numbers) {
@@ -16,7 +17,7 @@ export default class otherNumPanel {
 
 		this.numbersSprites = {};
 
-		let texts = presets.texts.infoPanel.otherNumbers;
+		let texts = settings.texts.otherNumbers;
 
 		// Контейнер для фишки с тенью и текстом
 		this._spriteContainer = new _pxC();
@@ -27,8 +28,8 @@ export default class otherNumPanel {
 
 		texts.forEach((item) => {
 			let newText = item.type === 'gradientText' ?
-				new _pxEx.BitmapText(item.text, presets.textStyles.infoPanel[item.type]) :
-				new _pxT(item.text, presets.textStyles.infoPanel[item.type]);
+				new _pxEx.BitmapText(item.text, settings.textStyle[item.type]) :
+				new _pxT(item.text, settings.textStyle[item.type]);
 
 			newText.position = {x: item.x || 0, y: item.y || 0};
 
@@ -48,7 +49,7 @@ export default class otherNumPanel {
 			let num = this.numbers[key] + '%';
 
 			if(!this.numbersSprites[key]){
-				this.numbersSprites[key] = new _pxT(num, presets.textStyles.infoPanel.whiteText);
+				this.numbersSprites[key] = new _pxT(num, settings.textStyle.whiteText);
 				this.numbersSprites[key].position = this.numbersPos[key];
 				this._spriteContainer.addChild(this.numbersSprites[key]);
 			} else {
@@ -76,10 +77,10 @@ export default class otherNumPanel {
 	}
 
 	drawRhombus(){
-		let redR = new _pxS(presets.spriteStore.bgNumbers.icoRed);
+		let redR = new _pxS(spriteStore.bgNumbers.icoRed);
 		redR.position = {x: 20, y: 75};
 
-		let blackR = new _pxS(presets.spriteStore.bgNumbers.icoBlack);
+		let blackR = new _pxS(spriteStore.bgNumbers.icoBlack);
 		blackR.position = {x: 200, y: 75};
 		this._spriteContainer.addChild(redR);
 		this._spriteContainer.addChild(blackR);

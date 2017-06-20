@@ -134,6 +134,31 @@ Array.prototype.equals = function (array, full) {
 // Hide method from for-in loops
 Object.defineProperty(Array.prototype, "equals", {enumerable: false});
 
+function getCoords(elem) {
+	// (1)
+	let box = elem.getBoundingClientRect();
+
+	let body = document.body;
+	let docEl = document.documentElement;
+
+	// (2)
+	let scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
+	let scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
+
+	// (3)
+	let clientTop = docEl.clientTop || body.clientTop || 0;
+	let clientLeft = docEl.clientLeft || body.clientLeft || 0;
+
+	// (4)
+	let top = box.top + scrollTop - clientTop;
+	let left = box.left + scrollLeft - clientLeft;
+
+	return {
+		top: top,
+		left: left
+	};
+}
+
 
 let _hf = {
 	isPosInBounds,
@@ -142,7 +167,8 @@ let _hf = {
 	colorType,
 	addTextToSprite,
 	randEl,
-	getClass
+	getClass,
+	getCoords
 };
 
 export {_hf};

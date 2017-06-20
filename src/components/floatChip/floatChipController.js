@@ -1,5 +1,4 @@
 import FloatChipView from './floatChipView';
-import presets from './../../constants/presets';
 
 export default class FloatChipController {
 	constructor(configByGameCtrl) {
@@ -18,5 +17,9 @@ export default class FloatChipController {
 
 	setPosition(pos){
 		this._floatChipsSprite.setPosition(pos);
+	}
+
+	setKoeff(text){
+		this._floatChipsSprite.setKoeff(text);
 	}
 }

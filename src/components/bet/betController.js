@@ -1,5 +1,5 @@
 import BetView from './betView';
-import presets from './../../constants/presets';
+import settings from './settings';
 
 export default class BetController {
 	constructor(configByGameCtrl) {
@@ -8,7 +8,7 @@ export default class BetController {
 		this._moreType = configByGameCtrl.info[ configByGameCtrl.info.type ];
 
 		let config = configByGameCtrl;
-		config.limits = presets.limits[ this._numbers.length ];
+		config.limits = settings.limits[ this._numbers.length ];
 
 		this._betView = new BetView(config);
 	}
