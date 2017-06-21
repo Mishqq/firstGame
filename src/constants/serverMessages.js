@@ -35,16 +35,17 @@ const serverMessages = {
 			lang: "ru",
 			prev_game_kind: -1,
 			auth: {
-				balance: 11200.456,
+				balance: 10000.456,
 				bonus: 24000,
 				kind: "by_card",
 				nickname: "Maika",
 			},
-			bets: [
-				{price: 300, bonus: false, content: {kind: "numbers", numbers: [5, 4]}},
-				{price: 300, bonus: false, content: {kind: "numbers", numbers: [25, 26, 28, 29]}},
-				{price: 500, bonus: false, content: {kind: "dozen", dozen: 1}}
-				],
+			bets: [],
+			// bets: [
+			// 	{price: 300, bonus: false, content: {kind: "numbers", numbers: [5, 4]}},
+			// 	{price: 300, bonus: false, content: {kind: "numbers", numbers: [25, 26, 28, 29]}},
+			// 	{price: 500, bonus: false, content: {kind: "dozen", dozen: 1}}
+			// ],
 			game_data: {
 				balls: [24],
 				end_bets_expected: "2017-06-16T12:20:00Z",
@@ -72,6 +73,30 @@ const serverMessages = {
 				game_id:787,
 				game_state:2,
 				total_win:105000
+			}
+		},
+		{
+			kind:"init_msg",
+			lang:"ru",
+			prev_game_kind:-1,
+			auth: {
+				balance:5000,
+				bonus:54000,
+				kind:"by_card",
+				nickname:"Maika"
+			},
+			bets:[
+				// {bonus:false, content: {kind:"red"}, price:1000}
+				// {bonus:false, content:{kind:"numbers", numbers:[16]}, price:3000}
+				// {bonus:false, content:{kind:"dozen", dozen:1}, price:3000}
+				{bonus:false, content:{kind:"column", column:1}, price:1000}
+			],
+			game_data:{
+				balls:[1],
+				end_bets_expected:"",
+				game_id:832,
+				game_state:2,
+				total_win: 1000
 			}
 		}
 	],
@@ -111,7 +136,7 @@ const serverMessages = {
 	},
 	bets_ok_msg: {
 		kind: "bets_ok_msg",
-		balance: 2200,
+		balance: 8200,
 		bonus: 12.3,
 	}
 };

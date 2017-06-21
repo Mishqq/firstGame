@@ -32,7 +32,8 @@ export default class GameFieldView {
 
 		this.drawWinHints();
 
-		// this.devModeInteractiveAreas();
+		// Подсветка полей для ставок
+		//this.devModeInteractiveAreas();
 	}
 
 	set pixiContainer(container){

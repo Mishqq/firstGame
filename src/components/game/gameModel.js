@@ -3,7 +3,7 @@ import settings from './settings'
 export default class GameModel {
 	constructor(){
 		this._betsCtrls = {};
-		this._cmpCtrls = {};
+		this.componentsControllers = {};
 		this._confirmBets = [];
 
 		this._balance = 0;

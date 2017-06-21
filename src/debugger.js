@@ -36,7 +36,7 @@ export default class Debugger {
 
 			// setTimeout(() => {
 			// 	this.toJs(JSON.stringify( {error_code:401,error_ctx:"bet_error",kind:"error_msg"} ));
-			// }, 4000);
+			// }, 2000);
 
 		} else if(data.kind === 'bets_msg'){
 
@@ -57,7 +57,6 @@ export default class Debugger {
         }
 
 	}
-
 }
 
 

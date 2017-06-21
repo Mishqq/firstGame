@@ -15,4 +15,8 @@ export default class Controller {
 		this.view.viewError(error.ru, lockError);
 	}
 
+	get pixiSprite(){
+		return this.view.container;
+	}
+
 }

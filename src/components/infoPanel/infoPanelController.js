@@ -9,7 +9,7 @@ export default class infoPanelController {
 		return this._infoPanel.sprite
 	}
 
-	updateInfoPanelView(data){
+	setData(data){
 		this._infoPanel.update(data);
 	}
 }

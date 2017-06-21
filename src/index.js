@@ -1,9 +1,14 @@
 import "babel-polyfill";
 import GameController from './components/game/gameController';
 import Debugger from './debugger';
+import serverEmulate from './services/serverEmulate';
 import {_hf} from './services/helpFunctions';
 
-if(!window.cppObj) window.cppObj = new Debugger();
+if(!window.cppObj) {
+	window.cppObj = new Debugger();
+	// let stateMachine = new serverEmulate();
+	// stateMachine.startWork();
+}
 
 let gameCtrl = new GameController((...ars)=>cppObj.fromJs(...ars));
 gameCtrl.init((...ars)=>cppObj.fromJs(...ars));

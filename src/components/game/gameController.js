@@ -4,7 +4,7 @@ import Game from '../../Game';
 import {assetLoader} from '../../services/resourseLoader'
 import {touchEvents, gameSounds} from '../../constants/presets'
 import settings from './settings'
-import {_p, _pxC, _pxS, _pxT, _pxEx} from './../../constants/PIXIabbr';
+import {_pxC} from './../../constants/PIXIabbr';
 
 import GameModel from './gameModel';
 import {_hf} from '../../services/helpFunctions';
@@ -24,11 +24,6 @@ import historyController    from '../history/historyController';
 import ExitController    	from '../exit/controller';
 import ErrorsController    	from '../errors/controller';
 
-// Сокращения для удобства
-let _gm,    // gameModel
-	_cmp,   // components // храним контроллеры компонентов
-	_stg;   // stage
-
 
 /**
  * Плохо оно само получится ©
@@ -41,8 +36,13 @@ export default class GameController {
 	}
 
 	init(callback){
-		// Component controller instances collection
-		this._cmpCtrls = {};
+		let game = this.game;
+
+		this.componentCotrollers = {};      // Component controller instances collection
+		this.gameModel = new GameModel();
+		this.stage = game.stage;
+
+		let {componentCotrollers: cmpCtrl, stage: st} = this;
 
 		this._touchEvents = {
 			betStart: false,
@@ -51,82 +51,55 @@ export default class GameController {
 			move: false
 		};
 
-		let game = this.game;
-		this.stage = game.stage;
+		st.addChild( new Background() );
+		st.interactive = true;
 
-		this.gameModel = new GameModel();
+		touchEvents.start.forEach((event)=>{ st.on(event, this.onTouchStart, this) });
 
-		_gm = this.gameModel;
-		_cmp = this._cmpCtrls;
+		touchEvents.move.forEach((event)=>{ st.on(event, this.onTouchMove, this) });
 
-		_stg = this.stage;
-
-		/**
-		 * background
-		 */
-		let bg = new Background();
-		_stg.addChild(bg);
-		_stg.interactive = true;
-
-
-		touchEvents.start.forEach((event)=>{ _stg.on(event, this.onTouchStart, this) });
-
-		touchEvents.move.forEach((event)=>{ _stg.on(event, this.onTouchMove, this) });
-
-		touchEvents.end.forEach((event)=>{ _stg.on(event, this.onTouchEnd, this) });
+		touchEvents.end.forEach((event)=>{ st.on(event, this.onTouchEnd, this) });
 
 
 		// Игровое поле
-		_cmp.gameField = new GameFieldController({checkChips: this.checkActiveChip, ctx: this});
+		cmpCtrl.gameField = new GameFieldController({checkChips: this.checkActiveChip, ctx: this});
 
 		// Прогружаем все json-атласы
 		assetLoader( () => {
-
-                _cmp.chips = new ChipController({touchEnd: this.chipTouchEnd, touchStart: this.chipTouchStart,ctx: this
+			cmpCtrl.chips = new ChipController({touchEnd: this.chipTouchEnd, touchStart: this.chipTouchStart,ctx: this
 			});
 
 			// Панель кнопок
-			let buttonsController = new ButtonController({
+			cmpCtrl.buttons = new ButtonController({
 				btnClear: this.btnClear,
 				btnRepeat: this.btnRepeat,
 				btnX2: this.btnX2,
 				ctx: this
 			});
-			_cmp.buttons = buttonsController;
 
 			// Плавающая фишка
-			_cmp.betBtn = new betButtonController({betBtnClick: this.betBtnClick, ctx: this});
-
-			// Плавающая фишка
-			// _cmp.fChip = new FloatChipController({setBet: this.floatChipCallback, ctx: this});
+			cmpCtrl.betBtn = new betButtonController({betBtnClick: this.betBtnClick, ctx: this});
 
 			// Шкала-таймер
-			_cmp.timeScale = new TimeScaleController({lockTable:this.lockTable, ctx: this});
-			//_cmp.timeScale.start();
+			cmpCtrl.timeScale = new TimeScaleController();
 
 			// Панель с информацией о лимитах, горячих/холодных номерах
-			_cmp.infoPanel = new infoPanelController(settings.infoPanelData);
+			cmpCtrl.infoPanel = new infoPanelController(settings.infoPanelData);
 
 			// Панель с информацией о выигрыше/ставке/балансе
-			_cmp.betPanelCtrl = new betPanelController();
+			cmpCtrl.betPanelCtrl = new betPanelController();
 
 			// Панель с рулеткой и лентой истории
-			_cmp.historyCtrl = new historyController();
+			cmpCtrl.historyCtrl = new historyController();
 
-			for(let key in _cmp) {
-				_stg.addChild(_cmp[key].pixiSprite);
-            }
+			cmpCtrl.exit = new ExitController({exit: ()=>this.exit()});
 
-            let {stage} = this;
-            let exit = new ExitController({exit: ()=>this.exit()});
-            stage.addChild(exit.view.container);
-            this._cmpCtrls.exit = exit;
+			cmpCtrl.errors = new ErrorsController();
 
-			let errors = new ErrorsController();
-			stage.addChild(errors.view.container);
-			this._cmpCtrls.errors = errors;
+			for(let key in cmpCtrl)
+				if(cmpCtrl.hasOwnProperty(key)) st.addChild(cmpCtrl[key].pixiSprite);
 
-			_stg.addChild(this.betsCnt = new _pxC());
+			st.addChild(this.betsContainer = new _pxC());
 
 			game.start();
 
@@ -142,6 +115,8 @@ export default class GameController {
 	 * Обработка init_msg-сообщений
 	 */
 	initMessageHandler(gameData, authData, bets){
+		let {componentCotrollers: cmpCtrl} = this;
+
 		this.animateTimeouts = [];
 
 		this.prevBets = undefined;
@@ -149,21 +124,26 @@ export default class GameController {
 
 		this.gameModel.balance = Math.floor(authData.balance);
 
-		let betPanelCfg =  {fldBet: 0, fldWin: gameData.total_win, fldBalance: Math.floor(authData.balance)};
-		_cmp.betPanelCtrl.setData(betPanelCfg);
-
-		if(bets) this.setServerBets(bets);
+		// TODO: если есть выигрышь со старой игры - сделать анимацию перечисления
+		let betPanelCfg = {fldBet: 0, fldWin: 0, fldBalance: this.gameModel.balance};
+		cmpCtrl.betPanelCtrl.setData(betPanelCfg);
+		if(bets) {
+			this.setServerBets(bets);
+			cmpCtrl.betPanelCtrl.setData({fldBalance: this.gameModel.balance});
+		}
 
 		// game_state === 1 - игра закончена. Шкала времени уменьшается. Отображается число предыдущего выигрыша
 		// game_state === 2 - розыгрышь. Ролится число. Шкалы времени нет
 		if(+gameData.game_state === 1){
 			this.interactiveSwitcher(!bets.length);
 
-			_cmp.historyCtrl.setData(gameData.balls);
+			this.betBtnClickStatus = false;
 
-			_cmp.buttons.lockClear(true);
+			cmpCtrl.historyCtrl.setData(gameData.balls);
 
-			_cmp.gameField.hideWinNum();
+			cmpCtrl.buttons.lockClear(true);
+
+			cmpCtrl.gameField.hideWinNum();
 
 			let start = momentJs();
 			let end = momentJs(gameData.end_bets_expected);
@@ -172,23 +152,23 @@ export default class GameController {
 			//playTime = 6;
 
 			// Анимация выпадающего числа
-			_cmp.historyCtrl.showRollAnim(false);
+			cmpCtrl.historyCtrl.showRollAnim(false);
 
 			if(playTime > 0){
 				// идёт розыгрыш со шкалой
 				let tm1 = setTimeout(() => {
-					_cmp.historyCtrl.showRollAnim(true).play();
+					cmpCtrl.historyCtrl.showRollAnim(true).play();
 				}, (playTime - settings.timeScale.changeColorPer * playTime) * 1000);
 				this.animateTimeouts.push(tm1);
 
 				// Задаём время шкале и запускаем её
-				_cmp.timeScale.setTime(playTime).start();
+				cmpCtrl.timeScale.setTime(playTime).start();
 
 			} else {
 				// Всё ещё идёт розыгрыш без шкалы и с роллом числа
-				_cmp.historyCtrl.showRollAnim(true).play();
+				cmpCtrl.historyCtrl.showRollAnim(true).play();
 
-				_cmp.timeScale.setTime(30).start();
+				cmpCtrl.timeScale.setTime(30).start();
 			}
 
 
@@ -196,13 +176,21 @@ export default class GameController {
 			this.interactiveSwitcher(false);
 
 			if(gameData.balls.length){
-				_cmp.timeScale.setState(4, gameData.balls[0]);
-				_cmp.historyCtrl.showRollAnim(false).showRolledNum(gameData.balls[0]);
-				_cmp.gameField.showWinNum(gameData.balls[0]);
+				cmpCtrl.timeScale.setState(4, gameData.balls[0]);
+				cmpCtrl.historyCtrl.showRollAnim(false).showRolledNum(gameData.balls[0]);
+				cmpCtrl.gameField.showWinNum(gameData.balls[0]);
+
+				let win = gameData.total_win;
+				if(win) {
+					gameSounds.play('sound06');
+					cmpCtrl.betPanelCtrl.setData({fldWin: win});
+
+					this.gameModel.balance = cmpCtrl.betPanelCtrl.data.fldBalance+win;
+				}
 			} else {
-				_cmp.timeScale.setState(3);
-				_cmp.gameField.hideWinNum();
-				_cmp.historyCtrl.play();
+				cmpCtrl.timeScale.setState(3);
+				cmpCtrl.gameField.hideWinNum();
+				cmpCtrl.historyCtrl.play();
 			}
 		}
 	}
@@ -211,28 +199,39 @@ export default class GameController {
 	 * Обработка rand_msg-сообщений
 	 */
 	randMessageHandler(gameData){
+		let {componentCotrollers: cmpCtrl, gameModel: GM} = this;
+
 		this.clearTableBet();
 		this.removeFloatChip();
 
 		this.prevBetsActive = false;
 
 		if(+gameData.game_state === 1){
+			this.betBtnClickStatus = false;
+
 			// Очистка стола от предыдущих ставок.
 			this.clearTableBet();
-			for(let key in _gm.betsCtrl){
-				_gm.betsCtrl[key].clearBet();
+			for(let key in GM.betsCtrl){
+				if(!GM.betsCtrl.hasOwnProperty(key)) continue;
+
+				GM.betsCtrl[key].clearBet();
 				gameSounds.play('sound03');
+
+				let b =cmpCtrl.betPanelCtrl.data;
+				cmpCtrl.betPanelCtrl.setData({fldWin: 0, fldBalance: b.fldBalance+b.fldWin});
 			}
 			setTimeout(() => this.btnClear(), 1000);
 
-			_gm.resetModel();
-			this.interactiveSwitcher(true);
-			_cmp.buttons.lockClear(true);
-			//_cmp.gameField.hideWinNum();
-			setTimeout(() => _cmp.gameField.hideWinNum(), 3000);
+			cmpCtrl.betPanelCtrl.setData({fldBet: 0, fldWin: 0, fldBalance: this.gameModel.balance});
 
-			_cmp.historyCtrl.showRollAnim(true);
-			//_cmp.historyCtrl.showRolledNum(gameData.balls[0]);
+			GM.resetModel();
+			this.interactiveSwitcher(true);
+			cmpCtrl.buttons.lockClear(true);
+			//cmpCtrl.gameField.hideWinNum();
+			setTimeout(() => cmpCtrl.gameField.hideWinNum(), 3000);
+
+			cmpCtrl.historyCtrl.showRollAnim(true);
+			//cmpCtrl.historyCtrl.showRolledNum(gameData.balls[0]);
 
 			let start = momentJs();
 			let end = momentJs(gameData.end_bets_expected);
@@ -242,15 +241,15 @@ export default class GameController {
 
 			// Анимация выпадающего числа
 			if(gameData.balls.length){
-				_cmp.historyCtrl.showRollAnim(false).addNum(gameData.balls[0], true).showRolledNum(gameData.balls[0]);
+				cmpCtrl.historyCtrl.showRollAnim(false).addNum(gameData.balls[0], true).showRolledNum(gameData.balls[0]);
 			}
 			let tm1 = setTimeout(() => {
-				_cmp.historyCtrl.showRollAnim(true).play();
+				cmpCtrl.historyCtrl.showRollAnim(true).play();
 			}, (playTime - settings.timeScale.changeColorPer * playTime) * 1000);
 			this.animateTimeouts.push(tm1);
 
 			// Задаём время шкале и запускаем её
-			_cmp.timeScale.setTime(playTime).start();
+			cmpCtrl.timeScale.setTime(playTime).start();
 		} else if(+gameData.game_state === 2){
 			this.animateTimeouts.forEach(item => clearTimeout(item));
 			this.animateTimeouts.length = 0;
@@ -259,33 +258,40 @@ export default class GameController {
 
 			if(!gameData.balls.length){
 				// Шаров нет. Крутим анимацию, скрываем шкалу
-
-				_cmp.historyCtrl.showRollAnim(true).play();
+				cmpCtrl.historyCtrl.showRollAnim(true).play();
 
 				// Переводим таймскейл в состояние "Идёт игра"
-				_cmp.timeScale.setState(3);
+				cmpCtrl.timeScale.setState(3);
+
+				if(!this.betBtnClickStatus){
+					for(let key in GM.betsCtrl){
+						if(!GM.betsCtrl.hasOwnProperty(key)) continue;
+
+						GM.betsCtrl[key].clearBet();
+						gameSounds.play('sound03');
+
+						let nums = cmpCtrl.betPanelCtrl.data;
+						cmpCtrl.betPanelCtrl.setData({fldBet: 0, fldWin: 0, fldBalance: nums.fldBalance + nums.fldBet});
+					}
+				}
 			} else {
 				// Отключаем анимацию и показываем выигрышное число
-				_cmp.historyCtrl.showRollAnim(false).showRolledNum(gameData.balls[0]);
+				cmpCtrl.historyCtrl.showRollAnim(false).showRolledNum(gameData.balls[0]);
 
 				// Переводим таймскейл в состояние "выигрышное число"
-				_cmp.timeScale.setState(4, gameData.balls[0]);
+				cmpCtrl.timeScale.setState(4, gameData.balls[0]);
 
 				// Скрываем (если есть) предыдущее выигршное число и показываем текущее
-				_cmp.gameField.hideWinNum().showWinNum(gameData.balls[0]);
+				cmpCtrl.gameField.hideWinNum().showWinNum(gameData.balls[0]);
 
-				let win = _gm.calculateWin(gameData.balls[0]);
+				//let win = GM.calculateWin(gameData.balls[0]);
 				// Выигрыш с сервера
-				win = gameData.total_win;
+				let win = gameData.total_win;
 				if(win) {
 					gameSounds.play('sound06');
-					_cmp.betPanelCtrl.updateInfoPanelView({fldWin: win});
+					cmpCtrl.betPanelCtrl.setData({fldWin: win});
 
-					this.gameModel.balance = _cmp.betPanelCtrl.data.fldBalance+win;
-
-					setTimeout(() => {
-						_cmp.betPanelCtrl.updateInfoPanelView({fldWin: 0, fldBalance: _cmp.betPanelCtrl.data.fldBalance+win});
-					}, 5000)
+					this.gameModel.balance = cmpCtrl.betPanelCtrl.data.fldBalance+win;
 				}
 			}
 		}
@@ -295,19 +301,21 @@ export default class GameController {
 	 * Обработчик сообщений с kind === "error_msg"
 	 */
 	errorsHandler(code){
+		let {componentCotrollers: cmpCtrl} = this;
 		// Коды ошибок, при которых лочится клиент; слетают ставки
-		let lockClient = [-1, 102, 106],
+		let lockClient = [-1, 102, 106, 401],
 			clearBets = [401, 402];
 
 		if(clearBets.includes(code)) this.confirmBets(false);
 
-		this._cmpCtrls.errors.viewError(code, lockClient.includes(code));
+		cmpCtrl.errors.viewError(code, lockClient.includes(code));
 
 		if(lockClient.includes(code)) this.interactiveSwitcher(false);
 	}
 
 	checkActiveChip(){
-		return _gm.activeChip;
+		let {gameModel: GM} = this;
+		return GM.activeChip;
 	}
 
 	get touchEvents(){
@@ -315,10 +323,12 @@ export default class GameController {
 	}
 
 	set touchEvents(event){
-		for(let key in this._touchEvents)
-			this._touchEvents[key] = false;
+		let {_touchEvents: tEv} = this;
 
-		this._touchEvents[event] = (event !== 'reset');
+		for(let key in tEv)
+			if(tEv.hasOwnProperty(key)) tEv[key] = false;
+
+		tEv[event] = (event !== 'reset');
 	}
 
 
@@ -329,6 +339,8 @@ export default class GameController {
 	 * Создание/апдейт ставки
 	 */
 	changeBets(pos4Bet, value, globalPos){
+		let {gameModel: GM, betsContainer: betsCnt} = this;
+
 		if(!pos4Bet) return;
 
 		let betsChange = (item)=>{
@@ -338,15 +350,15 @@ export default class GameController {
 
 			let betStoreId = pos.x + '_' + pos.y;
 
-			if(_gm.betsCtrl[betStoreId]){
-				_gm.betsCtrl[betStoreId].updateBet(value);
+			if(GM.betsCtrl[betStoreId]){
+				GM.betsCtrl[betStoreId].updateBet(value);
 			} else {
 				let cfg = {pos: pos, info: item, value: value, callback: this.betCallback, ctx: this};
-				_gm.betsCtrl[betStoreId] = new BetController(cfg);
+				GM.betsCtrl[betStoreId] = new BetController(cfg);
 
-				this.betsCnt.addChild(_gm.betsCtrl[betStoreId].betSprite);
+				betsCnt.addChild(GM.betsCtrl[betStoreId].betSprite);
 				// Сортировка bet'ов, чтобы фишки налезали друг на друга правильно
-				this.betsCnt.children.sort((a, b) => {return a.y > b.y});
+				betsCnt.children.sort((a, b) => a.y - b.y);
 			}
 		};
 
@@ -364,7 +376,9 @@ export default class GameController {
 	 * @returns {x|y}
 	 */
 	getDataForBet(pos, global){
-		return _cmp.gameField.getDataForBet(pos, global);
+		let {componentCotrollers: cmpCtrl} = this;
+
+		return cmpCtrl.gameField.getDataForBet(pos, global);
 	};
 
 	/**
@@ -374,46 +388,55 @@ export default class GameController {
 	 * @returns {*}
 	 */
 	getPositionForBet(betType, betData){
-		return _cmp.gameField.getPositionForBet(betType, betData);
+		let {componentCotrollers: cmpCtrl} = this;
+
+		return cmpCtrl.gameField.getPositionForBet(betType, betData);
 	};
 
 	/**
 	 * Обновление информации на панели ставок/баланса,выигрыша после изменения ставок
 	 */
 	updateBetModel(){
-		let bet = 0;
+		let {componentCotrollers: cmpCtrl, gameModel: GM, stage: st} = this,
+			{buttons, betPanelCtrl: betPanel} = cmpCtrl,
+			bet = 0;
 
-		for(let key in _gm.betsCtrl){
-			if(_gm.betsCtrl[key].balance === 0){
-				_stg.removeChild( _gm.betsCtrl[key].betSprite );
-				delete _gm.betsCtrl[key];
+		for(let key in GM.betsCtrl){
+			if(!GM.betsCtrl.hasOwnProperty(key)) continue;
+
+			if(GM.betsCtrl[key].balance === 0){
+				st.removeChild( GM.betsCtrl[key].betSprite );
+				delete GM.betsCtrl[key];
 			} else {
-				bet += _gm.betsCtrl[key].balance;
+				bet += GM.betsCtrl[key].balance;
 			}
 		}
 
-		_cmp.buttons.lockClear(!(bet > 0));
+		buttons.lockClear(!(bet > 0));
 
 		let newBalance = this.gameModel.balance-bet;
 
-		_cmp.betPanelCtrl.updateInfoPanelView({fldBet: bet, fldBalance: newBalance});
+		betPanel.setData({fldBet: bet, fldBalance: newBalance});
 	};
 
 	/**
 	 * Обработчик подтверждения ставок от сервера
 	 */
 	confirmBets(betsServerStatus){
+		let {componentCotrollers: cmpCtrl, gameModel: GM} = this,
+			{betPanelCtrl: betPanel} = cmpCtrl;
+
 		if(!betsServerStatus){
 			// Если ставка не прошла
 			this.btnClear();
 
-			_gm.deleteConfirmBets();
-			_gm.deleteBetsCtrl();
+			GM.deleteConfirmBets();
+			GM.deleteBetsCtrl();
 
 			this.interactiveSwitcher(true);
 		} else {
 			this.gameModel.balance = Math.floor(betsServerStatus.balance);
-			_cmp.betPanelCtrl.updateInfoPanelView({fldBalance: Math.floor(betsServerStatus.balance)});
+			betPanel.setData({fldBalance: Math.floor(betsServerStatus.balance)});
 			this.interactiveSwitcher(false);
 		}
 	}
@@ -422,18 +445,11 @@ export default class GameController {
 	 * Делаем ставки по данным с сервера
 	 */
 	setServerBets(bets){
-		let currentBetsValue = 0;
-		bets.forEach((item) => currentBetsValue += item.price);
+		bets.forEach((bet) => {
+			let cell = this.getPositionForBet(bet.content.kind, bet.content[ bet.content.kind ]);
 
-		if(currentBetsValue > _cmp.betPanelCtrl.data.fldBalance){
-			this._cmpCtrls.errors.viewError(402);
-		} else {
-			bets.forEach((bet) => {
-				let cell = this.getPositionForBet(bet.content.kind, bet.content[ bet.content.kind ]);
-
-				this.changeBets(cell, bet.price, true);
-			});
-		}
+			this.changeBets(cell, bet.price, true);
+		});
 	}
 
 
@@ -444,39 +460,23 @@ export default class GameController {
 	 * Очищаем стол: скидываем размер ставки, скрываем белые кольца
 	 */
 	clearTableBet(){
-		_cmp.gameField.hideHints();
+		let {componentCotrollers: cmpCtrl} = this;
+
+		cmpCtrl.gameField.hideHints();
 	};
-
-	/**
-	 * Метод лочит панель фишек и кнопок по истечению времени
-	 */
-	lockTable(){
-		this.interactiveSwitcher(false);
-
-		this.clearTableBet();
-		this.removeFloatChip();
-
-		_cmp.chips.setDefault();
-
-		setTimeout(() => {
-			for(let key in _gm.betsCtrl){
-				_gm.betsCtrl[key].clearBet();
-				gameSounds.play('sound03');
-			}
-		}, 2000);
-	}
 
 	/**
 	 * Удаление плавающей фишки
 	 */
 	removeFloatChip(){
-		if(this.fChip){
-			_stg.removeChild(this.fChip.pixiSprite);
-			_gm.activeChip = undefined;
-			delete this.fChip;
-		}
-	}
+		let {gameModel: GM, stage: st} = this;
 
+		if(!this.fChip) return;
+
+		st.removeChild(this.fChip.pixiSprite);
+		GM.activeChip = undefined;
+		delete this.fChip;
+	}
 
 
 	/**
@@ -486,6 +486,8 @@ export default class GameController {
 	 * Коллбек для компонента ставок
 	 */
 	betCallback(type, data){
+		let {gameModel: GM} = this;
+
 		if(type === 'change'){
 
 			this.updateBetModel();
@@ -493,12 +495,12 @@ export default class GameController {
 		} else if(type === 'touchStart'){
 
 			this.touchEvents.betStart = true;
-			_gm.touchBet = data;
+			GM.touchBet = data;
 
 		} else if(type === 'touchEnd'){
 
-			_gm.touchBet = undefined;
-			_gm.activeChip = undefined;
+			GM.touchBet = undefined;
+			GM.activeChip = undefined;
 			this.touchEvents = 'reset';
 
 		}
@@ -511,6 +513,8 @@ export default class GameController {
 	 * @param event
 	 */
 	onTouchMove(event){
+		let {gameModel: GM, stage: st} = this;
+
 		let koeff = settings.coefficients;
 
 		if(this.fChip) {
@@ -523,14 +527,14 @@ export default class GameController {
 		}
 
 		if( this.touchEvents.betStart ) {
-			let value = _gm.touchBet.getTopChipValue();
-			_gm.touchBet.updateBet( -value );
-			_gm.activeChip = {value: value};
+			let value = GM.touchBet.getTopChipValue();
+			GM.touchBet.updateBet( -value );
+			GM.activeChip = {value: value};
 		}
 
-		if(_gm.activeChip){
-			this.fChip = new FloatChipController({value: _gm.activeChip.value});
-			_stg.addChild(this.fChip.pixiSprite);
+		if(GM.activeChip){
+			this.fChip = new FloatChipController({value: GM.activeChip.value});
+			st.addChild(this.fChip.pixiSprite);
 		}
 
 		this.touchEvents = 'reset';
@@ -540,19 +544,21 @@ export default class GameController {
 	 * touchEnd по сцене. Создаёт ставку и скрывает плавающую фишку/скрывает подсказки
 	 */
 	onTouchEnd(event){
-		let activeChip = _gm.activeChip || _cmp.chips.getActiveChipData();
+		let {componentCotrollers: cmpCtrl, gameModel: GM} = this;
+
+		let activeChip = GM.activeChip || cmpCtrl.chips.getActiveChipData();
 
 		if(activeChip){
 			let pos4Bet = this.getDataForBet(event.data.global, true);
 			console.log('pos4Bet ➠ ', pos4Bet);
-			if(_cmp.betPanelCtrl.data.fldBalance - activeChip.value < 0){
-				if(pos4Bet) this._cmpCtrls.errors.viewError(402);
+			if(cmpCtrl.betPanelCtrl.data.fldBalance - activeChip.value < 0){
+				if(pos4Bet) cmpCtrl.errors.viewError(402);
 			} else {
 				this.changeBets(pos4Bet, activeChip.value);
 			}
 		}
 
-		_gm.activeChip = undefined;
+		GM.activeChip = undefined;
 		this.removeFloatChip();
 		this.clearTableBet();
 	}
@@ -562,15 +568,19 @@ export default class GameController {
 	 * @param chip
 	 */
 	chipTouchStart(chip){
+		let {gameModel: GM} = this;
+
 		this.touchEvents.chipStart = true;
-		_gm.activeChip = chip;
+		GM.activeChip = chip;
 	};
 
 	/**
 	 * Для того, чтобы не рисовалист подсказки при touchMove на игровом поле и активной фишке на панели фишек
 	 */
 	chipTouchEnd(){
-		_gm.activeChip = undefined;
+		let {gameModel: GM} = this;
+
+		GM.activeChip = undefined;
 	};
 
 
@@ -582,16 +592,18 @@ export default class GameController {
 	 * Событие кнопки "очистить" (передаётся коллбеком)
 	 */
 	btnClear(){
-		for(let key in _gm.betsCtrl)
-			this.betsCnt.removeChild(_gm.betsCtrl[key].betSprite);
+		let {componentCotrollers: cmpCtrl, gameModel: GM} = this;
 
-		_cmp.betPanelCtrl.updateInfoPanelView({fldBet: 0, fldBalance: this.gameModel.balance});
+		for(let key in GM.betsCtrl)
+			if(GM.betsCtrl.hasOwnProperty(key)) this.betsContainer.removeChild(GM.betsCtrl[key].betSprite);
+
+		cmpCtrl.betPanelCtrl.setData({fldBet: 0, fldBalance: this.gameModel.balance});
 
 		this.prevBetsActive = false;
 
-		_gm.deleteBetsCtrl();
+		GM.deleteBetsCtrl();
 
-		_cmp.buttons.lockClear(true);
+		cmpCtrl.buttons.lockClear(true);
 	};
 
 	/**
@@ -619,16 +631,16 @@ export default class GameController {
 	 * Событие кнопки "удвоить ставки" (передаётся коллбеком)
 	 */
 	btnX2(){
-		let currentBetsValue = 0;
-		for(let key in _gm.betsCtrl)
-			currentBetsValue += _gm.betsCtrl[key].balance;
+		let {componentCotrollers: cmpCtrl, gameModel: GM} = this, currentBetsValue = 0;
 
-		if(currentBetsValue > _cmp.betPanelCtrl.data.fldBalance){
-			this._cmpCtrls.errors.viewError(402);
+		for(let key in GM.betsCtrl)
+			if(GM.betsCtrl.hasOwnProperty(key)) currentBetsValue += GM.betsCtrl[key].balance;
+
+		if(currentBetsValue > cmpCtrl.betPanelCtrl.data.fldBalance){
+			cmpCtrl.errors.viewError(402);
 		} else {
-			for(let key in _gm.betsCtrl){
-				_gm.betsCtrl[key].updateBet( _gm.betsCtrl[key].balance );
-			}
+			for(let key in GM.betsCtrl)
+				if(GM.betsCtrl.hasOwnProperty(key)) GM.betsCtrl[key].updateBet( GM.betsCtrl[key].balance );
 		}
 
 	};
@@ -637,12 +649,16 @@ export default class GameController {
 	 * Событие кнопки "BET" (передаётся коллбеком)
 	 */
 	betBtnClick(){
-		if(_gm.isEmptyBetsCtrl) return false;
+		let {gameModel: GM} = this;
 
-		_gm.calculateConfirmBets();
+		if(GM.isEmptyBetsCtrl) return false;
+
+		GM.calculateConfirmBets();
 
 		// Запоминаем в историю
-		this.prevBets = _gm.fromJsMessage();
+		this.prevBets = GM.fromJsMessage();
+
+		this.betBtnClickStatus = true;
 
 		this.fromJs(this.prevBets);
 
@@ -654,18 +670,24 @@ export default class GameController {
 	 * @param status
 	 */
 	interactiveSwitcher(status){
+		let {componentCotrollers: cmpCtrl, gameModel: GM, stage: st} = this;
+
 		status = !!status;
 
-		_stg.interactive = status;
+		st.interactive = status;
 
-		for(let key in _cmp){
-			if(_cmp[key].disable && status) _cmp[key].enable();
-			if(_cmp[key].disable && !status) _cmp[key].disable();
+		for(let key in cmpCtrl){
+			if(cmpCtrl.hasOwnProperty(key)){
+				if(cmpCtrl[key].disable && status) cmpCtrl[key].enable();
+				if(cmpCtrl[key].disable && !status) cmpCtrl[key].disable();
+			}
 		}
 
-		for(let key in _gm.betsCtrl){
-			if(status) _gm.betsCtrl[key].enableMove();
-			if(!status) _gm.betsCtrl[key].disableMove();
+		for(let key in GM.betsCtrl){
+			if(GM.betsCtrl.hasOwnProperty(key)){
+				if(status) GM.betsCtrl[key].enableMove();
+				if(!status) GM.betsCtrl[key].disableMove();
+			}
 		}
 	}
 }

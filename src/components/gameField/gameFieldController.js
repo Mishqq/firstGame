@@ -117,21 +117,12 @@ export default class GameFieldController {
 	getPositionForBet(betType, betData){
 		let cell;
 
-		clickAreas.forEach((item) => {
-			if(betType === 'numbers'){
-				if(item.numbers.equals(betData, true)) cell = item;
-			} else if(betType === 'dozen'){
-				if(item.dozen === betData) cell = item;
-			} else if(betType === 'column'){
-				if(item.column === betData) cell = item;
-			} else if(betType === '1to18' || betType === '19to36'
-				|| betType === 'even' || betType === 'odd'
-				|| betType === 'red' || betType === 'black'){
-				cell = item;
-			}
-		});
+		cell = betType === 'numbers' ?
+			clickAreas.filter(item => item.numbers.equals(betData, true)) :
+			clickAreas.filter(item => betData ?
+				item.type === betType && item[betType] === betData : item.type === betType);
 
-		return cell;
+		return cell[0];
 	}
 
 	disable(){

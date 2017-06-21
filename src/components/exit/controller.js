@@ -6,4 +6,8 @@ export default class Controller {
         this.view = new View(config);
     }
 
+	get pixiSprite(){
+        return this.view.container;
+    }
+
 }

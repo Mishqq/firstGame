@@ -28224,11 +28224,19 @@
 	
 	var _debugger2 = _interopRequireDefault(_debugger);
 	
+	var _serverEmulate = __webpack_require__(611);
+	
+	var _serverEmulate2 = _interopRequireDefault(_serverEmulate);
+	
 	var _helpFunctions = __webpack_require__(564);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	if (!window.cppObj) window.cppObj = new _debugger2.default();
+	if (!window.cppObj) {
+		window.cppObj = new _debugger2.default();
+		// let stateMachine = new serverEmulate();
+		// stateMachine.startWork();
+	}
 	
 	var gameCtrl = new _gameController2.default(function () {
 		var _cppObj;
@@ -36364,18 +36372,9 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	// Сокращения для удобства
-	var _gm = void 0,
-	    // gameModel
-	_cmp = void 0,
-	    // components // храним контроллеры компонентов
-	_stg = void 0; // stage
-	
-	
 	/**
 	 * Плохо оно само получится ©
 	 */
-	
 	var GameController = function () {
 		function GameController(fromJs) {
 			_classCallCheck(this, GameController);
@@ -36390,8 +36389,15 @@
 			value: function init(callback) {
 				var _this = this;
 	
-				// Component controller instances collection
-				this._cmpCtrls = {};
+				var game = this.game;
+	
+				this.componentCotrollers = {}; // Component controller instances collection
+				this.gameModel = new _gameModel2.default();
+				this.stage = game.stage;
+	
+				var cmpCtrl = this.componentCotrollers,
+				    st = this.stage;
+	
 	
 				this._touchEvents = {
 					betStart: false,
@@ -36400,89 +36406,61 @@
 					move: false
 				};
 	
-				var game = this.game;
-				this.stage = game.stage;
-	
-				this.gameModel = new _gameModel2.default();
-	
-				_gm = this.gameModel;
-				_cmp = this._cmpCtrls;
-	
-				_stg = this.stage;
-	
-				/**
-	    * background
-	    */
-				var bg = new _background2.default();
-				_stg.addChild(bg);
-				_stg.interactive = true;
+				st.addChild(new _background2.default());
+				st.interactive = true;
 	
 				_presets.touchEvents.start.forEach(function (event) {
-					_stg.on(event, _this.onTouchStart, _this);
+					st.on(event, _this.onTouchStart, _this);
 				});
 	
 				_presets.touchEvents.move.forEach(function (event) {
-					_stg.on(event, _this.onTouchMove, _this);
+					st.on(event, _this.onTouchMove, _this);
 				});
 	
 				_presets.touchEvents.end.forEach(function (event) {
-					_stg.on(event, _this.onTouchEnd, _this);
+					st.on(event, _this.onTouchEnd, _this);
 				});
 	
 				// Игровое поле
-				_cmp.gameField = new _gameFieldController2.default({ checkChips: this.checkActiveChip, ctx: this });
+				cmpCtrl.gameField = new _gameFieldController2.default({ checkChips: this.checkActiveChip, ctx: this });
 	
 				// Прогружаем все json-атласы
 				(0, _resourseLoader.assetLoader)(function () {
-	
-					_cmp.chips = new _chipController2.default({ touchEnd: _this.chipTouchEnd, touchStart: _this.chipTouchStart, ctx: _this
+					cmpCtrl.chips = new _chipController2.default({ touchEnd: _this.chipTouchEnd, touchStart: _this.chipTouchStart, ctx: _this
 					});
 	
 					// Панель кнопок
-					var buttonsController = new _buttonPanelController2.default({
+					cmpCtrl.buttons = new _buttonPanelController2.default({
 						btnClear: _this.btnClear,
 						btnRepeat: _this.btnRepeat,
 						btnX2: _this.btnX2,
 						ctx: _this
 					});
-					_cmp.buttons = buttonsController;
 	
 					// Плавающая фишка
-					_cmp.betBtn = new _betButtonController2.default({ betBtnClick: _this.betBtnClick, ctx: _this });
-	
-					// Плавающая фишка
-					// _cmp.fChip = new FloatChipController({setBet: this.floatChipCallback, ctx: this});
+					cmpCtrl.betBtn = new _betButtonController2.default({ betBtnClick: _this.betBtnClick, ctx: _this });
 	
 					// Шкала-таймер
-					_cmp.timeScale = new _controller2.default({ lockTable: _this.lockTable, ctx: _this });
-					//_cmp.timeScale.start();
+					cmpCtrl.timeScale = new _controller2.default();
 	
 					// Панель с информацией о лимитах, горячих/холодных номерах
-					_cmp.infoPanel = new _infoPanelController2.default(_settings2.default.infoPanelData);
+					cmpCtrl.infoPanel = new _infoPanelController2.default(_settings2.default.infoPanelData);
 	
 					// Панель с информацией о выигрыше/ставке/балансе
-					_cmp.betPanelCtrl = new _betPanelController2.default();
+					cmpCtrl.betPanelCtrl = new _betPanelController2.default();
 	
 					// Панель с рулеткой и лентой истории
-					_cmp.historyCtrl = new _historyController2.default();
+					cmpCtrl.historyCtrl = new _historyController2.default();
 	
-					for (var key in _cmp) {
-						_stg.addChild(_cmp[key].pixiSprite);
-					}
-	
-					var stage = _this.stage;
-	
-					var exit = new _controller4.default({ exit: function exit() {
+					cmpCtrl.exit = new _controller4.default({ exit: function exit() {
 							return _this.exit();
 						} });
-					stage.addChild(exit.view.container);
-					_this._cmpCtrls.exit = exit;
 	
-					var errors = new _controller6.default();
-					stage.addChild(errors.view.container);
-					_this._cmpCtrls.errors = errors;
+					cmpCtrl.errors = new _controller6.default();
 	
-					_stg.addChild(_this.betsCnt = new _PIXIabbr._pxC());
+					for (var key in cmpCtrl) {
+						if (cmpCtrl.hasOwnProperty(key)) st.addChild(cmpCtrl[key].pixiSprite);
+					}st.addChild(_this.betsContainer = new _PIXIabbr._pxC());
 	
 					game.start();
 	
@@ -36502,6 +36480,9 @@
 		}, {
 			key: 'initMessageHandler',
 			value: function initMessageHandler(gameData, authData, bets) {
+				var cmpCtrl = this.componentCotrollers;
+	
+	
 				this.animateTimeouts = [];
 	
 				this.prevBets = undefined;
@@ -36509,21 +36490,26 @@
 	
 				this.gameModel.balance = Math.floor(authData.balance);
 	
-				var betPanelCfg = { fldBet: 0, fldWin: gameData.total_win, fldBalance: Math.floor(authData.balance) };
-				_cmp.betPanelCtrl.setData(betPanelCfg);
-	
-				if (bets) this.setServerBets(bets);
+				// TODO: если есть выигрышь со старой игры - сделать анимацию перечисления
+				var betPanelCfg = { fldBet: 0, fldWin: 0, fldBalance: this.gameModel.balance };
+				cmpCtrl.betPanelCtrl.setData(betPanelCfg);
+				if (bets) {
+					this.setServerBets(bets);
+					cmpCtrl.betPanelCtrl.setData({ fldBalance: this.gameModel.balance });
+				}
 	
 				// game_state === 1 - игра закончена. Шкала времени уменьшается. Отображается число предыдущего выигрыша
 				// game_state === 2 - розыгрышь. Ролится число. Шкалы времени нет
 				if (+gameData.game_state === 1) {
 					this.interactiveSwitcher(!bets.length);
 	
-					_cmp.historyCtrl.setData(gameData.balls);
+					this.betBtnClickStatus = false;
 	
-					_cmp.buttons.lockClear(true);
+					cmpCtrl.historyCtrl.setData(gameData.balls);
 	
-					_cmp.gameField.hideWinNum();
+					cmpCtrl.buttons.lockClear(true);
+	
+					cmpCtrl.gameField.hideWinNum();
 	
 					var start = (0, _moment2.default)();
 					var end = (0, _moment2.default)(gameData.end_bets_expected);
@@ -36532,34 +36518,42 @@
 					//playTime = 6;
 	
 					// Анимация выпадающего числа
-					_cmp.historyCtrl.showRollAnim(false);
+					cmpCtrl.historyCtrl.showRollAnim(false);
 	
 					if (playTime > 0) {
 						// идёт розыгрыш со шкалой
 						var tm1 = setTimeout(function () {
-							_cmp.historyCtrl.showRollAnim(true).play();
+							cmpCtrl.historyCtrl.showRollAnim(true).play();
 						}, (playTime - _settings2.default.timeScale.changeColorPer * playTime) * 1000);
 						this.animateTimeouts.push(tm1);
 	
 						// Задаём время шкале и запускаем её
-						_cmp.timeScale.setTime(playTime).start();
+						cmpCtrl.timeScale.setTime(playTime).start();
 					} else {
 						// Всё ещё идёт розыгрыш без шкалы и с роллом числа
-						_cmp.historyCtrl.showRollAnim(true).play();
+						cmpCtrl.historyCtrl.showRollAnim(true).play();
 	
-						_cmp.timeScale.setTime(30).start();
+						cmpCtrl.timeScale.setTime(30).start();
 					}
 				} else if (+gameData.game_state === 2) {
 					this.interactiveSwitcher(false);
 	
 					if (gameData.balls.length) {
-						_cmp.timeScale.setState(4, gameData.balls[0]);
-						_cmp.historyCtrl.showRollAnim(false).showRolledNum(gameData.balls[0]);
-						_cmp.gameField.showWinNum(gameData.balls[0]);
+						cmpCtrl.timeScale.setState(4, gameData.balls[0]);
+						cmpCtrl.historyCtrl.showRollAnim(false).showRolledNum(gameData.balls[0]);
+						cmpCtrl.gameField.showWinNum(gameData.balls[0]);
+	
+						var win = gameData.total_win;
+						if (win) {
+							_presets.gameSounds.play('sound06');
+							cmpCtrl.betPanelCtrl.setData({ fldWin: win });
+	
+							this.gameModel.balance = cmpCtrl.betPanelCtrl.data.fldBalance + win;
+						}
 					} else {
-						_cmp.timeScale.setState(3);
-						_cmp.gameField.hideWinNum();
-						_cmp.historyCtrl.play();
+						cmpCtrl.timeScale.setState(3);
+						cmpCtrl.gameField.hideWinNum();
+						cmpCtrl.historyCtrl.play();
 					}
 				}
 			}
@@ -36573,32 +36567,45 @@
 			value: function randMessageHandler(gameData) {
 				var _this2 = this;
 	
+				var cmpCtrl = this.componentCotrollers,
+				    GM = this.gameModel;
+	
+	
 				this.clearTableBet();
 				this.removeFloatChip();
 	
 				this.prevBetsActive = false;
 	
 				if (+gameData.game_state === 1) {
+					this.betBtnClickStatus = false;
+	
 					// Очистка стола от предыдущих ставок.
 					this.clearTableBet();
-					for (var key in _gm.betsCtrl) {
-						_gm.betsCtrl[key].clearBet();
+					for (var key in GM.betsCtrl) {
+						if (!GM.betsCtrl.hasOwnProperty(key)) continue;
+	
+						GM.betsCtrl[key].clearBet();
 						_presets.gameSounds.play('sound03');
+	
+						var b = cmpCtrl.betPanelCtrl.data;
+						cmpCtrl.betPanelCtrl.setData({ fldWin: 0, fldBalance: b.fldBalance + b.fldWin });
 					}
 					setTimeout(function () {
 						return _this2.btnClear();
 					}, 1000);
 	
-					_gm.resetModel();
+					cmpCtrl.betPanelCtrl.setData({ fldBet: 0, fldWin: 0, fldBalance: this.gameModel.balance });
+	
+					GM.resetModel();
 					this.interactiveSwitcher(true);
-					_cmp.buttons.lockClear(true);
-					//_cmp.gameField.hideWinNum();
+					cmpCtrl.buttons.lockClear(true);
+					//cmpCtrl.gameField.hideWinNum();
 					setTimeout(function () {
-						return _cmp.gameField.hideWinNum();
+						return cmpCtrl.gameField.hideWinNum();
 					}, 3000);
 	
-					_cmp.historyCtrl.showRollAnim(true);
-					//_cmp.historyCtrl.showRolledNum(gameData.balls[0]);
+					cmpCtrl.historyCtrl.showRollAnim(true);
+					//cmpCtrl.historyCtrl.showRolledNum(gameData.balls[0]);
 	
 					var start = (0, _moment2.default)();
 					var end = (0, _moment2.default)(gameData.end_bets_expected);
@@ -36608,15 +36615,15 @@
 	
 					// Анимация выпадающего числа
 					if (gameData.balls.length) {
-						_cmp.historyCtrl.showRollAnim(false).addNum(gameData.balls[0], true).showRolledNum(gameData.balls[0]);
+						cmpCtrl.historyCtrl.showRollAnim(false).addNum(gameData.balls[0], true).showRolledNum(gameData.balls[0]);
 					}
 					var tm1 = setTimeout(function () {
-						_cmp.historyCtrl.showRollAnim(true).play();
+						cmpCtrl.historyCtrl.showRollAnim(true).play();
 					}, (playTime - _settings2.default.timeScale.changeColorPer * playTime) * 1000);
 					this.animateTimeouts.push(tm1);
 	
 					// Задаём время шкале и запускаем её
-					_cmp.timeScale.setTime(playTime).start();
+					cmpCtrl.timeScale.setTime(playTime).start();
 				} else if (+gameData.game_state === 2) {
 					this.animateTimeouts.forEach(function (item) {
 						return clearTimeout(item);
@@ -36627,33 +36634,40 @@
 	
 					if (!gameData.balls.length) {
 						// Шаров нет. Крутим анимацию, скрываем шкалу
-	
-						_cmp.historyCtrl.showRollAnim(true).play();
+						cmpCtrl.historyCtrl.showRollAnim(true).play();
 	
 						// Переводим таймскейл в состояние "Идёт игра"
-						_cmp.timeScale.setState(3);
+						cmpCtrl.timeScale.setState(3);
+	
+						if (!this.betBtnClickStatus) {
+							for (var _key in GM.betsCtrl) {
+								if (!GM.betsCtrl.hasOwnProperty(_key)) continue;
+	
+								GM.betsCtrl[_key].clearBet();
+								_presets.gameSounds.play('sound03');
+	
+								var nums = cmpCtrl.betPanelCtrl.data;
+								cmpCtrl.betPanelCtrl.setData({ fldBet: 0, fldWin: 0, fldBalance: nums.fldBalance + nums.fldBet });
+							}
+						}
 					} else {
 						// Отключаем анимацию и показываем выигрышное число
-						_cmp.historyCtrl.showRollAnim(false).showRolledNum(gameData.balls[0]);
+						cmpCtrl.historyCtrl.showRollAnim(false).showRolledNum(gameData.balls[0]);
 	
 						// Переводим таймскейл в состояние "выигрышное число"
-						_cmp.timeScale.setState(4, gameData.balls[0]);
+						cmpCtrl.timeScale.setState(4, gameData.balls[0]);
 	
 						// Скрываем (если есть) предыдущее выигршное число и показываем текущее
-						_cmp.gameField.hideWinNum().showWinNum(gameData.balls[0]);
+						cmpCtrl.gameField.hideWinNum().showWinNum(gameData.balls[0]);
 	
-						var win = _gm.calculateWin(gameData.balls[0]);
+						//let win = GM.calculateWin(gameData.balls[0]);
 						// Выигрыш с сервера
-						win = gameData.total_win;
+						var win = gameData.total_win;
 						if (win) {
 							_presets.gameSounds.play('sound06');
-							_cmp.betPanelCtrl.updateInfoPanelView({ fldWin: win });
+							cmpCtrl.betPanelCtrl.setData({ fldWin: win });
 	
-							this.gameModel.balance = _cmp.betPanelCtrl.data.fldBalance + win;
-	
-							setTimeout(function () {
-								_cmp.betPanelCtrl.updateInfoPanelView({ fldWin: 0, fldBalance: _cmp.betPanelCtrl.data.fldBalance + win });
-							}, 5000);
+							this.gameModel.balance = cmpCtrl.betPanelCtrl.data.fldBalance + win;
 						}
 					}
 				}
@@ -36666,20 +36680,24 @@
 		}, {
 			key: 'errorsHandler',
 			value: function errorsHandler(code) {
+				var cmpCtrl = this.componentCotrollers;
 				// Коды ошибок, при которых лочится клиент; слетают ставки
-				var lockClient = [-1, 102, 106],
+	
+				var lockClient = [-1, 102, 106, 401],
 				    clearBets = [401, 402];
 	
 				if (clearBets.includes(code)) this.confirmBets(false);
 	
-				this._cmpCtrls.errors.viewError(code, lockClient.includes(code));
+				cmpCtrl.errors.viewError(code, lockClient.includes(code));
 	
 				if (lockClient.includes(code)) this.interactiveSwitcher(false);
 			}
 		}, {
 			key: 'checkActiveChip',
 			value: function checkActiveChip() {
-				return _gm.activeChip;
+				var GM = this.gameModel;
+	
+				return GM.activeChip;
 			}
 		}, {
 			key: 'changeBets',
@@ -36694,6 +36712,10 @@
 			value: function changeBets(pos4Bet, value, globalPos) {
 				var _this3 = this;
 	
+				var GM = this.gameModel,
+				    betsCnt = this.betsContainer;
+	
+	
 				if (!pos4Bet) return;
 	
 				var betsChange = function betsChange(item) {
@@ -36702,16 +36724,16 @@
 	
 					var betStoreId = pos.x + '_' + pos.y;
 	
-					if (_gm.betsCtrl[betStoreId]) {
-						_gm.betsCtrl[betStoreId].updateBet(value);
+					if (GM.betsCtrl[betStoreId]) {
+						GM.betsCtrl[betStoreId].updateBet(value);
 					} else {
 						var cfg = { pos: pos, info: item, value: value, callback: _this3.betCallback, ctx: _this3 };
-						_gm.betsCtrl[betStoreId] = new _betController2.default(cfg);
+						GM.betsCtrl[betStoreId] = new _betController2.default(cfg);
 	
-						_this3.betsCnt.addChild(_gm.betsCtrl[betStoreId].betSprite);
+						betsCnt.addChild(GM.betsCtrl[betStoreId].betSprite);
 						// Сортировка bet'ов, чтобы фишки налезали друг на друга правильно
-						_this3.betsCnt.children.sort(function (a, b) {
-							return a.y > b.y;
+						betsCnt.children.sort(function (a, b) {
+							return a.y - b.y;
 						});
 					}
 				};
@@ -36734,7 +36756,10 @@
 		}, {
 			key: 'getDataForBet',
 			value: function getDataForBet(pos, global) {
-				return _cmp.gameField.getDataForBet(pos, global);
+				var cmpCtrl = this.componentCotrollers;
+	
+	
+				return cmpCtrl.gameField.getDataForBet(pos, global);
 			}
 		}, {
 			key: 'getPositionForBet',
@@ -36747,7 +36772,10 @@
 	   * @returns {*}
 	   */
 			value: function getPositionForBet(betType, betData) {
-				return _cmp.gameField.getPositionForBet(betType, betData);
+				var cmpCtrl = this.componentCotrollers;
+	
+	
+				return cmpCtrl.gameField.getPositionForBet(betType, betData);
 			}
 		}, {
 			key: 'updateBetModel',
@@ -36757,22 +36785,30 @@
 	   * Обновление информации на панели ставок/баланса,выигрыша после изменения ставок
 	   */
 			value: function updateBetModel() {
-				var bet = 0;
+				var cmpCtrl = this.componentCotrollers,
+				    GM = this.gameModel,
+				    st = this.stage,
+				    buttons = cmpCtrl.buttons,
+				    betPanel = cmpCtrl.betPanelCtrl,
+				    bet = 0;
 	
-				for (var key in _gm.betsCtrl) {
-					if (_gm.betsCtrl[key].balance === 0) {
-						_stg.removeChild(_gm.betsCtrl[key].betSprite);
-						delete _gm.betsCtrl[key];
+	
+				for (var key in GM.betsCtrl) {
+					if (!GM.betsCtrl.hasOwnProperty(key)) continue;
+	
+					if (GM.betsCtrl[key].balance === 0) {
+						st.removeChild(GM.betsCtrl[key].betSprite);
+						delete GM.betsCtrl[key];
 					} else {
-						bet += _gm.betsCtrl[key].balance;
+						bet += GM.betsCtrl[key].balance;
 					}
 				}
 	
-				_cmp.buttons.lockClear(!(bet > 0));
+				buttons.lockClear(!(bet > 0));
 	
 				var newBalance = this.gameModel.balance - bet;
 	
-				_cmp.betPanelCtrl.updateInfoPanelView({ fldBet: bet, fldBalance: newBalance });
+				betPanel.setData({ fldBet: bet, fldBalance: newBalance });
 			}
 		}, {
 			key: 'confirmBets',
@@ -36782,17 +36818,22 @@
 	   * Обработчик подтверждения ставок от сервера
 	   */
 			value: function confirmBets(betsServerStatus) {
+				var cmpCtrl = this.componentCotrollers,
+				    GM = this.gameModel,
+				    betPanel = cmpCtrl.betPanelCtrl;
+	
+	
 				if (!betsServerStatus) {
 					// Если ставка не прошла
 					this.btnClear();
 	
-					_gm.deleteConfirmBets();
-					_gm.deleteBetsCtrl();
+					GM.deleteConfirmBets();
+					GM.deleteBetsCtrl();
 	
 					this.interactiveSwitcher(true);
 				} else {
 					this.gameModel.balance = Math.floor(betsServerStatus.balance);
-					_cmp.betPanelCtrl.updateInfoPanelView({ fldBalance: Math.floor(betsServerStatus.balance) });
+					betPanel.setData({ fldBalance: Math.floor(betsServerStatus.balance) });
 					this.interactiveSwitcher(false);
 				}
 			}
@@ -36806,20 +36847,11 @@
 			value: function setServerBets(bets) {
 				var _this4 = this;
 	
-				var currentBetsValue = 0;
-				bets.forEach(function (item) {
-					return currentBetsValue += item.price;
+				bets.forEach(function (bet) {
+					var cell = _this4.getPositionForBet(bet.content.kind, bet.content[bet.content.kind]);
+	
+					_this4.changeBets(cell, bet.price, true);
 				});
-	
-				if (currentBetsValue > _cmp.betPanelCtrl.data.fldBalance) {
-					this._cmpCtrls.errors.viewError(402);
-				} else {
-					bets.forEach(function (bet) {
-						var cell = _this4.getPositionForBet(bet.content.kind, bet.content[bet.content.kind]);
-	
-						_this4.changeBets(cell, bet.price, true);
-					});
-				}
 			}
 	
 			/**
@@ -36832,43 +36864,28 @@
 		}, {
 			key: 'clearTableBet',
 			value: function clearTableBet() {
-				_cmp.gameField.hideHints();
+				var cmpCtrl = this.componentCotrollers;
+	
+	
+				cmpCtrl.gameField.hideHints();
 			}
 		}, {
-			key: 'lockTable',
+			key: 'removeFloatChip',
 	
-	
-			/**
-	   * Метод лочит панель фишек и кнопок по истечению времени
-	   */
-			value: function lockTable() {
-				this.interactiveSwitcher(false);
-	
-				this.clearTableBet();
-				this.removeFloatChip();
-	
-				_cmp.chips.setDefault();
-	
-				setTimeout(function () {
-					for (var key in _gm.betsCtrl) {
-						_gm.betsCtrl[key].clearBet();
-						_presets.gameSounds.play('sound03');
-					}
-				}, 2000);
-			}
 	
 			/**
 	   * Удаление плавающей фишки
 	   */
-	
-		}, {
-			key: 'removeFloatChip',
 			value: function removeFloatChip() {
-				if (this.fChip) {
-					_stg.removeChild(this.fChip.pixiSprite);
-					_gm.activeChip = undefined;
-					delete this.fChip;
-				}
+				var GM = this.gameModel,
+				    st = this.stage;
+	
+	
+				if (!this.fChip) return;
+	
+				st.removeChild(this.fChip.pixiSprite);
+				GM.activeChip = undefined;
+				delete this.fChip;
 			}
 	
 			/**
@@ -36881,17 +36898,20 @@
 		}, {
 			key: 'betCallback',
 			value: function betCallback(type, data) {
+				var GM = this.gameModel;
+	
+	
 				if (type === 'change') {
 	
 					this.updateBetModel();
 				} else if (type === 'touchStart') {
 	
 					this.touchEvents.betStart = true;
-					_gm.touchBet = data;
+					GM.touchBet = data;
 				} else if (type === 'touchEnd') {
 	
-					_gm.touchBet = undefined;
-					_gm.activeChip = undefined;
+					GM.touchBet = undefined;
+					GM.activeChip = undefined;
 					this.touchEvents = 'reset';
 				}
 			}
@@ -36907,6 +36927,10 @@
 		}, {
 			key: 'onTouchMove',
 			value: function onTouchMove(event) {
+				var GM = this.gameModel,
+				    st = this.stage;
+	
+	
 				var koeff = _settings2.default.coefficients;
 	
 				if (this.fChip) {
@@ -36919,14 +36943,14 @@
 				}
 	
 				if (this.touchEvents.betStart) {
-					var value = _gm.touchBet.getTopChipValue();
-					_gm.touchBet.updateBet(-value);
-					_gm.activeChip = { value: value };
+					var value = GM.touchBet.getTopChipValue();
+					GM.touchBet.updateBet(-value);
+					GM.activeChip = { value: value };
 				}
 	
-				if (_gm.activeChip) {
-					this.fChip = new _floatChipController2.default({ value: _gm.activeChip.value });
-					_stg.addChild(this.fChip.pixiSprite);
+				if (GM.activeChip) {
+					this.fChip = new _floatChipController2.default({ value: GM.activeChip.value });
+					st.addChild(this.fChip.pixiSprite);
 				}
 	
 				this.touchEvents = 'reset';
@@ -36939,19 +36963,23 @@
 	   * touchEnd по сцене. Создаёт ставку и скрывает плавающую фишку/скрывает подсказки
 	   */
 			value: function onTouchEnd(event) {
-				var activeChip = _gm.activeChip || _cmp.chips.getActiveChipData();
+				var cmpCtrl = this.componentCotrollers,
+				    GM = this.gameModel;
+	
+	
+				var activeChip = GM.activeChip || cmpCtrl.chips.getActiveChipData();
 	
 				if (activeChip) {
 					var pos4Bet = this.getDataForBet(event.data.global, true);
 					console.log('pos4Bet ➠ ', pos4Bet);
-					if (_cmp.betPanelCtrl.data.fldBalance - activeChip.value < 0) {
-						if (pos4Bet) this._cmpCtrls.errors.viewError(402);
+					if (cmpCtrl.betPanelCtrl.data.fldBalance - activeChip.value < 0) {
+						if (pos4Bet) cmpCtrl.errors.viewError(402);
 					} else {
 						this.changeBets(pos4Bet, activeChip.value);
 					}
 				}
 	
-				_gm.activeChip = undefined;
+				GM.activeChip = undefined;
 				this.removeFloatChip();
 				this.clearTableBet();
 			}
@@ -36964,8 +36992,11 @@
 		}, {
 			key: 'chipTouchStart',
 			value: function chipTouchStart(chip) {
+				var GM = this.gameModel;
+	
+	
 				this.touchEvents.chipStart = true;
-				_gm.activeChip = chip;
+				GM.activeChip = chip;
 			}
 		}, {
 			key: 'chipTouchEnd',
@@ -36975,7 +37006,10 @@
 	   * Для того, чтобы не рисовалист подсказки при touchMove на игровом поле и активной фишке на панели фишек
 	   */
 			value: function chipTouchEnd() {
-				_gm.activeChip = undefined;
+				var GM = this.gameModel;
+	
+	
+				GM.activeChip = undefined;
 			}
 		}, {
 			key: 'btnClear',
@@ -36988,15 +37022,19 @@
 	   * Событие кнопки "очистить" (передаётся коллбеком)
 	   */
 			value: function btnClear() {
-				for (var key in _gm.betsCtrl) {
-					this.betsCnt.removeChild(_gm.betsCtrl[key].betSprite);
-				}_cmp.betPanelCtrl.updateInfoPanelView({ fldBet: 0, fldBalance: this.gameModel.balance });
+				var cmpCtrl = this.componentCotrollers,
+				    GM = this.gameModel;
+	
+	
+				for (var key in GM.betsCtrl) {
+					if (GM.betsCtrl.hasOwnProperty(key)) this.betsContainer.removeChild(GM.betsCtrl[key].betSprite);
+				}cmpCtrl.betPanelCtrl.setData({ fldBet: 0, fldBalance: this.gameModel.balance });
 	
 				this.prevBetsActive = false;
 	
-				_gm.deleteBetsCtrl();
+				GM.deleteBetsCtrl();
 	
-				_cmp.buttons.lockClear(true);
+				cmpCtrl.buttons.lockClear(true);
 			}
 		}, {
 			key: 'btnRepeat',
@@ -37030,14 +37068,18 @@
 	   * Событие кнопки "удвоить ставки" (передаётся коллбеком)
 	   */
 			value: function btnX2() {
-				var currentBetsValue = 0;
-				for (var key in _gm.betsCtrl) {
-					currentBetsValue += _gm.betsCtrl[key].balance;
-				}if (currentBetsValue > _cmp.betPanelCtrl.data.fldBalance) {
-					this._cmpCtrls.errors.viewError(402);
+				var cmpCtrl = this.componentCotrollers,
+				    GM = this.gameModel,
+				    currentBetsValue = 0;
+	
+	
+				for (var key in GM.betsCtrl) {
+					if (GM.betsCtrl.hasOwnProperty(key)) currentBetsValue += GM.betsCtrl[key].balance;
+				}if (currentBetsValue > cmpCtrl.betPanelCtrl.data.fldBalance) {
+					cmpCtrl.errors.viewError(402);
 				} else {
-					for (var _key in _gm.betsCtrl) {
-						_gm.betsCtrl[_key].updateBet(_gm.betsCtrl[_key].balance);
+					for (var _key2 in GM.betsCtrl) {
+						if (GM.betsCtrl.hasOwnProperty(_key2)) GM.betsCtrl[_key2].updateBet(GM.betsCtrl[_key2].balance);
 					}
 				}
 			}
@@ -37049,12 +37091,17 @@
 	   * Событие кнопки "BET" (передаётся коллбеком)
 	   */
 			value: function betBtnClick() {
-				if (_gm.isEmptyBetsCtrl) return false;
+				var GM = this.gameModel;
 	
-				_gm.calculateConfirmBets();
+	
+				if (GM.isEmptyBetsCtrl) return false;
+	
+				GM.calculateConfirmBets();
 	
 				// Запоминаем в историю
-				this.prevBets = _gm.fromJsMessage();
+				this.prevBets = GM.fromJsMessage();
+	
+				this.betBtnClickStatus = true;
 	
 				this.fromJs(this.prevBets);
 	
@@ -37069,18 +37116,27 @@
 	   * @param status
 	   */
 			value: function interactiveSwitcher(status) {
+				var cmpCtrl = this.componentCotrollers,
+				    GM = this.gameModel,
+				    st = this.stage;
+	
+	
 				status = !!status;
 	
-				_stg.interactive = status;
+				st.interactive = status;
 	
-				for (var key in _cmp) {
-					if (_cmp[key].disable && status) _cmp[key].enable();
-					if (_cmp[key].disable && !status) _cmp[key].disable();
+				for (var key in cmpCtrl) {
+					if (cmpCtrl.hasOwnProperty(key)) {
+						if (cmpCtrl[key].disable && status) cmpCtrl[key].enable();
+						if (cmpCtrl[key].disable && !status) cmpCtrl[key].disable();
+					}
 				}
 	
-				for (var _key2 in _gm.betsCtrl) {
-					if (status) _gm.betsCtrl[_key2].enableMove();
-					if (!status) _gm.betsCtrl[_key2].disableMove();
+				for (var _key3 in GM.betsCtrl) {
+					if (GM.betsCtrl.hasOwnProperty(_key3)) {
+						if (status) GM.betsCtrl[_key3].enableMove();
+						if (!status) GM.betsCtrl[_key3].disableMove();
+					}
 				}
 			}
 		}, {
@@ -37089,9 +37145,12 @@
 				return this._touchEvents;
 			},
 			set: function set(event) {
-				for (var key in this._touchEvents) {
-					this._touchEvents[key] = false;
-				}this._touchEvents[event] = event !== 'reset';
+				var tEv = this._touchEvents;
+	
+	
+				for (var key in tEv) {
+					if (tEv.hasOwnProperty(key)) tEv[key] = false;
+				}tEv[event] = event !== 'reset';
 			}
 		}]);
 	
@@ -62529,7 +62588,7 @@
 			_classCallCheck(this, GameModel);
 	
 			this._betsCtrls = {};
-			this._cmpCtrls = {};
+			this.componentsControllers = {};
 			this._confirmBets = [];
 	
 			this._balance = 0;
@@ -63019,19 +63078,13 @@
 			value: function getPositionForBet(betType, betData) {
 				var cell = void 0;
 	
-				_gameFieldCellMap.clickAreas.forEach(function (item) {
-					if (betType === 'numbers') {
-						if (item.numbers.equals(betData, true)) cell = item;
-					} else if (betType === 'dozen') {
-						if (item.dozen === betData) cell = item;
-					} else if (betType === 'column') {
-						if (item.column === betData) cell = item;
-					} else if (betType === '1to18' || betType === '19to36' || betType === 'even' || betType === 'odd' || betType === 'red' || betType === 'black') {
-						cell = item;
-					}
+				cell = betType === 'numbers' ? _gameFieldCellMap.clickAreas.filter(function (item) {
+					return item.numbers.equals(betData, true);
+				}) : _gameFieldCellMap.clickAreas.filter(function (item) {
+					return betData ? item.type === betType && item[betType] === betData : item.type === betType;
 				});
 	
-				return cell;
+				return cell[0];
 			}
 		}, {
 			key: 'disable',
@@ -63115,7 +63168,8 @@
 	
 			this.drawWinHints();
 	
-			// this.devModeInteractiveAreas();
+			// Подсветка полей для ставок
+			//this.devModeInteractiveAreas();
 		}
 	
 		_createClass(GameFieldView, [{
@@ -63400,8 +63454,8 @@
 	// Размер ячейки
 	var cs = { w: 53, h: 53, evs: 184, odds: 132 };
 	
-	var clickAreas = [{ type: 'numbers', x: 0, y: 0, w: 80, h: 158, numbers: [37] }, //zero
-	{ type: 'numbers', x: 0, y: 158, w: 80, h: 158, numbers: [0] }, //zeroZero
+	var clickAreas = [{ type: 'numbers', x: 0, y: 0, w: 80, h: 135, numbers: [37], center: { x: 50, y: 75 } }, //zero
+	{ type: 'numbers', x: 0, y: 135, w: 80, h: 52, numbers: [0, 37], center: { x: 50, y: 161 } }, { type: 'numbers', x: 0, y: 187, w: 80, h: 129, numbers: [0], center: { x: 50, y: 240 } }, //zeroZero
 	{ type: 'column', column: 1, x: 1363, y: 0, w: 78, h: 105, numbers: [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36] }, //2b1_row1
 	{ type: 'column', column: 2, x: 1363, y: 105, w: 78, h: 105, numbers: [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35] }, //2b1_row2
 	{ type: 'column', column: 3, x: 1363, y: 210, w: 78, h: 105, numbers: [1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34] }, //2b1_row3
@@ -72811,8 +72865,8 @@
 		}
 	
 		_createClass(infoPanelController, [{
-			key: 'updateInfoPanelView',
-			value: function updateInfoPanelView(data) {
+			key: 'setData',
+			value: function setData(data) {
 				this._infoPanel.update(data);
 			}
 		}, {
@@ -73571,11 +73625,6 @@
 				this.betPanel.setData(data);
 			}
 		}, {
-			key: 'updateInfoPanelView',
-			value: function updateInfoPanelView(newData) {
-				this.betPanel.updateNumbers(newData);
-			}
-		}, {
 			key: 'pixiSprite',
 			get: function get() {
 				return this.betPanel.getPixiSprite;
@@ -73619,13 +73668,13 @@
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
 	var betPanelView = function () {
-		function betPanelView(values) {
+		function betPanelView() {
 			_classCallCheck(this, betPanelView);
 	
 			var spriteContainer = new _PIXIabbr._pxC();
 			this._spriteContainer = spriteContainer;
 	
-			this._data;
+			this._data = {};
 	
 			spriteContainer.position = _settings2.default.position.main;
 	
@@ -73636,6 +73685,20 @@
 				textSprites[key].position = texts[key].pos;
 				spriteContainer.addChild(textSprites[key]);
 			}
+	
+			this.fieldSprites = {};
+			this.numSprites = {};
+			for (var _key in _settings2.default.position.fields) {
+				this.fieldSprites[_key] = new _PIXIabbr._pxS(_presets.spriteStore.fields[_key]);
+				this.fieldSprites[_key].position = _settings2.default.position.fields[_key];
+	
+				this.numSprites[_key] = new _PIXIabbr._pxT(_helpFunctions._hf.formatLimit(0), _settings2.default.textStyle);
+				this.numSprites[_key].anchor.set(0, 0.5);
+				this.numSprites[_key].position = _settings2.default.position.numbers[_key];
+				this.fieldSprites[_key].addChild(this.numSprites[_key]);
+	
+				this._spriteContainer.addChild(this.fieldSprites[_key]);
+			}
 		}
 	
 		_createClass(betPanelView, [{
@@ -73643,33 +73706,8 @@
 			value: function setData(data) {
 				this.data = data;
 	
-				this.numSprites = {};
-				var fieldSprites = {},
-				    pos = _settings2.default.position;
-				for (var key in pos.fields) {
-					fieldSprites[key] = new _PIXIabbr._pxS(_presets.spriteStore.fields[key]);
-					fieldSprites[key].position = pos.fields[key];
-	
-					this.numSprites[key] = new _PIXIabbr._pxT(_helpFunctions._hf.formatLimit(data[key]), _settings2.default.textStyle);
-					this.numSprites[key].anchor.set(0, 0.5);
-					this.numSprites[key].position = pos.numbers[key];
-					fieldSprites[key].addChild(this.numSprites[key]);
-	
-					this._spriteContainer.addChild(fieldSprites[key]);
-				}
-			}
-		}, {
-			key: 'updateNumbers',
-	
-	
-			/**
-	   * newData - {fldBet, fldWin, fldBalance}
-	   * @param newData
-	   */
-			value: function updateNumbers(newData) {
-				for (var key in newData) {
-					this.numSprites[key].text = _helpFunctions._hf.formatLimit(newData[key]);
-					this.data[key] = newData[key];
+				for (var key in data) {
+					this.numSprites[key].text = _helpFunctions._hf.formatLimit(data[key]);
 				}
 			}
 		}, {
@@ -73678,7 +73716,9 @@
 				return this._data;
 			},
 			set: function set(data) {
-				this._data = data;
+				for (var key in data) {
+					this._data[key] = data[key];
+				}
 			}
 		}, {
 			key: 'getPixiSprite',
@@ -74206,6 +74246,8 @@
 	    value: true
 	});
 	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
 	var _view = __webpack_require__(603);
 	
 	var _view2 = _interopRequireDefault(_view);
@@ -74214,11 +74256,22 @@
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	var Controller = function Controller(config) {
-	    _classCallCheck(this, Controller);
+	var Controller = function () {
+	    function Controller(config) {
+	        _classCallCheck(this, Controller);
 	
-	    this.view = new _view2.default(config);
-	};
+	        this.view = new _view2.default(config);
+	    }
+	
+	    _createClass(Controller, [{
+	        key: 'pixiSprite',
+	        get: function get() {
+	            return this.view.container;
+	        }
+	    }]);
+	
+	    return Controller;
+	}();
 	
 	exports.default = Controller;
 
@@ -74320,6 +74373,11 @@
 				});
 	
 				this.view.viewError(error.ru, lockError);
+			}
+		}, {
+			key: 'pixiSprite',
+			get: function get() {
+				return this.view.container;
 			}
 		}]);
 	
@@ -74510,7 +74568,7 @@
 	
 					// setTimeout(() => {
 					// 	this.toJs(JSON.stringify( {error_code:401,error_ctx:"bet_error",kind:"error_msg"} ));
-					// }, 4000);
+					// }, 2000);
 				} else if (data.kind === 'bets_msg') {
 	
 					setTimeout(function () {
@@ -74579,12 +74637,17 @@
 			lang: "ru",
 			prev_game_kind: -1,
 			auth: {
-				balance: 11200.456,
+				balance: 10000.456,
 				bonus: 24000,
 				kind: "by_card",
 				nickname: "Maika"
 			},
-			bets: [{ price: 300, bonus: false, content: { kind: "numbers", numbers: [5, 4] } }, { price: 300, bonus: false, content: { kind: "numbers", numbers: [25, 26, 28, 29] } }, { price: 500, bonus: false, content: { kind: "dozen", dozen: 1 } }],
+			bets: [],
+			// bets: [
+			// 	{price: 300, bonus: false, content: {kind: "numbers", numbers: [5, 4]}},
+			// 	{price: 300, bonus: false, content: {kind: "numbers", numbers: [25, 26, 28, 29]}},
+			// 	{price: 500, bonus: false, content: {kind: "dozen", dozen: 1}}
+			// ],
 			game_data: {
 				balls: [24],
 				end_bets_expected: "2017-06-16T12:20:00Z",
@@ -74609,6 +74672,28 @@
 				game_id: 787,
 				game_state: 2,
 				total_win: 105000
+			}
+		}, {
+			kind: "init_msg",
+			lang: "ru",
+			prev_game_kind: -1,
+			auth: {
+				balance: 5000,
+				bonus: 54000,
+				kind: "by_card",
+				nickname: "Maika"
+			},
+			bets: [
+			// {bonus:false, content: {kind:"red"}, price:1000}
+			// {bonus:false, content:{kind:"numbers", numbers:[16]}, price:3000}
+			// {bonus:false, content:{kind:"dozen", dozen:1}, price:3000}
+			{ bonus: false, content: { kind: "column", column: 1 }, price: 1000 }],
+			game_data: {
+				balls: [1],
+				end_bets_expected: "",
+				game_id: 832,
+				game_state: 2,
+				total_win: 1000
 			}
 		}],
 		auth_msg: {
@@ -74643,12 +74728,83 @@
 		},
 		bets_ok_msg: {
 			kind: "bets_ok_msg",
-			balance: 2200,
+			balance: 8200,
 			bonus: 12.3
 		}
 	};
 	
 	exports.default = serverMessages;
+
+/***/ },
+/* 611 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _serverMessages = __webpack_require__(610);
+	
+	var _serverMessages2 = _interopRequireDefault(_serverMessages);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	// Алгоритм
+	// При получении fromJs('loaded_msg') отправляем  toJs('init_msg'/game_state==1)
+	// Затем по таймаутам начинаем отправлять последовательно toJs('rand_msg')
+	var stateMachine = function () {
+		function stateMachine() {
+			_classCallCheck(this, stateMachine);
+	
+			this.randMsgCount = 1;
+	
+			this.randMsgTiming = [10, 5, 5];
+		}
+	
+		_createClass(stateMachine, [{
+			key: 'getMessage',
+			value: function getMessage() {}
+		}, {
+			key: 'sendMessage',
+			value: function sendMessage(msg) {
+				console.log('msg ➠ ', msg, this.randMsgCount);
+			}
+		}, {
+			key: 'startWork',
+			value: function startWork() {
+				var _this = this;
+	
+				this.sendMessage(_serverMessages2.default.init_msg[0]);
+	
+				this.timeoutId = setTimeout(function () {
+					return sendRandMeg();
+				}, this.randMsgTiming[0]);
+	
+				var sendRandMeg = function sendRandMeg() {
+					_this.sendMessage(_serverMessages2.default.rand_msg[_this.randMsgCount]);
+	
+					if (_this.randMsgCount++ > 2) _this.randMsgCount = 0;
+	
+					_this.timeoutId = setTimeout(sendRandMeg, _this.randMsgTiming[_this.randMsgCount] * 1000);
+				};
+			}
+		}, {
+			key: 'stopWork',
+			value: function stopWork() {
+				clearTimeout(this.timeoutId);
+			}
+		}]);
+	
+		return stateMachine;
+	}();
+	
+	exports.default = stateMachine;
 
 /***/ }
 /******/ ]);

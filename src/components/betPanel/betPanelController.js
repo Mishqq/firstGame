@@ -14,10 +14,6 @@ export default class betPanelController {
 		return this.betPanel.getPixiSprite
 	}
 
-	updateInfoPanelView(newData){
-		this.betPanel.updateNumbers(newData);
-	}
-
 	get data(){
 		return this.betPanel.data;
 	}
