@@ -5,9 +5,9 @@ let clickAreas = [
 	{type:'numbers', x:0, y:0, w:80, h:135, numbers:[37], center: {x:50, y: 75}}, //zero
 	{type:'numbers', x:0, y:135, w: 80, h: 52, numbers:[0,37], center: {x:50, y: 161}},
 	{type:'numbers', x:0, y:187, w:80, h:129, numbers:[0], center: {x:50, y: 240}}, //zeroZero
-	{type:'column', column: 1, x:1363, y:0, w:78, h:105, numbers:[3,6,9,12, 15,18,21,24, 27,30,33,36]}, //2b1_row1
+	{type:'column', column: 1, x:1363, y:210, w:78, h:105, numbers:[1,4,7,10, 13,16,19,22, 25,28,31,34]}, //2b1_row1
 	{type:'column', column: 2, x:1363, y:105, w:78, h:105, numbers:[2,5,8,11, 14,17,20,23, 26,29,32,35]}, //2b1_row2
-	{type:'column', column: 3, x:1363, y:210, w:78, h:105, numbers:[1,4,7,10, 13,16,19,22, 25,28,31,34]}, //2b1_row3
+	{type:'column', column: 3, x:1363, y:0, w:78, h:105, numbers:[3,6,9,12, 15,18,21,24, 27,30,33,36]}, //2b1_row3
 	{type:'dozen', dozen: 1, x:105, y:341, w:420, h:52, numbers:[1,2,3,4,5,6,7,8,9,10,11,12]}, //1st12
 	{type:'dozen', dozen: 2, x:525, y:341, w:420, h:52, numbers:[13,14,15,16,17,18,19,20,21,22,23,24]}, //2st12
 	{type:'dozen', dozen: 3, x:945, y:341, w:420, h:52, numbers:[25,26,27,28,29,30,31,32,33,34,35,36]}, //3st12

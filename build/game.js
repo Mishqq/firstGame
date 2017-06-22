@@ -28228,14 +28228,17 @@
 	
 	var _serverEmulate2 = _interopRequireDefault(_serverEmulate);
 	
-	var _helpFunctions = __webpack_require__(564);
+	var _settings = __webpack_require__(583);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	if (!window.cppObj) {
 		window.cppObj = new _debugger2.default();
-		// let stateMachine = new serverEmulate();
-		// stateMachine.startWork();
+		var stateMachine = new _serverEmulate2.default(window.cppObj);
+		stateMachine.startWork();
+	
+		//stateMachine.sendErrorMessage(402, 2)
+		//stateMachine.sendMessage(serverMessages.bets_msg, 3)
 	}
 	
 	var gameCtrl = new _gameController2.default(function () {
@@ -36308,43 +36311,47 @@
 	
 	var _settings2 = _interopRequireDefault(_settings);
 	
-	var _PIXIabbr = __webpack_require__(562);
+	var _PIXIabbr = __webpack_require__(563);
 	
-	var _gameModel = __webpack_require__(563);
+	var _globalSettings = __webpack_require__(562);
+	
+	var _globalSettings2 = _interopRequireDefault(_globalSettings);
+	
+	var _gameModel = __webpack_require__(564);
 	
 	var _gameModel2 = _interopRequireDefault(_gameModel);
 	
-	var _helpFunctions = __webpack_require__(564);
+	var _helpFunctions = __webpack_require__(565);
 	
-	var _background = __webpack_require__(565);
+	var _background = __webpack_require__(566);
 	
 	var _background2 = _interopRequireDefault(_background);
 	
-	var _gameFieldController = __webpack_require__(566);
+	var _gameFieldController = __webpack_require__(567);
 	
 	var _gameFieldController2 = _interopRequireDefault(_gameFieldController);
 	
-	var _buttonPanelController = __webpack_require__(571);
+	var _buttonPanelController = __webpack_require__(572);
 	
 	var _buttonPanelController2 = _interopRequireDefault(_buttonPanelController);
 	
-	var _chipController = __webpack_require__(574);
+	var _chipController = __webpack_require__(575);
 	
 	var _chipController2 = _interopRequireDefault(_chipController);
 	
-	var _floatChipController = __webpack_require__(577);
+	var _floatChipController = __webpack_require__(578);
 	
 	var _floatChipController2 = _interopRequireDefault(_floatChipController);
 	
-	var _betController = __webpack_require__(580);
+	var _betController = __webpack_require__(581);
 	
 	var _betController2 = _interopRequireDefault(_betController);
 	
-	var _controller = __webpack_require__(583);
+	var _controller = __webpack_require__(584);
 	
 	var _controller2 = _interopRequireDefault(_controller);
 	
-	var _infoPanelController = __webpack_require__(585);
+	var _infoPanelController = __webpack_require__(586);
 	
 	var _infoPanelController2 = _interopRequireDefault(_infoPanelController);
 	
@@ -36514,8 +36521,6 @@
 					var start = (0, _moment2.default)();
 					var end = (0, _moment2.default)(gameData.end_bets_expected);
 					var playTime = end.diff(start, 'seconds');
-					console.log('init_msg, time for timeScale', playTime);
-					//playTime = 6;
 	
 					// Анимация выпадающего числа
 					cmpCtrl.historyCtrl.showRollAnim(false);
@@ -36610,8 +36615,6 @@
 					var start = (0, _moment2.default)();
 					var end = (0, _moment2.default)(gameData.end_bets_expected);
 					var playTime = end.diff(start, 'seconds');
-					console.log('init_msg, time for timeScale', playTime);
-					//playTime = 6;
 	
 					// Анимация выпадающего числа
 					if (gameData.balls.length) {
@@ -36724,8 +36727,12 @@
 	
 					var betStoreId = pos.x + '_' + pos.y;
 	
+					var limits = _globalSettings2.default.betLimits[pos4Bet.numbers.length];
+	
 					if (GM.betsCtrl[betStoreId]) {
 						GM.betsCtrl[betStoreId].updateBet(value);
+					} else if (value > limits.max || value < limits.min) {
+						console.log('Ставка выходит за пределы лимитов');
 					} else {
 						var cfg = { pos: pos, info: item, value: value, callback: _this3.betCallback, ctx: _this3 };
 						GM.betsCtrl[betStoreId] = new _betController2.default(cfg);
@@ -62452,9 +62459,13 @@
 	
 	var _settings4 = _interopRequireDefault(_settings3);
 	
+	var _globalSettings = __webpack_require__(562);
+	
+	var _globalSettings2 = _interopRequireDefault(_globalSettings);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
-	var limits = { min: 100, max: 30000 };
+	var limits = _globalSettings2.default.betLimits[1];
 	
 	exports.default = {
 		game: {
@@ -62532,6 +62543,43 @@
 
 /***/ },
 /* 562 */
+/***/ function(module, exports) {
+
+	"use strict";
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	var globalSettings = {
+		numColor: {
+			bgRed: [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36],
+			bgBlack: [2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35],
+			bgZero: [0, 37]
+		},
+		betSums: null,
+		betLimits: null
+	};
+	
+	var setData = window.cppObj && window.cppObj.gameSettings ? JSON.parse(window.cppObj.gameSettings()) : {
+		bet_sums: [50, 100, 500, 1000, 3000],
+		bet_limits: {
+			1: { min: 50, max: 3000 },
+			2: { min: 50, max: 3000 },
+			3: { min: 50, max: 3000 },
+			4: { min: 50, max: 3000 },
+			6: { min: 50, max: 3000 },
+			12: { min: 50, max: 3000 },
+			18: { min: 50, max: 3000 }
+		}
+	};
+	
+	globalSettings.betSums = setData.bet_sums;
+	globalSettings.betLimits = setData.bet_limits;
+	
+	exports.default = globalSettings;
+
+/***/ },
+/* 563 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -62564,7 +62612,7 @@
 	exports._pxEx = _pxEx;
 
 /***/ },
-/* 563 */
+/* 564 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -62711,7 +62759,7 @@
 	exports.default = GameModel;
 
 /***/ },
-/* 564 */
+/* 565 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -62721,7 +62769,7 @@
 	});
 	exports._hf = undefined;
 	
-	var _PIXIabbr = __webpack_require__(562);
+	var _PIXIabbr = __webpack_require__(563);
 	
 	/**
 	 * Проверка принадлежности по координатам
@@ -62887,7 +62935,7 @@
 	exports._hf = _hf;
 
 /***/ },
-/* 565 */
+/* 566 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -62929,7 +62977,7 @@
 	exports.default = Background;
 
 /***/ },
-/* 566 */
+/* 567 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -62940,11 +62988,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _gameFieldView = __webpack_require__(567);
+	var _gameFieldView = __webpack_require__(568);
 	
 	var _gameFieldView2 = _interopRequireDefault(_gameFieldView);
 	
-	var _gameFieldCellMap = __webpack_require__(568);
+	var _gameFieldCellMap = __webpack_require__(569);
 	
 	var _settings = __webpack_require__(561);
 	
@@ -63109,7 +63157,7 @@
 	exports.default = GameFieldController;
 
 /***/ },
-/* 567 */
+/* 568 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -63120,7 +63168,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(562);
+	var _PIXIabbr = __webpack_require__(563);
 	
 	var _presets = __webpack_require__(555);
 	
@@ -63128,9 +63176,9 @@
 	
 	var _settings2 = _interopRequireDefault(_settings);
 	
-	var _gameFieldCellMap = __webpack_require__(568);
+	var _gameFieldCellMap = __webpack_require__(569);
 	
-	var _gsap = __webpack_require__(569);
+	var _gsap = __webpack_require__(570);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -63443,7 +63491,7 @@
 	exports.default = GameFieldView;
 
 /***/ },
-/* 568 */
+/* 569 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -63456,9 +63504,9 @@
 	
 	var clickAreas = [{ type: 'numbers', x: 0, y: 0, w: 80, h: 135, numbers: [37], center: { x: 50, y: 75 } }, //zero
 	{ type: 'numbers', x: 0, y: 135, w: 80, h: 52, numbers: [0, 37], center: { x: 50, y: 161 } }, { type: 'numbers', x: 0, y: 187, w: 80, h: 129, numbers: [0], center: { x: 50, y: 240 } }, //zeroZero
-	{ type: 'column', column: 1, x: 1363, y: 0, w: 78, h: 105, numbers: [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36] }, //2b1_row1
+	{ type: 'column', column: 1, x: 1363, y: 210, w: 78, h: 105, numbers: [1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34] }, //2b1_row1
 	{ type: 'column', column: 2, x: 1363, y: 105, w: 78, h: 105, numbers: [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35] }, //2b1_row2
-	{ type: 'column', column: 3, x: 1363, y: 210, w: 78, h: 105, numbers: [1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34] }, //2b1_row3
+	{ type: 'column', column: 3, x: 1363, y: 0, w: 78, h: 105, numbers: [3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36] }, //2b1_row3
 	{ type: 'dozen', dozen: 1, x: 105, y: 341, w: 420, h: 52, numbers: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] }, //1st12
 	{ type: 'dozen', dozen: 2, x: 525, y: 341, w: 420, h: 52, numbers: [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24] }, //2st12
 	{ type: 'dozen', dozen: 3, x: 945, y: 341, w: 420, h: 52, numbers: [25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36] }, //3st12
@@ -63559,7 +63607,7 @@
 	exports.winHintPos = winHintPos;
 
 /***/ },
-/* 569 */
+/* 570 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(global) {/*!
@@ -69605,7 +69653,7 @@
 							if (global) {
 								_globals[n] = _exports[n] = cl; //provides a way to avoid global namespace pollution. By default, the main classes like TweenLite, Power1, Strong, etc. are added to window unless a GreenSockGlobals is defined. So if you want to have things added to a custom object instead, just do something like window.GreenSockGlobals = {} before loading any GreenSock files. You can even set up an alias like window.GreenSockGlobals = windows.gs = {} so that you can access everything like gs.TweenLite. Also remember that ALL classes are added to the window.com.greensock object (in their respective packages, like com.greensock.easing.Power1, com.greensock.TweenLite, etc.)
 								hasModule = (typeof(module) !== "undefined" && module.exports);
-								if (!hasModule && "function" === "function" && __webpack_require__(570)){ //AMD
+								if (!hasModule && "function" === "function" && __webpack_require__(571)){ //AMD
 									!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_RESULT__ = function() { return cl; }.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 								} else if (hasModule){ //node
 									if (ns === moduleName) {
@@ -71422,7 +71470,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
-/* 570 */
+/* 571 */
 /***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(__webpack_amd_options__) {module.exports = __webpack_amd_options__;
@@ -71430,7 +71478,7 @@
 	/* WEBPACK VAR INJECTION */}.call(exports, {}))
 
 /***/ },
-/* 571 */
+/* 572 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -71441,7 +71489,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _buttonPanelView = __webpack_require__(572);
+	var _buttonPanelView = __webpack_require__(573);
 	
 	var _buttonPanelView2 = _interopRequireDefault(_buttonPanelView);
 	
@@ -71484,7 +71532,7 @@
 	exports.default = ButtonController;
 
 /***/ },
-/* 572 */
+/* 573 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -71497,11 +71545,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(562);
+	var _PIXIabbr = __webpack_require__(563);
 	
 	var _presets = __webpack_require__(555);
 	
-	var _settings = __webpack_require__(573);
+	var _settings = __webpack_require__(574);
 	
 	var _settings2 = _interopRequireDefault(_settings);
 	
@@ -71754,7 +71802,7 @@
 	exports.default = ButtonView;
 
 /***/ },
-/* 573 */
+/* 574 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -71781,7 +71829,7 @@
 	};
 
 /***/ },
-/* 574 */
+/* 575 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -71792,11 +71840,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _chipView = __webpack_require__(575);
+	var _chipView = __webpack_require__(576);
 	
 	var _chipView2 = _interopRequireDefault(_chipView);
 	
-	var _settings = __webpack_require__(576);
+	var _settings = __webpack_require__(577);
 	
 	var _settings2 = _interopRequireDefault(_settings);
 	
@@ -71921,7 +71969,7 @@
 	exports.default = ChipController;
 
 /***/ },
-/* 575 */
+/* 576 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -71932,15 +71980,15 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(562);
+	var _PIXIabbr = __webpack_require__(563);
 	
 	var _presets = __webpack_require__(555);
 	
-	var _settings = __webpack_require__(576);
+	var _settings = __webpack_require__(577);
 	
 	var _settings2 = _interopRequireDefault(_settings);
 	
-	var _helpFunctions = __webpack_require__(564);
+	var _helpFunctions = __webpack_require__(565);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -72084,15 +72132,22 @@
 	exports.default = ChipView;
 
 /***/ },
-/* 576 */
-/***/ function(module, exports) {
+/* 577 */
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.default = {
+	
+	var _globalSettings = __webpack_require__(562);
+	
+	var _globalSettings2 = _interopRequireDefault(_globalSettings);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var componentSettings = {
 		position: {
 			chip0: { x: 640, y: 957 },
 			chip1: { x: 800, y: 957 },
@@ -72101,17 +72156,19 @@
 			chip4: { x: 1280, y: 957 }
 		},
 		values: {
-			chip0: 100,
-			chip1: 500,
-			chip2: 1000,
-			chip3: 2000,
-			chip4: 3000
+			chip0: _globalSettings2.default.betSums[0],
+			chip1: _globalSettings2.default.betSums[1],
+			chip2: _globalSettings2.default.betSums[2],
+			chip3: _globalSettings2.default.betSums[3],
+			chip4: _globalSettings2.default.betSums[4]
 		},
 		textStyle: { font: 'bold 32px Arial', fill: 'white', align: 'center' }
 	};
+	
+	exports.default = componentSettings;
 
 /***/ },
-/* 577 */
+/* 578 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -72122,7 +72179,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _floatChipView = __webpack_require__(578);
+	var _floatChipView = __webpack_require__(579);
 	
 	var _floatChipView2 = _interopRequireDefault(_floatChipView);
 	
@@ -72167,7 +72224,7 @@
 	exports.default = FloatChipController;
 
 /***/ },
-/* 578 */
+/* 579 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -72178,15 +72235,15 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(562);
+	var _PIXIabbr = __webpack_require__(563);
 	
 	var _presets = __webpack_require__(555);
 	
-	var _settings = __webpack_require__(579);
+	var _settings = __webpack_require__(580);
 	
 	var _settings2 = _interopRequireDefault(_settings);
 	
-	var _helpFunctions = __webpack_require__(564);
+	var _helpFunctions = __webpack_require__(565);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -72204,19 +72261,16 @@
 			this._floatChipsContainer = new _PIXIabbr._pxC();
 			this._floatChipsContainer.x = 50;
 			this._floatChipsContainer.y = 50;
-			// this._floatChipsContainer.visible = false;
 			this._floatChipsContainer.interactive = true;
 	
 			var chipType = _settings2.default.data[config.value];
 	
 			var floatChipSprite = new _PIXIabbr._pxS(_presets.spriteStore.chips[chipType]);
-			// floatChipSprite.visible = false;
 			floatChipSprite.anchor.set(0.5);
 			this._floatChipsContainer.addChild(floatChipSprite);
 	
 			// Значение на фишке
 			var chipValueText = new _PIXIabbr._pxT(_helpFunctions._hf.formatChipValue(config.value), _settings2.default.textStyle);
-			// chipValueText.visible = false;
 			this._floatChipsContainer.addChild(chipValueText);
 			chipValueText.anchor.x = 0.5;
 			chipValueText.anchor.y = 0.55;
@@ -72276,31 +72330,38 @@
 	exports.default = FloatChipView;
 
 /***/ },
-/* 579 */
-/***/ function(module, exports) {
+/* 580 */
+/***/ function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.default = {
-		data: {
-			100: "chipSm0",
-			500: "chipSm1",
-			1000: "chipSm2",
-			2000: "chipSm3",
-			3000: "chipSm4"
-		},
+	
+	var _globalSettings = __webpack_require__(562);
+	
+	var _globalSettings2 = _interopRequireDefault(_globalSettings);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var componentSettings = {
+		data: {},
 		textStyle: {
 			font: 'bold 20px Arial',
 			fill: 'white',
 			align: 'center'
 		}
 	};
+	
+	_globalSettings2.default.betSums.forEach(function (item, idx) {
+		componentSettings.data[item] = "chipSm" + idx;
+	});
+	
+	exports.default = componentSettings;
 
 /***/ },
-/* 580 */
+/* 581 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -72311,11 +72372,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _betView = __webpack_require__(581);
+	var _betView = __webpack_require__(582);
 	
 	var _betView2 = _interopRequireDefault(_betView);
 	
-	var _settings = __webpack_require__(582);
+	var _settings = __webpack_require__(583);
 	
 	var _settings2 = _interopRequireDefault(_settings);
 	
@@ -72395,7 +72456,7 @@
 	exports.default = BetController;
 
 /***/ },
-/* 581 */
+/* 582 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -72406,17 +72467,17 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(562);
+	var _PIXIabbr = __webpack_require__(563);
 	
 	var _presets = __webpack_require__(555);
 	
-	var _settings = __webpack_require__(582);
+	var _settings = __webpack_require__(583);
 	
 	var _settings2 = _interopRequireDefault(_settings);
 	
-	var _helpFunctions = __webpack_require__(564);
+	var _helpFunctions = __webpack_require__(565);
 	
-	var _gsap = __webpack_require__(569);
+	var _gsap = __webpack_require__(570);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -72604,41 +72665,37 @@
 	exports.default = BetView;
 
 /***/ },
-/* 582 */
-/***/ function(module, exports) {
+/* 583 */
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	var limits = { min: 100, max: 30000 };
 	
-	exports.default = {
+	var _globalSettings = __webpack_require__(562);
+	
+	var _globalSettings2 = _interopRequireDefault(_globalSettings);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var componentSettings = {
 		values: {
-			chipSm0: 100,
-			chipSm1: 500,
-			chipSm2: 1000,
-			chipSm3: 2000,
-			chipSm4: 3000
+			chipSm0: _globalSettings2.default.betSums[0],
+			chipSm1: _globalSettings2.default.betSums[1],
+			chipSm2: _globalSettings2.default.betSums[2],
+			chipSm3: _globalSettings2.default.betSums[3],
+			chipSm4: _globalSettings2.default.betSums[4]
 		},
-		limits: {
-			min: limits.min,
-			max: limits.max,
-			1: { min: limits.min || 100, max: 4000 },
-			2: { min: limits.min || 100, max: 8000 },
-			3: { min: limits.min || 100, max: 12000 },
-			4: { min: limits.min || 100, max: 16000 },
-			5: { min: limits.min || 100, max: 20000 },
-			6: { min: limits.min || 100, max: 24000 },
-			12: { min: limits.min || 100, max: 28000 },
-			18: { min: limits.min || 100, max: 30000 }
-		},
+		limits: _globalSettings2.default.betLimits,
 		textStyles: { font: 'normal 14px Arial', fill: 'white', align: 'center' }
 	};
+	
+	exports.default = componentSettings;
 
 /***/ },
-/* 583 */
+/* 584 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -72649,7 +72706,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _view = __webpack_require__(584);
+	var _view = __webpack_require__(585);
 	
 	var _view2 = _interopRequireDefault(_view);
 	
@@ -72694,7 +72751,7 @@
 	exports.default = TimeScaleController;
 
 /***/ },
-/* 584 */
+/* 585 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -72705,7 +72762,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(562);
+	var _PIXIabbr = __webpack_require__(563);
 	
 	var _presets = __webpack_require__(555);
 	
@@ -72838,7 +72895,7 @@
 	exports.default = TimeScaleView;
 
 /***/ },
-/* 585 */
+/* 586 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -72849,7 +72906,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _infoPanelView = __webpack_require__(586);
+	var _infoPanelView = __webpack_require__(587);
 	
 	var _infoPanelView2 = _interopRequireDefault(_infoPanelView);
 	
@@ -72882,7 +72939,7 @@
 	exports.default = infoPanelController;
 
 /***/ },
-/* 586 */
+/* 587 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -72896,9 +72953,9 @@
 	// views
 	
 	
-	var _PIXIabbr = __webpack_require__(562);
+	var _PIXIabbr = __webpack_require__(563);
 	
-	var _settings = __webpack_require__(587);
+	var _settings = __webpack_require__(588);
 	
 	var _settings2 = _interopRequireDefault(_settings);
 	
@@ -72980,7 +73037,7 @@
 	exports.default = infoPanelView;
 
 /***/ },
-/* 587 */
+/* 588 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -72989,7 +73046,7 @@
 		value: true
 	});
 	
-	var _globalSettings = __webpack_require__(588);
+	var _globalSettings = __webpack_require__(562);
 	
 	var _globalSettings2 = _interopRequireDefault(_globalSettings);
 	
@@ -73020,23 +73077,6 @@
 	};
 
 /***/ },
-/* 588 */
-/***/ function(module, exports) {
-
-	"use strict";
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	exports.default = {
-		numColor: {
-			bgRed: [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36],
-			bgBlack: [2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35],
-			bgZero: [0, 37]
-		}
-	};
-
-/***/ },
 /* 589 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -73048,11 +73088,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(562);
+	var _PIXIabbr = __webpack_require__(563);
 	
-	var _helpFunctions = __webpack_require__(564);
+	var _helpFunctions = __webpack_require__(565);
 	
-	var _settings = __webpack_require__(587);
+	var _settings = __webpack_require__(588);
 	
 	var _settings2 = _interopRequireDefault(_settings);
 	
@@ -73136,11 +73176,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(562);
+	var _PIXIabbr = __webpack_require__(563);
 	
 	var _presets = __webpack_require__(555);
 	
-	var _settings = __webpack_require__(587);
+	var _settings = __webpack_require__(588);
 	
 	var _settings2 = _interopRequireDefault(_settings);
 	
@@ -73307,11 +73347,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(562);
+	var _PIXIabbr = __webpack_require__(563);
 	
 	var _presets = __webpack_require__(555);
 	
-	var _settings = __webpack_require__(587);
+	var _settings = __webpack_require__(588);
 	
 	var _settings2 = _interopRequireDefault(_settings);
 	
@@ -73478,11 +73518,11 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(562);
+	var _PIXIabbr = __webpack_require__(563);
 	
 	var _presets = __webpack_require__(555);
 	
-	var _settings = __webpack_require__(587);
+	var _settings = __webpack_require__(588);
 	
 	var _settings2 = _interopRequireDefault(_settings);
 	
@@ -73653,7 +73693,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(562);
+	var _PIXIabbr = __webpack_require__(563);
 	
 	var _presets = __webpack_require__(555);
 	
@@ -73661,7 +73701,7 @@
 	
 	var _settings2 = _interopRequireDefault(_settings);
 	
-	var _helpFunctions = __webpack_require__(564);
+	var _helpFunctions = __webpack_require__(565);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -73838,7 +73878,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(562);
+	var _PIXIabbr = __webpack_require__(563);
 	
 	var _presets = __webpack_require__(555);
 	
@@ -74042,7 +74082,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _PIXIabbr = __webpack_require__(562);
+	var _PIXIabbr = __webpack_require__(563);
 	
 	var _presets = __webpack_require__(555);
 	
@@ -74050,9 +74090,9 @@
 	
 	var _settings2 = _interopRequireDefault(_settings);
 	
-	var _helpFunctions = __webpack_require__(564);
+	var _helpFunctions = __webpack_require__(565);
 	
-	var _gsap = __webpack_require__(569);
+	var _gsap = __webpack_require__(570);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -74221,7 +74261,7 @@
 		value: true
 	});
 	
-	var _globalSettings = __webpack_require__(588);
+	var _globalSettings = __webpack_require__(562);
 	
 	var _globalSettings2 = _interopRequireDefault(_globalSettings);
 	
@@ -74404,7 +74444,7 @@
 	
 	var _pixi = __webpack_require__(1);
 	
-	var _gsap = __webpack_require__(569);
+	var _gsap = __webpack_require__(570);
 	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
@@ -74531,7 +74571,7 @@
 	
 			this.toJs = {
 				connect: function connect(toJs) {
-					_this.toJs = toJs;
+					return _this.toJs = toJs;
 				}
 			};
 		}
@@ -74547,24 +74587,6 @@
 					setTimeout(function () {
 						_this2.toJs(JSON.stringify(_serverMessages2.default.init_msg[0]));
 					}, 0);
-	
-					// setTimeout(() => {
-					// 	this.toJs(JSON.stringify( serverMessages.rand_msg[0] ));
-					//
-					// 	setTimeout(() => {
-					// 		this.toJs(JSON.stringify( serverMessages.rand_msg[1] ));
-					//
-					// 		setTimeout(() => {
-					// 			this.toJs(JSON.stringify( serverMessages.rand_msg[2] ));
-					//
-					// 			setTimeout(() => {
-					// 				this.toJs(JSON.stringify( serverMessages.rand_msg[0] ));
-					//
-					// 			}, 5000)
-					// 		}, 5000);
-					// 	}, 5000);
-					// }, 5000);
-	
 	
 					// setTimeout(() => {
 					// 	this.toJs(JSON.stringify( {error_code:401,error_ctx:"bet_error",kind:"error_msg"} ));
@@ -74607,6 +74629,15 @@
 		rand_msg: [{
 			kind: "rand_msg",
 			game_data: {
+				balls: [28],
+				end_bets_expected: "2017-06-16T12:00:00Z",
+				game_id: 10,
+				game_state: 1,
+				total_win: 0
+			}
+		}, {
+			kind: "rand_msg",
+			game_data: {
 				balls: [],
 				end_bets_expected: "",
 				game_id: 9,
@@ -74620,15 +74651,6 @@
 				end_bets_expected: "",
 				game_id: 9,
 				game_state: 2,
-				total_win: 10000
-			}
-		}, {
-			kind: "rand_msg",
-			game_data: {
-				balls: [28],
-				end_bets_expected: "2017-06-16T12:00:00Z",
-				game_id: 10,
-				game_state: 1,
 				total_win: 0
 			}
 		}],
@@ -74637,7 +74659,7 @@
 			lang: "ru",
 			prev_game_kind: -1,
 			auth: {
-				balance: 10000.456,
+				balance: 10000000.456,
 				bonus: 24000,
 				kind: "by_card",
 				nickname: "Maika"
@@ -74751,20 +74773,28 @@
 	
 	var _serverMessages2 = _interopRequireDefault(_serverMessages);
 	
+	var _helpFunctions = __webpack_require__(565);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 	
-	// Алгоритм
+	var nums = [];
+	for (var i = 0; i < 38; i += 1) {
+		nums.push(i);
+	} // Алгоритм
 	// При получении fromJs('loaded_msg') отправляем  toJs('init_msg'/game_state==1)
 	// Затем по таймаутам начинаем отправлять последовательно toJs('rand_msg')
+	
 	var stateMachine = function () {
-		function stateMachine() {
+		function stateMachine(cppObj) {
 			_classCallCheck(this, stateMachine);
+	
+			this.cppObj = cppObj;
 	
 			this.randMsgCount = 1;
 	
-			this.randMsgTiming = [10, 5, 5];
+			this.randMsgTiming = [5, 10, 5]; // game_state 2[ball], 1, 2
 		}
 	
 		_createClass(stateMachine, [{
@@ -74772,32 +74802,51 @@
 			value: function getMessage() {}
 		}, {
 			key: 'sendMessage',
-			value: function sendMessage(msg) {
-				console.log('msg ➠ ', msg, this.randMsgCount);
+			value: function sendMessage(msg, time) {
+				var _this = this;
+	
+				time ? setTimeout(function () {
+					return _this.cppObj.toJs(JSON.stringify(msg));
+				}, time * 1000) : this.cppObj.toJs(JSON.stringify(msg));
 			}
 		}, {
 			key: 'startWork',
 			value: function startWork() {
-				var _this = this;
-	
-				this.sendMessage(_serverMessages2.default.init_msg[0]);
-	
-				this.timeoutId = setTimeout(function () {
-					return sendRandMeg();
-				}, this.randMsgTiming[0]);
+				var _this2 = this;
 	
 				var sendRandMeg = function sendRandMeg() {
-					_this.sendMessage(_serverMessages2.default.rand_msg[_this.randMsgCount]);
+					var randMsg = _serverMessages2.default.rand_msg[_this2.randMsgCount];
+					if (_this2.randMsgCount === 2) {
+						var rundNum = _helpFunctions._hf.randEl(nums);
+						_serverMessages2.default.rand_msg[0].game_data.balls[0] = rundNum;
+						randMsg.game_data.balls[0] = rundNum;
+					}
+					_this2.sendMessage(randMsg);
 	
-					if (_this.randMsgCount++ > 2) _this.randMsgCount = 0;
+					if (++_this2.randMsgCount > 2) _this2.randMsgCount = 0;
 	
-					_this.timeoutId = setTimeout(sendRandMeg, _this.randMsgTiming[_this.randMsgCount] * 1000);
+					var thisStateTime = _this2.randMsgTiming[_this2.randMsgCount] * 1000;
+					_this2.timeoutId = setTimeout(sendRandMeg, thisStateTime);
 				};
+	
+				this.timeoutId = setTimeout(sendRandMeg, this.randMsgTiming[this.randMsgCount] * 1000);
 			}
 		}, {
 			key: 'stopWork',
 			value: function stopWork() {
 				clearTimeout(this.timeoutId);
+			}
+		}, {
+			key: 'sendErrorMessage',
+			value: function sendErrorMessage(code, time) {
+				var _this3 = this;
+	
+				var msg = _serverMessages2.default.error_msg;
+				if (code) msg.error_code = code;
+	
+				time ? setTimeout(function () {
+					return _this3.sendMessage(msg);
+				}, time * 1000) : this.sendMessage(msg);
 			}
 		}]);
 	

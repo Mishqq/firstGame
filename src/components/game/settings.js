@@ -1,7 +1,8 @@
 import timeScaleSettings from './../timeScale/settings';
 import gameFieldSettings from './../gameField/settings';
+import globalSettings from './../../constants/globalSettings';
 
-let limits = {min: 100, max: 30000};
+let limits = globalSettings.betLimits[1];
 
 export default {
 	game: {

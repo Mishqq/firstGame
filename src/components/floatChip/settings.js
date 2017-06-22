@@ -1,14 +1,16 @@
-export default {
-	data: {
-		100:    "chipSm0",
-		500:    "chipSm1",
-		1000:   "chipSm2",
-		2000:   "chipSm3",
-		3000:   "chipSm4"
-	},
+import globalSettings from './../../constants/globalSettings';
+
+let componentSettings = {
+	data: {},
 	textStyle: {
 		font: 'bold 20px Arial',
 		fill : 'white',
 		align : 'center'
 	}
-}
+};
+
+globalSettings.betSums.forEach((item, idx) => {
+	componentSettings.data[item] = "chipSm" + idx;
+});
+
+export default componentSettings;

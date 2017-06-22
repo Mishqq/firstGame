@@ -5,6 +5,7 @@ import {assetLoader} from '../../services/resourseLoader'
 import {touchEvents, gameSounds} from '../../constants/presets'
 import settings from './settings'
 import {_pxC} from './../../constants/PIXIabbr';
+import globalSettings from './../../constants/globalSettings';
 
 import GameModel from './gameModel';
 import {_hf} from '../../services/helpFunctions';
@@ -148,8 +149,6 @@ export default class GameController {
 			let start = momentJs();
 			let end = momentJs(gameData.end_bets_expected);
 			let playTime = end.diff(start, 'seconds');
-			console.log('init_msg, time for timeScale', playTime);
-			//playTime = 6;
 
 			// Анимация выпадающего числа
 			cmpCtrl.historyCtrl.showRollAnim(false);
@@ -236,8 +235,6 @@ export default class GameController {
 			let start = momentJs();
 			let end = momentJs(gameData.end_bets_expected);
 			let playTime = end.diff(start, 'seconds');
-			console.log('init_msg, time for timeScale', playTime);
-			//playTime = 6;
 
 			// Анимация выпадающего числа
 			if(gameData.balls.length){
@@ -350,8 +347,12 @@ export default class GameController {
 
 			let betStoreId = pos.x + '_' + pos.y;
 
+			let limits = globalSettings.betLimits[pos4Bet.numbers.length];
+
 			if(GM.betsCtrl[betStoreId]){
 				GM.betsCtrl[betStoreId].updateBet(value);
+			} else if(value > limits.max || value < limits.min){
+				console.log('Ставка выходит за пределы лимитов');
 			} else {
 				let cfg = {pos: pos, info: item, value: value, callback: this.betCallback, ctx: this};
 				GM.betsCtrl[betStoreId] = new BetController(cfg);

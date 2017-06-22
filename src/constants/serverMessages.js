@@ -3,6 +3,16 @@ const serverMessages = {
 		{
 			kind: "rand_msg",
 			game_data: {
+				balls: [28],
+				end_bets_expected: "2017-06-16T12:00:00Z",
+				game_id: 10,
+				game_state: 1,
+				total_win: 0
+			}
+		},
+		{
+			kind: "rand_msg",
+			game_data: {
 				balls: [],
 				end_bets_expected: "",
 				game_id: 9,
@@ -16,15 +26,6 @@ const serverMessages = {
 				end_bets_expected: "",
 				game_id: 9,
 				game_state: 2,
-				total_win: 10000
-			}
-		},{
-			kind: "rand_msg",
-			game_data: {
-				balls: [28],
-				end_bets_expected: "2017-06-16T12:00:00Z",
-				game_id: 10,
-				game_state: 1,
 				total_win: 0
 			}
 		}
@@ -35,7 +36,7 @@ const serverMessages = {
 			lang: "ru",
 			prev_game_kind: -1,
 			auth: {
-				balance: 10000.456,
+				balance: 10000000.456,
 				bonus: 24000,
 				kind: "by_card",
 				nickname: "Maika",

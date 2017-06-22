@@ -13,19 +13,16 @@ export default class FloatChipView {
 		this._floatChipsContainer = new _pxC();
 		this._floatChipsContainer.x = 50;
 		this._floatChipsContainer.y = 50;
-		// this._floatChipsContainer.visible = false;
 		this._floatChipsContainer.interactive = true;
 
 		let chipType = settings.data[ config.value ];
 
 		let floatChipSprite = new _pxS( spriteStore.chips[chipType] );
-		// floatChipSprite.visible = false;
 		floatChipSprite.anchor.set(0.5);
 		this._floatChipsContainer.addChild(floatChipSprite);
 
 		// Значение на фишке
 		let chipValueText = new _pxT( _hf.formatChipValue(config.value), settings.textStyle);
-		// chipValueText.visible = false;
 		this._floatChipsContainer.addChild(chipValueText);
 		chipValueText.anchor.x = 0.5;
 		chipValueText.anchor.y = 0.55;

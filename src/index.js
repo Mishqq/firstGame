@@ -2,13 +2,18 @@ import "babel-polyfill";
 import GameController from './components/game/gameController';
 import Debugger from './debugger';
 import serverEmulate from './services/serverEmulate';
-import {_hf} from './services/helpFunctions';
+
+import {updateSettings as betUpdateSettings} from './components/bet/settings';
 
 if(!window.cppObj) {
 	window.cppObj = new Debugger();
-	// let stateMachine = new serverEmulate();
-	// stateMachine.startWork();
+	let stateMachine = new serverEmulate(window.cppObj);
+	stateMachine.startWork();
+
+	//stateMachine.sendErrorMessage(402, 2)
+	//stateMachine.sendMessage(serverMessages.bets_msg, 3)
 }
+
 
 let gameCtrl = new GameController((...ars)=>cppObj.fromJs(...ars));
 gameCtrl.init((...ars)=>cppObj.fromJs(...ars));

@@ -3,7 +3,7 @@ import serverMessages from './constants/serverMessages';
 export default class Debugger {
 	constructor() {
 		this.toJs = {
-			connect: toJs => {this.toJs = toJs;}
+			connect: toJs => this.toJs = toJs
 		};
 	}
 
@@ -14,25 +14,6 @@ export default class Debugger {
 			setTimeout(() => {
 				this.toJs(JSON.stringify( serverMessages.init_msg[0] ));
 			}, 0);
-
-
-			// setTimeout(() => {
-			// 	this.toJs(JSON.stringify( serverMessages.rand_msg[0] ));
-			//
-			// 	setTimeout(() => {
-			// 		this.toJs(JSON.stringify( serverMessages.rand_msg[1] ));
-			//
-			// 		setTimeout(() => {
-			// 			this.toJs(JSON.stringify( serverMessages.rand_msg[2] ));
-			//
-			// 			setTimeout(() => {
-			// 				this.toJs(JSON.stringify( serverMessages.rand_msg[0] ));
-			//
-			// 			}, 5000)
-			// 		}, 5000);
-			// 	}, 5000);
-			// }, 5000);
-
 
 			// setTimeout(() => {
 			// 	this.toJs(JSON.stringify( {error_code:401,error_ctx:"bet_error",kind:"error_msg"} ));

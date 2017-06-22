@@ -1,7 +1,29 @@
-export default {
+let globalSettings = {
 	numColor: {
 		bgRed: [1,3,5,7,9, 12,14,16,18, 19,21,23,25,27, 30,32,34,36],
 		bgBlack: [2,4,6,8, 10,11,13,15,17, 20,22,24,26, 28,29,31,33,35],
 		bgZero: [0, 37]
-	}
-}
+	},
+	betSums: null,
+	betLimits: null
+};
+
+let setData = window.cppObj && window.cppObj.gameSettings ?
+	JSON.parse(window.cppObj.gameSettings()) :
+	{
+		bet_sums: [50, 100, 500, 1000, 3000],
+		bet_limits: {
+			1: {min: 50, max: 3000},
+			2: {min: 50, max: 3000},
+			3: {min: 50, max: 3000},
+			4: {min: 50, max: 3000},
+			6: {min: 50, max: 3000},
+			12: {min: 50, max: 3000},
+			18: {min: 50, max: 3000}
+		}
+	};
+
+globalSettings.betSums = setData.bet_sums;
+globalSettings.betLimits = setData.bet_limits;
+
+export default globalSettings

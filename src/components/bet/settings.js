@@ -1,24 +1,15 @@
-let limits = {min: 100, max: 30000};
+import globalSettings from './../../constants/globalSettings';
 
-export default {
+let componentSettings = {
 	values: {
-		chipSm0: 100,
-		chipSm1: 500,
-		chipSm2: 1000,
-		chipSm3: 2000,
-		chipSm4: 3000
+		chipSm0: globalSettings.betSums[0],
+		chipSm1: globalSettings.betSums[1],
+		chipSm2: globalSettings.betSums[2],
+		chipSm3: globalSettings.betSums[3],
+		chipSm4: globalSettings.betSums[4]
 	},
-	limits: {
-		min: limits.min,
-		max: limits.max,
-		1:  {min: limits.min || 100, max: 4000},
-		2:  {min: limits.min || 100, max: 8000},
-		3:  {min: limits.min || 100, max: 12000},
-		4:  {min: limits.min || 100, max: 16000},
-		5:  {min: limits.min || 100, max: 20000},
-		6:  {min: limits.min || 100, max: 24000},
-		12: {min: limits.min || 100, max: 28000},
-		18: {min: limits.min || 100, max: 30000}
-	},
+	limits: globalSettings.betLimits,
 	textStyles: {font: 'normal 14px Arial', fill : 'white', align : 'center'}
-}
+};
+
+export default componentSettings;
