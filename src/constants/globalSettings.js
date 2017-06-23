@@ -15,6 +15,7 @@ let defaultSettings = {
 		2: {min: 50, max: 3000},
 		3: {min: 50, max: 3000},
 		4: {min: 50, max: 3000},
+		5: {min: 50, max: 3000},
 		6: {min: 50, max: 3000},
 		12: {min: 50, max: 3000},
 		18: {min: 50, max: 3000}

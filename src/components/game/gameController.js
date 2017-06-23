@@ -396,7 +396,7 @@ export default class GameController {
 
 			let betStoreId = pos.x + '_' + pos.y;
 
-			let limits = globalSettings.betLimits[pos4Bet.numbers.length];
+			let limits = globalSettings.betLimits[item.numbers.length];
 
 			if(GM.betsCtrl[betStoreId]){
 				GM.betsCtrl[betStoreId].updateBet(value);
@@ -571,7 +571,7 @@ export default class GameController {
 			this.fChip.setPosition( event.data.global );
 
 			let obj = this.getDataForBet(event.data.global, true);
-			this.fChip.setKoeff( obj ? koeff[obj.numbers.length] : null );
+			this.fChip.setKoeff( obj && _hf.getClass(obj) === 'object' ? koeff[obj.numbers.length] : null );
 
 			return false;
 		}

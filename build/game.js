@@ -36491,10 +36491,8 @@
 	
 	
 				this.animateTimeouts = [];
-	
 				this.prevBets = undefined;
 				this.prevBetsActive = false;
-	
 				this.gameModel.balance = Math.floor(authData.balance);
 	
 				// TODO: если есть выигрышь со старой игры - сделать анимацию перечисления
@@ -36507,60 +36505,92 @@
 	
 				// game_state === 1 - игра закончена. Шкала времени уменьшается. Отображается число предыдущего выигрыша
 				// game_state === 2 - розыгрышь. Ролится число. Шкалы времени нет
-				if (+gameData.game_state === 1) {
-					this.interactiveSwitcher(!bets.length);
+				+gameData.game_state === 1 ? this.initMsgState_1(gameData, bets) : gameData.balls.length ? this.initMsgState_2_balls(gameData) : this.initMsgState_2_noBalls();
+			}
 	
-					this.betBtnClickStatus = false;
+			/**
+	   * Состояние с game_state === 1
+	   * Игра завершена. Открыта возможность ставок для новой игры
+	   * Если время розыгрыша с сервера отрицательное, значит идёт идёт ролл числа
+	   * На блочке - "next game"
+	   */
 	
-					cmpCtrl.historyCtrl.setData(gameData.balls);
+		}, {
+			key: 'initMsgState_1',
+			value: function initMsgState_1(gameData, bets) {
+				var cmpCtrl = this.componentCotrollers;
 	
-					cmpCtrl.buttons.lockClear(true);
+				this.interactiveSwitcher(!bets.length);
 	
-					cmpCtrl.gameField.hideWinNum();
+				this.betBtnClickStatus = false;
 	
-					var start = (0, _moment2.default)();
-					var end = (0, _moment2.default)(gameData.end_bets_expected);
-					var playTime = end.diff(start, 'seconds');
+				cmpCtrl.historyCtrl.setData(gameData.balls); // Добавляем выпавшие шары из прошлых розыгрышей
+				cmpCtrl.buttons.lockClear(true); // Блокировка "Очистить"
+				cmpCtrl.gameField.hideWinNum(); // Отключение подсветки выигрышного номера
+				cmpCtrl.historyCtrl.showRollAnim(false); // Анимация выпадающего числа
 	
-					// Анимация выпадающего числа
-					cmpCtrl.historyCtrl.showRollAnim(false);
+				var start = (0, _moment2.default)(),
+				    end = (0, _moment2.default)(gameData.end_bets_expected),
+				    playTime = end.diff(start, 'seconds');
 	
-					if (playTime > 0) {
-						// идёт розыгрыш со шкалой
-						var tm1 = setTimeout(function () {
-							cmpCtrl.historyCtrl.showRollAnim(true).play();
-						}, (playTime - _settings2.default.timeScale.changeColorPer * playTime) * 1000);
-						this.animateTimeouts.push(tm1);
+				// playTime = 30; // для локальной отладки
 	
-						// Задаём время шкале и запускаем её
-						cmpCtrl.timeScale.setTime(playTime).start();
-					} else {
-						// Всё ещё идёт розыгрыш без шкалы и с роллом числа
-						cmpCtrl.historyCtrl.showRollAnim(true).play();
+				// playTime > 0 ? идёт розыгрыш со шкалой : Всё ещё идёт розыгрыш без шкалы и с роллом числа;
+				if (playTime > 0) {
+					// Когда жёлтая шкала становится красной - начинается ролл числа
+					var rollTime = (playTime - _settings2.default.timeScale.changeColorPer * playTime) * 1000;
+					var tm1 = setTimeout(function () {
+						return cmpCtrl.historyCtrl.showRollAnim(true).play();
+					}, rollTime);
+					this.animateTimeouts.push(tm1);
 	
-						cmpCtrl.timeScale.setTime(30).start();
-					}
-				} else if (+gameData.game_state === 2) {
-					this.interactiveSwitcher(false);
-	
-					if (gameData.balls.length) {
-						cmpCtrl.timeScale.setState(4, gameData.balls[0]);
-						cmpCtrl.historyCtrl.showRollAnim(false).showRolledNum(gameData.balls[0]);
-						cmpCtrl.gameField.showWinNum(gameData.balls[0]);
-	
-						var win = gameData.total_win;
-						if (win) {
-							_presets.gameSounds.play('sound06');
-							cmpCtrl.betPanelCtrl.setData({ fldWin: win });
-	
-							this.gameModel.balance = cmpCtrl.betPanelCtrl.data.fldBalance + win;
-						}
-					} else {
-						cmpCtrl.timeScale.setState(3);
-						cmpCtrl.gameField.hideWinNum();
-						cmpCtrl.historyCtrl.play();
-					}
+					cmpCtrl.timeScale.setTime(playTime).start(); // Задаём время шкале и запускаем её
+				} else {
+					cmpCtrl.historyCtrl.showRollAnim(true).play();
+					cmpCtrl.timeScale.setTime(30).start();
 				}
+			}
+	
+			/**
+	   * Состояние с game_state === 2 и выпавшим шаром
+	   * На блочке - задать выигрышное число
+	   */
+	
+		}, {
+			key: 'initMsgState_2_balls',
+			value: function initMsgState_2_balls(gameData) {
+				var cmpCtrl = this.componentCotrollers;
+	
+				this.interactiveSwitcher(false);
+	
+				cmpCtrl.timeScale.setState(4, gameData.balls[0]);
+				cmpCtrl.historyCtrl.showRollAnim(false).showRolledNum(gameData.balls[0]);
+				cmpCtrl.gameField.showWinNum(gameData.balls[0]);
+	
+				var win = gameData.total_win;
+				if (win) {
+					_presets.gameSounds.play('sound06');
+					cmpCtrl.betPanelCtrl.setData({ fldWin: win });
+	
+					this.gameModel.balance = cmpCtrl.betPanelCtrl.data.fldBalance + win;
+				}
+			}
+	
+			/**
+	   * Состояние с game_state === 2 (без выпавшего шара)
+	   * На блочке - "End bets"
+	   */
+	
+		}, {
+			key: 'initMsgState_2_noBalls',
+			value: function initMsgState_2_noBalls() {
+				var cmpCtrl = this.componentCotrollers;
+	
+				this.interactiveSwitcher(false);
+	
+				cmpCtrl.timeScale.setState(3);
+				cmpCtrl.gameField.hideWinNum();
+				cmpCtrl.historyCtrl.play();
 			}
 	
 			/**
@@ -36570,108 +36600,153 @@
 		}, {
 			key: 'randMessageHandler',
 			value: function randMessageHandler(gameData) {
-				var _this2 = this;
-	
 				var cmpCtrl = this.componentCotrollers,
 				    GM = this.gameModel;
 	
 	
 				this.clearTableBet();
 				this.removeFloatChip();
-	
 				this.prevBetsActive = false;
 	
-				if (+gameData.game_state === 1) {
-					this.betBtnClickStatus = false;
+				+gameData.game_state === 1 ? this.randMsgState_1(gameData) : gameData.balls.length ? this.randMsgState_2_balls(gameData) : this.randMsgState_2_noBalls();
+			}
 	
-					// Очистка стола от предыдущих ставок.
-					this.clearTableBet();
+			/**
+	   * Состояние с game_state === 1
+	   * Игра завершена. Открыта возможность ставок для новой игры
+	   * Если время розыгрыша с сервера отрицательное, значит идёт идёт ролл числа
+	   * На блочке - "next game"
+	   */
+	
+		}, {
+			key: 'randMsgState_1',
+			value: function randMsgState_1(gameData) {
+				var _this2 = this;
+	
+				var cmpCtrl = this.componentCotrollers,
+				    GM = this.gameModel;
+	
+	
+				this.betBtnClickStatus = false;
+	
+				// Очистка стола от предыдущих ставок.
+				this.clearTableBet();
+				for (var key in GM.betsCtrl) {
+					if (!GM.betsCtrl.hasOwnProperty(key)) continue;
+	
+					GM.betsCtrl[key].clearBet();
+					_presets.gameSounds.play('sound03');
+	
+					var b = cmpCtrl.betPanelCtrl.data;
+					cmpCtrl.betPanelCtrl.setData({ fldWin: 0, fldBalance: b.fldBalance + b.fldWin });
+				}
+				setTimeout(function () {
+					return _this2.btnClear();
+				}, 1000);
+	
+				cmpCtrl.betPanelCtrl.setData({ fldBet: 0, fldWin: 0, fldBalance: this.gameModel.balance });
+	
+				GM.resetModel();
+				this.interactiveSwitcher(true);
+				cmpCtrl.buttons.lockClear(true);
+				//cmpCtrl.gameField.hideWinNum();
+				setTimeout(function () {
+					return cmpCtrl.gameField.hideWinNum();
+				}, 3000);
+	
+				cmpCtrl.historyCtrl.showRollAnim(true);
+				//cmpCtrl.historyCtrl.showRolledNum(gameData.balls[0]);
+	
+				var start = (0, _moment2.default)(),
+				    end = (0, _moment2.default)(gameData.end_bets_expected),
+				    playTime = end.diff(start, 'seconds');
+	
+				// playTime = 30; // для локальной отладки
+	
+				// Анимация выпадающего числа
+				if (gameData.balls.length) cmpCtrl.historyCtrl.showRollAnim(false).addNum(gameData.balls[0], true).showRolledNum(gameData.balls[0]);
+	
+				var rollTime = (playTime - _settings2.default.timeScale.changeColorPer * playTime) * 1000;
+				var tm1 = setTimeout(function () {
+					return cmpCtrl.historyCtrl.showRollAnim(true).play();
+				}, rollTime);
+				this.animateTimeouts.push(tm1);
+	
+				// Задаём время шкале и запускаем её
+				cmpCtrl.timeScale.setTime(playTime).start();
+			}
+	
+			/**
+	   * Состояние с game_state === 2 и выпавшим шаром
+	   * На блочке - задать выигрышное число
+	   */
+	
+		}, {
+			key: 'randMsgState_2_balls',
+			value: function randMsgState_2_balls(gameData) {
+				var cmpCtrl = this.componentCotrollers,
+				    GM = this.gameModel;
+	
+	
+				this.animateTimeouts.forEach(function (item) {
+					return clearTimeout(item);
+				});
+				this.animateTimeouts.length = 0;
+				this.interactiveSwitcher(false);
+	
+				// Отключаем анимацию и показываем выигрышное число
+				cmpCtrl.historyCtrl.showRollAnim(false).showRolledNum(gameData.balls[0]);
+	
+				// Переводим таймскейл в состояние "выигрышное число"
+				cmpCtrl.timeScale.setState(4, gameData.balls[0]);
+	
+				// Скрываем (если есть) предыдущее выигршное число и показываем текущее
+				cmpCtrl.gameField.hideWinNum().showWinNum(gameData.balls[0]);
+	
+				//let win = GM.calculateWin(gameData.balls[0]);
+				// Выигрыш с сервера
+				var win = gameData.total_win;
+				if (win) {
+					_presets.gameSounds.play('sound06');
+					cmpCtrl.betPanelCtrl.setData({ fldWin: win });
+	
+					this.gameModel.balance = cmpCtrl.betPanelCtrl.data.fldBalance + win;
+				}
+			}
+	
+			/**
+	   * Состояние с game_state === 2 (без выпавшего шара)
+	   * На блочке - "End bets"
+	   */
+	
+		}, {
+			key: 'randMsgState_2_noBalls',
+			value: function randMsgState_2_noBalls() {
+				var cmpCtrl = this.componentCotrollers,
+				    GM = this.gameModel;
+	
+	
+				this.animateTimeouts.forEach(function (item) {
+					return clearTimeout(item);
+				});
+				this.animateTimeouts.length = 0;
+				this.interactiveSwitcher(false);
+	
+				// Шаров нет. Крутим анимацию, скрываем шкалу
+				cmpCtrl.historyCtrl.showRollAnim(true).play();
+	
+				// Переводим таймскейл в состояние "Идёт игра"
+				cmpCtrl.timeScale.setState(3);
+	
+				if (!this.betBtnClickStatus) {
 					for (var key in GM.betsCtrl) {
 						if (!GM.betsCtrl.hasOwnProperty(key)) continue;
 	
 						GM.betsCtrl[key].clearBet();
 						_presets.gameSounds.play('sound03');
 	
-						var b = cmpCtrl.betPanelCtrl.data;
-						cmpCtrl.betPanelCtrl.setData({ fldWin: 0, fldBalance: b.fldBalance + b.fldWin });
-					}
-					setTimeout(function () {
-						return _this2.btnClear();
-					}, 1000);
-	
-					cmpCtrl.betPanelCtrl.setData({ fldBet: 0, fldWin: 0, fldBalance: this.gameModel.balance });
-	
-					GM.resetModel();
-					this.interactiveSwitcher(true);
-					cmpCtrl.buttons.lockClear(true);
-					//cmpCtrl.gameField.hideWinNum();
-					setTimeout(function () {
-						return cmpCtrl.gameField.hideWinNum();
-					}, 3000);
-	
-					cmpCtrl.historyCtrl.showRollAnim(true);
-					//cmpCtrl.historyCtrl.showRolledNum(gameData.balls[0]);
-	
-					var start = (0, _moment2.default)();
-					var end = (0, _moment2.default)(gameData.end_bets_expected);
-					var playTime = end.diff(start, 'seconds');
-	
-					// Анимация выпадающего числа
-					if (gameData.balls.length) {
-						cmpCtrl.historyCtrl.showRollAnim(false).addNum(gameData.balls[0], true).showRolledNum(gameData.balls[0]);
-					}
-					var tm1 = setTimeout(function () {
-						cmpCtrl.historyCtrl.showRollAnim(true).play();
-					}, (playTime - _settings2.default.timeScale.changeColorPer * playTime) * 1000);
-					this.animateTimeouts.push(tm1);
-	
-					// Задаём время шкале и запускаем её
-					cmpCtrl.timeScale.setTime(playTime).start();
-				} else if (+gameData.game_state === 2) {
-					this.animateTimeouts.forEach(function (item) {
-						return clearTimeout(item);
-					});
-					this.animateTimeouts.length = 0;
-	
-					this.interactiveSwitcher(false);
-	
-					if (!gameData.balls.length) {
-						// Шаров нет. Крутим анимацию, скрываем шкалу
-						cmpCtrl.historyCtrl.showRollAnim(true).play();
-	
-						// Переводим таймскейл в состояние "Идёт игра"
-						cmpCtrl.timeScale.setState(3);
-	
-						if (!this.betBtnClickStatus) {
-							for (var _key in GM.betsCtrl) {
-								if (!GM.betsCtrl.hasOwnProperty(_key)) continue;
-	
-								GM.betsCtrl[_key].clearBet();
-								_presets.gameSounds.play('sound03');
-	
-								var nums = cmpCtrl.betPanelCtrl.data;
-								cmpCtrl.betPanelCtrl.setData({ fldBet: 0, fldWin: 0, fldBalance: nums.fldBalance + nums.fldBet });
-							}
-						}
-					} else {
-						// Отключаем анимацию и показываем выигрышное число
-						cmpCtrl.historyCtrl.showRollAnim(false).showRolledNum(gameData.balls[0]);
-	
-						// Переводим таймскейл в состояние "выигрышное число"
-						cmpCtrl.timeScale.setState(4, gameData.balls[0]);
-	
-						// Скрываем (если есть) предыдущее выигршное число и показываем текущее
-						cmpCtrl.gameField.hideWinNum().showWinNum(gameData.balls[0]);
-	
-						//let win = GM.calculateWin(gameData.balls[0]);
-						// Выигрыш с сервера
-						var win = gameData.total_win;
-						if (win) {
-							_presets.gameSounds.play('sound06');
-							cmpCtrl.betPanelCtrl.setData({ fldWin: win });
-	
-							this.gameModel.balance = cmpCtrl.betPanelCtrl.data.fldBalance + win;
-						}
+						var nums = cmpCtrl.betPanelCtrl.data;
+						cmpCtrl.betPanelCtrl.setData({ fldBet: 0, fldWin: 0, fldBalance: nums.fldBalance + nums.fldBet });
 					}
 				}
 			}
@@ -36727,7 +36802,7 @@
 	
 					var betStoreId = pos.x + '_' + pos.y;
 	
-					var limits = _globalSettings2.default.betLimits[pos4Bet.numbers.length];
+					var limits = _globalSettings2.default.betLimits[item.numbers.length];
 	
 					if (GM.betsCtrl[betStoreId]) {
 						GM.betsCtrl[betStoreId].updateBet(value);
@@ -36944,7 +37019,7 @@
 					this.fChip.setPosition(event.data.global);
 	
 					var obj = this.getDataForBet(event.data.global, true);
-					this.fChip.setKoeff(obj ? koeff[obj.numbers.length] : null);
+					this.fChip.setKoeff(obj && _helpFunctions._hf.getClass(obj) === 'object' ? koeff[obj.numbers.length] : null);
 	
 					return false;
 				}
@@ -37085,8 +37160,8 @@
 				}if (currentBetsValue > cmpCtrl.betPanelCtrl.data.fldBalance) {
 					cmpCtrl.errors.viewError(402);
 				} else {
-					for (var _key2 in GM.betsCtrl) {
-						if (GM.betsCtrl.hasOwnProperty(_key2)) GM.betsCtrl[_key2].updateBet(GM.betsCtrl[_key2].balance);
+					for (var _key in GM.betsCtrl) {
+						if (GM.betsCtrl.hasOwnProperty(_key)) GM.betsCtrl[_key].updateBet(GM.betsCtrl[_key].balance);
 					}
 				}
 			}
@@ -37139,10 +37214,10 @@
 					}
 				}
 	
-				for (var _key3 in GM.betsCtrl) {
-					if (GM.betsCtrl.hasOwnProperty(_key3)) {
-						if (status) GM.betsCtrl[_key3].enableMove();
-						if (!status) GM.betsCtrl[_key3].disableMove();
+				for (var _key2 in GM.betsCtrl) {
+					if (GM.betsCtrl.hasOwnProperty(_key2)) {
+						if (status) GM.betsCtrl[_key2].enableMove();
+						if (!status) GM.betsCtrl[_key2].disableMove();
 					}
 				}
 			}
@@ -62545,7 +62620,7 @@
 /* 562 */
 /***/ function(module, exports) {
 
-	"use strict";
+	'use strict';
 	
 	Object.defineProperty(exports, "__esModule", {
 		value: true
@@ -62560,18 +62635,23 @@
 		betLimits: null
 	};
 	
-	var setData = window.cppObj && window.cppObj.gameSettings ? JSON.parse(window.cppObj.gameSettings()) : {
+	var defaultSettings = {
 		bet_sums: [50, 100, 500, 1000, 3000],
 		bet_limits: {
 			1: { min: 50, max: 3000 },
 			2: { min: 50, max: 3000 },
 			3: { min: 50, max: 3000 },
 			4: { min: 50, max: 3000 },
+			5: { min: 50, max: 3000 },
 			6: { min: 50, max: 3000 },
 			12: { min: 50, max: 3000 },
 			18: { min: 50, max: 3000 }
 		}
 	};
+	
+	window.cppObj && window.cppObj.gameSettings ? console.log('window.cppObj.gameSettings() ➠ ', window.cppObj.gameSettings()) : console.log('Нет настроек с сервера, будут использованы дефолтные данные:', defaultSettings);
+	
+	var setData = window.cppObj && window.cppObj.gameSettings ? JSON.parse(window.cppObj.gameSettings()) : defaultSettings;
 	
 	globalSettings.betSums = setData.bet_sums;
 	globalSettings.betLimits = setData.bet_limits;
