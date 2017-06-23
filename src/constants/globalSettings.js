@@ -8,20 +8,26 @@ let globalSettings = {
 	betLimits: null
 };
 
+let defaultSettings = {
+	bet_sums: [50, 100, 500, 1000, 3000],
+	bet_limits: {
+		1: {min: 50, max: 3000},
+		2: {min: 50, max: 3000},
+		3: {min: 50, max: 3000},
+		4: {min: 50, max: 3000},
+		6: {min: 50, max: 3000},
+		12: {min: 50, max: 3000},
+		18: {min: 50, max: 3000}
+	}
+};
+
+window.cppObj && window.cppObj.gameSettings ?
+	console.log('window.cppObj.gameSettings() ➠ ', window.cppObj.gameSettings()) :
+	console.log('Нет настроек с сервера, будут использованы дефолтные данные:', defaultSettings);
+
 let setData = window.cppObj && window.cppObj.gameSettings ?
-	JSON.parse(window.cppObj.gameSettings()) :
-	{
-		bet_sums: [50, 100, 500, 1000, 3000],
-		bet_limits: {
-			1: {min: 50, max: 3000},
-			2: {min: 50, max: 3000},
-			3: {min: 50, max: 3000},
-			4: {min: 50, max: 3000},
-			6: {min: 50, max: 3000},
-			12: {min: 50, max: 3000},
-			18: {min: 50, max: 3000}
-		}
-	};
+	JSON.parse(window.cppObj.gameSettings()) : defaultSettings;
+
 
 globalSettings.betSums = setData.bet_sums;
 globalSettings.betLimits = setData.bet_limits;
