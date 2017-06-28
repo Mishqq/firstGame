@@ -9,16 +9,16 @@ let globalSettings = {
 };
 
 let defaultSettings = {
-	bet_sums: [50, 100, 500, 1000, 3000],
-	bet_limits: {
-		1: {min: 50, max: 3000},
-		2: {min: 50, max: 3000},
-		3: {min: 50, max: 3000},
-		4: {min: 50, max: 3000},
-		5: {min: 50, max: 3000},
-		6: {min: 50, max: 3000},
-		12: {min: 50, max: 3000},
-		18: {min: 50, max: 3000}
+	"bet_sums": ["100", "200", "500", "1000", "3000"],
+	"bet_limits": {
+		"1": {"min": "100", "max": "3000"},
+		"2": {"min": "100", "max": "3000"},
+		"3": {"min": "100", "max": "3000"},
+		"4": {"min": "100", "max": "3000"},
+		"5": {"min": "100", "max": "3000"},
+		"6": {"min": "100", "max": "3000"},
+		"12": {"min": "100", "max": "3000"},
+		"18": {"min": "100", "max": "3000"}
 	}
 };
 
@@ -29,6 +29,13 @@ window.cppObj && window.cppObj.gameSettings ?
 let setData = window.cppObj && window.cppObj.gameSettings ?
 	JSON.parse(window.cppObj.gameSettings()) : defaultSettings;
 
+
+setData.bet_sums.forEach((item, idx, arr) => arr[idx] = +item);
+for(let key in setData.bet_limits){
+	let limitObj = setData.bet_limits[key];
+	limitObj.min = +limitObj.min;
+	limitObj.max = +limitObj.max;
+}
 
 globalSettings.betSums = setData.bet_sums;
 globalSettings.betLimits = setData.bet_limits;

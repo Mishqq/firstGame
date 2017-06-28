@@ -182,7 +182,8 @@ export default class GameController {
 		let {componentCotrollers: cmpCtrl} = this;
 		this.interactiveSwitcher(false);
 
-		cmpCtrl.timeScale.setState(4, gameData.balls[0]);
+		let viewNum = gameData.balls[0] === 0 ? '0' : gameData.balls[0] === 37 ? '00' : gameData.balls[0];
+		cmpCtrl.timeScale.setState(4, viewNum);
 		cmpCtrl.historyCtrl.showRollAnim(false).showRolledNum(gameData.balls[0]);
 		cmpCtrl.gameField.showWinNum(gameData.balls[0]);
 
@@ -292,10 +293,13 @@ export default class GameController {
 		this.interactiveSwitcher(false);
 
 		// Отключаем анимацию и показываем выигрышное число
-		cmpCtrl.historyCtrl.showRollAnim(false).showRolledNum(gameData.balls[0]);
+		cmpCtrl.historyCtrl
+			.showRollAnim(false)
+			.showRolledNum(gameData.balls[0]);
 
 		// Переводим таймскейл в состояние "выигрышное число"
-		cmpCtrl.timeScale.setState(4, gameData.balls[0]);
+		let viewNum = gameData.balls[0] === 0 ? '0' : gameData.balls[0] === 37 ? '00' : gameData.balls[0];
+		cmpCtrl.timeScale.setState(4, viewNum);
 
 		// Скрываем (если есть) предыдущее выигршное число и показываем текущее
 		cmpCtrl.gameField.hideWinNum().showWinNum(gameData.balls[0]);

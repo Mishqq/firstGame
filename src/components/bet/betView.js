@@ -64,6 +64,9 @@ export default class BetView {
 	updateBet(value){
 		let _temp = this._summ;
 
+		// Хак для 101 зала. Мб будет работать
+		if(this._summ === this.limits.max && value > 0) return false;
+
 		(this._summ + value > this.limits.max) ? this._summ = this.limits.max : this._summ += value;
 
 		if(this._summ && this._summ > _temp) gameSounds.play('sound02');

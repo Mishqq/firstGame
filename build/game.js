@@ -36563,7 +36563,8 @@
 	
 				this.interactiveSwitcher(false);
 	
-				cmpCtrl.timeScale.setState(4, gameData.balls[0]);
+				var viewNum = gameData.balls[0] === 0 ? '0' : gameData.balls[0] === 37 ? '00' : gameData.balls[0];
+				cmpCtrl.timeScale.setState(4, viewNum);
 				cmpCtrl.historyCtrl.showRollAnim(false).showRolledNum(gameData.balls[0]);
 				cmpCtrl.gameField.showWinNum(gameData.balls[0]);
 	
@@ -36698,7 +36699,8 @@
 				cmpCtrl.historyCtrl.showRollAnim(false).showRolledNum(gameData.balls[0]);
 	
 				// Переводим таймскейл в состояние "выигрышное число"
-				cmpCtrl.timeScale.setState(4, gameData.balls[0]);
+				var viewNum = gameData.balls[0] === 0 ? '0' : gameData.balls[0] === 37 ? '00' : gameData.balls[0];
+				cmpCtrl.timeScale.setState(4, viewNum);
 	
 				// Скрываем (если есть) предыдущее выигршное число и показываем текущее
 				cmpCtrl.gameField.hideWinNum().showWinNum(gameData.balls[0]);
@@ -62620,7 +62622,7 @@
 /* 562 */
 /***/ function(module, exports) {
 
-	'use strict';
+	"use strict";
 	
 	Object.defineProperty(exports, "__esModule", {
 		value: true
@@ -62636,22 +62638,31 @@
 	};
 	
 	var defaultSettings = {
-		bet_sums: [50, 100, 500, 1000, 3000],
-		bet_limits: {
-			1: { min: 50, max: 3000 },
-			2: { min: 50, max: 3000 },
-			3: { min: 50, max: 3000 },
-			4: { min: 50, max: 3000 },
-			5: { min: 50, max: 3000 },
-			6: { min: 50, max: 3000 },
-			12: { min: 50, max: 3000 },
-			18: { min: 50, max: 3000 }
+		"bet_sums": ["100", "200", "500", "1000", "3000"],
+		"bet_limits": {
+			"1": { "min": "100", "max": "3000" },
+			"2": { "min": "100", "max": "3000" },
+			"3": { "min": "100", "max": "3000" },
+			"4": { "min": "100", "max": "3000" },
+			"5": { "min": "100", "max": "3000" },
+			"6": { "min": "100", "max": "3000" },
+			"12": { "min": "100", "max": "3000" },
+			"18": { "min": "100", "max": "3000" }
 		}
 	};
 	
 	window.cppObj && window.cppObj.gameSettings ? console.log('window.cppObj.gameSettings() ➠ ', window.cppObj.gameSettings()) : console.log('Нет настроек с сервера, будут использованы дефолтные данные:', defaultSettings);
 	
 	var setData = window.cppObj && window.cppObj.gameSettings ? JSON.parse(window.cppObj.gameSettings()) : defaultSettings;
+	
+	setData.bet_sums.forEach(function (item, idx, arr) {
+		return arr[idx] = +item;
+	});
+	for (var key in setData.bet_limits) {
+		var limitObj = setData.bet_limits[key];
+		limitObj.min = +limitObj.min;
+		limitObj.max = +limitObj.max;
+	}
 	
 	globalSettings.betSums = setData.bet_sums;
 	globalSettings.betLimits = setData.bet_limits;
@@ -72625,6 +72636,9 @@
 			value: function updateBet(value) {
 				var _temp = this._summ;
 	
+				// Хак для 101 зала. Мб будет работать
+				if (this._summ === this.limits.max && value > 0) return false;
+	
 				this._summ + value > this.limits.max ? this._summ = this.limits.max : this._summ += value;
 	
 				if (this._summ && this._summ > _temp) _presets.gameSounds.play('sound02');
@@ -74874,7 +74888,7 @@
 	
 			this.randMsgCount = 1;
 	
-			this.randMsgTiming = [5, 10, 5]; // game_state 2[ball], 1, 2
+			this.randMsgTiming = [10, 20, 10]; // game_state 2[ball], 1, 2
 		}
 	
 		_createClass(stateMachine, [{
