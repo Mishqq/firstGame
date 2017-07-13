@@ -28,13 +28,8 @@ export default class BetView {
 
 		this._betContainer.interactive = true;
 
-		touchEvents.start.forEach((event)=>{
-			this._betContainer.on(event, this.onTouchStart, this);
-		});
-
-		touchEvents.end.forEach((event)=>{
-			this._betContainer.on(event, this.onTouchEnd, this);
-		});
+		touchEvents.start.forEach(event=>this._betContainer.on(event, this.onTouchStart, this));
+		touchEvents.end.forEach(event=>this._betContainer.on(event, this.onTouchEnd, this));
 
 		this.updateBet(config.value);
 	}
@@ -149,12 +144,8 @@ export default class BetView {
 		return value;
 	}
 
-	disableMove(){
-		this.betViewContainer.interactive = false;
-	}
-
-	enableMove(){
-		this.betViewContainer.interactive = true;
+	lock(lockStatus){
+		this.betViewContainer.interactive = lockStatus;
 	}
 
 

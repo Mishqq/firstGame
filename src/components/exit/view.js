@@ -1,4 +1,4 @@
-import {spriteStore} from './../../constants/presets';
+import {spriteStore, touchEvents} from './../../constants/presets';
 import settings from './settings';
 import {Sprite, Container} from "pixi.js"
 
@@ -10,8 +10,7 @@ export default class View {
         let container = this.container = new Container();
         container.interactive = true;
 
-        container.on("touchend", exit);
-        container.on("mouseup", exit);
+	    touchEvents.end.forEach(event=>container.on(event, exit));
 
         let exitBtn = new Sprite( spriteStore.buttons2.btnExit );
         exitBtn.position = {x: 20, y: 15};

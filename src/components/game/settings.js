@@ -2,7 +2,30 @@ import timeScaleSettings from './../timeScale/settings';
 import gameFieldSettings from './../gameField/settings';
 import globalSettings from './../../constants/globalSettings';
 
-let limits = globalSettings.betLimits[1];
+let limits = {min: 0, max: 0};
+
+for(let key in globalSettings.betLimits){
+	if(limits.min === 0) limits.min = globalSettings.betLimits[key].min;
+	if(limits.max === 0) limits.max = globalSettings.betLimits[key].max;
+
+	if(limits.min > globalSettings.betLimits[key].min) limits.min = globalSettings.betLimits[key].min;
+	if(limits.max < globalSettings.betLimits[key].max) limits.max = globalSettings.betLimits[key].max;
+
+}
+
+let coefficients = window.coefficients || {
+		1:  35, // single num
+		2:  18, // 2 num
+		3:  12, // column (3 num)
+		4:  9,  // 4 num
+		5:  6,  // basket (5 num)
+		6:  6,  // 2 columns,
+		12: 3,  // row / dozen
+		18: 2   // odd / even / red / black / 1-18 / 19-36
+	};
+
+for(let key in coefficients)
+	coefficients[key] = +coefficients[key];
 
 export default {
 	game: {
@@ -13,16 +36,7 @@ export default {
 			backgroundColor : 0x1099bb
 		}
 	},
-	coefficients: {
-		1:  35, // single num
-		2:  18, // 2 num
-		3:  12, // column (3 num)
-		4:  9,  // 4 num
-		5:  6,  // basket (5 num)
-		6:  6,  // 2 columns,
-		12: 3,  // row / dozen
-		18: 2   // odd / even / red / black / 1-18 / 19-36
-	},
+	coefficients: coefficients,
 	infoPanelData: {
 		limitsPanel: {max: limits.max, min: limits.min},
 		hotNumPanel: [

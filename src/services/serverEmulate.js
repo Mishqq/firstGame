@@ -13,7 +13,7 @@ export default  class stateMachine{
 
 		this.randMsgCount = 1;
 
-		this.randMsgTiming = [10, 20, 10]; // game_state 2[ball], 1, 2
+		this.randMsgTiming = [5, 10, 5]; // game_state 2[ball], 1, 2
 	}
 
 	getMessage(){

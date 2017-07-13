@@ -41,12 +41,8 @@ export default class BetController {
 		return this._betView.getTopChipValue();
 	}
 
-	disableMove(){
-		this._betView.disableMove();
-	}
-
-	enableMove(){
-		this._betView.enableMove();
+	lock(lockStatus){
+		this._betView.lock(lockStatus);
 	}
 
 	clearBet(){

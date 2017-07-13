@@ -2,61 +2,23 @@ import settings from './settings'
 
 export default class GameModel {
 	constructor(){
-		this._betsCtrls = {};
-		this.componentsControllers = {};
-		this._confirmBets = [];
+		this._data = {fldBalance: 0, fldBet: 0, fldWin: 0, fldBonus: 0};
 
-		this._balance = 0;
+		this._betStore = [];
 	}
 
-
-
-	get betsCtrl(){
-		return this._betsCtrls;
+	get betStore(){
+		return this._betStore;
 	}
-	set betsCtrl(newBetsCtrl){
-		this._betsCtrls = newBetsCtrl;
+	set betStore(newBetStore){
+		this._betStore = newBetStore;
 	}
 
-	get balance(){
-		return this._balance;
+	get data(){
+		return this._data;
 	}
-	set balance(newBalance){
-		this._balance = newBalance;
-	}
-
-	deleteBetsCtrl(){
-		this.betsCtrl = {};
-	}
-	get isEmptyBetsCtrl(){
-		let isEmpty = true;
-
-		for(let key in this.betsCtrl)
-			if(this.betsCtrl[key]) isEmpty = false;
-
-		return isEmpty;
-	}
-
-
-
-	get confirmBets(){
-		return this._confirmBets;
-	}
-	set confirmBets(confirmBets){
-		this._confirmBets = confirmBets;
-	}
-	calculateConfirmBets(){
-		for(let key in this.betsCtrl){
-			let bet = this.betsCtrl[key];
-
-			let obj = {numbers: bet.numbers, balance: bet.balance, type: bet.type};
-			if(bet.moreType) obj[bet.type] = bet.moreType;
-
-			this.confirmBets.push(obj);
-		}
-	}
-	deleteConfirmBets(){
-		this.confirmBets.length = 0;
+	set data(newData){
+		this._data = newData;
 	}
 
 
@@ -66,8 +28,6 @@ export default class GameModel {
 	resetModel(){
 		this.activeChip = undefined;
 		this.betTouchStart = false;
-		this.deleteConfirmBets();
-		this.deleteBetsCtrl();
 	}
 
 
@@ -75,14 +35,13 @@ export default class GameModel {
 	 * Генератор сообщения о ставках для fromJs
 	 */
 	fromJsMessage(){
-		let _cfb = this.confirmBets;
-
 		let msg = {kind: 'bets_msg', bets: []};
-		_cfb.forEach((item) => {
-			let obj = {price: item.balance, content: {kind: item.type}};
+		this.betStore.forEach((bet) => {
+			let item = bet.ctrl,
+				obj = {price: item.balance, content: {kind: item.type}};
 
 			if(item.type === 'dozen' || item.type === 'column') {
-				obj.content[item.type] = item[item.type];
+				obj.content[item.type] = item.moreType;
 			} else if(item.type === 'numbers'){
 				obj.content.numbers = item.numbers;
 			}
@@ -99,8 +58,10 @@ export default class GameModel {
 	calculateWin(winNum){
 		let _k = settings.coefficients, winSum = 0;
 
-		this.confirmBets.forEach((item) => {
-			if(~item.numbers.indexOf(winNum)) winSum+= item.balance * _k[ item.numbers.length ];
+		this.betStore.forEach((bet) => {
+			let item = bet.ctrl;
+			if(~item.numbers.indexOf(winNum) && bet.confirm)
+				winSum+= item.balance * _k[ item.numbers.length ];
 		});
 
 		return winSum;

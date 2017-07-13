@@ -26,7 +26,16 @@ const serverMessages = {
 				end_bets_expected: "",
 				game_id: 9,
 				game_state: 2,
-				total_win: 0
+				total_win: 500
+			}
+		},{
+			kind: "rand_msg",
+			game_data: {
+				balls: [14],
+				end_bets_expected: "",
+				game_id: 9,
+				game_state: 2,
+				total_win: 9000
 			}
 		}
 	],
@@ -36,14 +45,14 @@ const serverMessages = {
 			lang: "ru",
 			prev_game_kind: -1,
 			auth: {
-				balance: 10000000.456,
+				balance: 10000.456,
 				bonus: 24000,
 				kind: "by_card",
 				nickname: "Maika",
 			},
 			bets: [],
 			// bets: [
-			// 	{price: 300, bonus: false, content: {kind: "numbers", numbers: [5, 4]}},
+			// 	{price: 200, bonus: false, content: {kind: "numbers", numbers: [5, 4]}},
 			// 	{price: 300, bonus: false, content: {kind: "numbers", numbers: [25, 26, 28, 29]}},
 			// 	{price: 500, bonus: false, content: {kind: "dozen", dozen: 1}}
 			// ],

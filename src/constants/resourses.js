@@ -100,8 +100,8 @@ const resourses = {
             bgExit:   		"bg_exit",
         },
 		fields: {
-			bonus:          "bonus",
-			bonusDis:       "bonus_dis",
+			fldBonus:          "bonus",
+			fldBonusDis:       "bonus_dis",
 			fldBalance:     "fld_balance",
 			fldBalanceDis:  "fld_balance_dis",
 			fldBet:         "fld_bet",

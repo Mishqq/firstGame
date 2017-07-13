@@ -8,7 +8,7 @@ import {updateSettings as betUpdateSettings} from './components/bet/settings';
 if(!window.cppObj) {
 	window.cppObj = new Debugger();
 	let stateMachine = new serverEmulate(window.cppObj);
-	stateMachine.startWork();
+	//stateMachine.startWork();
 
 	//stateMachine.sendErrorMessage(402, 2)
 	//stateMachine.sendMessage(serverMessages.bets_msg, 3)
