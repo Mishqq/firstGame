@@ -630,7 +630,7 @@ export default class GameController {
 		this.touchCount++;
 
 		if(this.touchCount > 1){
-			alert('touch');
+			alert('touch', this.touchCount);
 		}
 		// let intMan = this.game.renderer.plugins.interaction;
 		// console.log('➠', intMan.interactiveDataPool);
@@ -673,6 +673,7 @@ export default class GameController {
 	 */
 	onTouchEnd(event){
 		this.touchCount--;
+		alert('touch', this.touchCount);
 
 		let {componentCotrollers: cmpCtrl, gameModel: GM} = this;
 

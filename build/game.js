@@ -37109,7 +37109,7 @@
 				this.touchCount++;
 	
 				if (this.touchCount > 1) {
-					alert('touch');
+					alert('touch', this.touchCount);
 				}
 				// let intMan = this.game.renderer.plugins.interaction;
 				// console.log('➠', intMan.interactiveDataPool);
@@ -37160,6 +37160,7 @@
 	   */
 			value: function onTouchEnd(event) {
 				this.touchCount--;
+				alert('touch', this.touchCount);
 	
 				var cmpCtrl = this.componentCotrollers,
 				    GM = this.gameModel;
