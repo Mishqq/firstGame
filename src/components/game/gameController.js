@@ -24,6 +24,7 @@ import betButtonController  from '../betButton/betButtonController';
 import historyController    from '../history/historyController';
 import ExitController    	from '../exit/controller';
 import ErrorsController    	from '../errors/controller';
+import debugWindow    	    from '../debugWindow/controller';
 
 
 /**
@@ -112,6 +113,9 @@ export default class GameController {
 				if(cmpCtrl.hasOwnProperty(key)) st.addChild(cmpCtrl[key].pixiSprite);
 
 			st.addChild(this.betsContainer = new _pxC());
+
+			this.debugW = new debugWindow();
+			st.addChild(this.debugW.pixiSprite);
 
 			game.start();
 
@@ -628,10 +632,8 @@ export default class GameController {
 
 	onTouchStart(event){
 		this.touchCount++;
+		this.debugW.viewText('touchStart '+this.touchCount);
 
-		if(this.touchCount > 1){
-			alert('touch ' + this.touchCount);
-		}
 		// let intMan = this.game.renderer.plugins.interaction;
 		// console.log('➠', intMan.interactiveDataPool);
 	}
@@ -673,7 +675,7 @@ export default class GameController {
 	 */
 	onTouchEnd(event){
 		this.touchCount--;
-		alert('touch ' + this.touchCount);
+		this.debugW.viewText('touchStart '+this.touchCount);
 
 		let {componentCotrollers: cmpCtrl, gameModel: GM} = this;
 

@@ -36375,6 +36375,10 @@
 	
 	var _controller6 = _interopRequireDefault(_controller5);
 	
+	var _controller7 = __webpack_require__(612);
+	
+	var _controller8 = _interopRequireDefault(_controller7);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -36479,6 +36483,9 @@
 					for (var key in cmpCtrl) {
 						if (cmpCtrl.hasOwnProperty(key)) st.addChild(cmpCtrl[key].pixiSprite);
 					}st.addChild(_this.betsContainer = new _PIXIabbr._pxC());
+	
+					_this.debugW = new _controller8.default();
+					st.addChild(_this.debugW.pixiSprite);
 	
 					game.start();
 	
@@ -37107,10 +37114,8 @@
 			key: 'onTouchStart',
 			value: function onTouchStart(event) {
 				this.touchCount++;
+				this.debugW.viewText('touchStart ' + this.touchCount);
 	
-				if (this.touchCount > 1) {
-					alert('touch ' + this.touchCount);
-				}
 				// let intMan = this.game.renderer.plugins.interaction;
 				// console.log('➠', intMan.interactiveDataPool);
 			}
@@ -37160,7 +37165,7 @@
 	   */
 			value: function onTouchEnd(event) {
 				this.touchCount--;
-				alert('touch ' + this.touchCount);
+				this.debugW.viewText('touchStart ' + this.touchCount);
 	
 				var cmpCtrl = this.componentCotrollers,
 				    GM = this.gameModel;
@@ -75061,6 +75066,125 @@
 	}();
 	
 	exports.default = stateMachine;
+
+/***/ },
+/* 612 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _view = __webpack_require__(613);
+	
+	var _view2 = _interopRequireDefault(_view);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var Controller = function () {
+		function Controller() {
+			_classCallCheck(this, Controller);
+	
+			this.view = new _view2.default();
+		}
+	
+		_createClass(Controller, [{
+			key: 'viewText',
+			value: function viewText(text) {
+				this.view.viewText(text);
+			}
+		}, {
+			key: 'pixiSprite',
+			get: function get() {
+				return this.view.container;
+			}
+		}]);
+	
+		return Controller;
+	}();
+	
+	exports.default = Controller;
+
+/***/ },
+/* 613 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+			value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _settings = __webpack_require__(614);
+	
+	var _settings2 = _interopRequireDefault(_settings);
+	
+	var _pixi = __webpack_require__(1);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var View = function () {
+			function View() {
+					_classCallCheck(this, View);
+	
+					var container = this.container = new _pixi.Container();
+					container.position = { x: 0, y: 0 };
+	
+					var graphics = new PIXI.Graphics();
+	
+					// set a fill and line style
+					graphics.beginFill(0xFF3300);
+					graphics.lineStyle(4, 0xffd900, 1);
+	
+					// draw a rounded rectangle
+					graphics.lineStyle(2, 0x1F0731, 1);
+					graphics.beginFill(0x1F0731, 0.75);
+					graphics.drawRoundedRect(0, 0, _settings2.default.positions.w, _settings2.default.positions.h, 10);
+					graphics.endFill();
+	
+					this.errorText = new _pixi.Text('', _settings2.default.textStyle);
+					//this.errorText.anchor.set(0.5, 0.5);
+					this.errorText.position = { x: 20, y: 20 };
+	
+					container.addChild(graphics);
+					container.addChild(this.errorText);
+			}
+	
+			_createClass(View, [{
+					key: 'viewText',
+					value: function viewText(text) {
+							this.errorText.text = text;
+					}
+			}]);
+	
+			return View;
+	}();
+	
+	exports.default = View;
+
+/***/ },
+/* 614 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.default = {
+		positions: { x: 0, y: 0, w: 400, h: 300 },
+		textStyle: { font: "26px Arial", fill: 'white', align: 'center' }
+	};
 
 /***/ }
 /******/ ]);
