@@ -28220,11 +28220,11 @@
 	
 	var _gameController2 = _interopRequireDefault(_gameController);
 	
-	var _debugger = __webpack_require__(609);
+	var _debugger = __webpack_require__(612);
 	
 	var _debugger2 = _interopRequireDefault(_debugger);
 	
-	var _serverEmulate = __webpack_require__(611);
+	var _serverEmulate = __webpack_require__(614);
 	
 	var _serverEmulate2 = _interopRequireDefault(_serverEmulate);
 	
@@ -28235,7 +28235,7 @@
 	if (!window.cppObj) {
 		window.cppObj = new _debugger2.default();
 		var stateMachine = new _serverEmulate2.default(window.cppObj);
-		//stateMachine.startWork();
+		stateMachine.startWork();
 	
 		//stateMachine.sendErrorMessage(402, 2)
 		//stateMachine.sendMessage(serverMessages.bets_msg, 3)
@@ -36375,7 +36375,7 @@
 	
 	var _controller6 = _interopRequireDefault(_controller5);
 	
-	var _controller7 = __webpack_require__(612);
+	var _controller7 = __webpack_require__(609);
 	
 	var _controller8 = _interopRequireDefault(_controller7);
 	
@@ -36505,6 +36505,10 @@
 		}, {
 			key: 'initMessageHandler',
 			value: function initMessageHandler(gameData, authData, bets) {
+				this.debugW.addText('gameData: ' + JSON.stringify(gameData), 1);
+				this.debugW.addText('authData: ' + JSON.stringify(authData), 2);
+				this.debugW.addText('bets: ' + JSON.stringify(bets), 3);
+	
 				this.animateTimeouts = [];
 				this.prevBets = undefined;
 				this.prevBetsActive = false;
@@ -36609,6 +36613,8 @@
 		}, {
 			key: 'randMessageHandler',
 			value: function randMessageHandler(gameData) {
+				this.debugW.addText('gameData: ' + JSON.stringify(gameData), 1);
+	
 				this.hideTableHints();
 				this.removeFloatChip();
 				this.prevBetsActive = false;
@@ -36864,6 +36870,7 @@
 	   * Обработчик подтверждения ставок от сервера
 	   */
 			value: function confirmBets(betsServerStatus) {
+				this.debugW.addText('gameData: ' + JSON.stringify(betsServerStatus), 3);
 	
 				if (!betsServerStatus) {
 					// Если ставка не прошла
@@ -37114,7 +37121,7 @@
 			key: 'onTouchStart',
 			value: function onTouchStart(event) {
 				this.touchCount++;
-				this.debugW.viewText('touchStart ' + this.touchCount);
+				this.debugW.addText('touchCount: ' + this.touchCount, 0);
 	
 				// let intMan = this.game.renderer.plugins.interaction;
 				// console.log('➠', intMan.interactiveDataPool);
@@ -37165,7 +37172,7 @@
 	   */
 			value: function onTouchEnd(event) {
 				this.touchCount--;
-				this.debugW.viewText('touchStart ' + this.touchCount);
+				this.debugW.addText('touchCount: ' + this.touchCount, 0);
 	
 				var cmpCtrl = this.componentCotrollers,
 				    GM = this.gameModel;
@@ -74711,7 +74718,214 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _serverMessages = __webpack_require__(610);
+	var _view = __webpack_require__(610);
+	
+	var _view2 = _interopRequireDefault(_view);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var Controller = function () {
+		function Controller() {
+			_classCallCheck(this, Controller);
+	
+			this.view = new _view2.default();
+		}
+	
+		_createClass(Controller, [{
+			key: 'addText',
+			value: function addText(text, pos) {
+				this.view.addText(text, pos);
+				return this;
+			}
+		}, {
+			key: 'clearText',
+			value: function clearText() {
+				this.view.clearText();
+				return this;
+			}
+		}, {
+			key: 'pixiSprite',
+			get: function get() {
+				return this.view.container;
+			}
+		}]);
+	
+		return Controller;
+	}();
+	
+	exports.default = Controller;
+
+/***/ },
+/* 610 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _settings = __webpack_require__(611);
+	
+	var _settings2 = _interopRequireDefault(_settings);
+	
+	var _presets = __webpack_require__(555);
+	
+	var _pixi = __webpack_require__(1);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+	
+	var View = function () {
+		function View() {
+			var _this = this;
+	
+			_classCallCheck(this, View);
+	
+			this.debugWindowActive = false;
+			this.textStore = [];
+	
+			var container = this.container = new _pixi.Container();
+			container.position = { x: 0, y: 0 };
+	
+			// Область, по которой надо тапнуть 10 раз менее чем за 3 секунды
+			var trigger = new PIXI.Graphics();
+			trigger.beginFill(0x3FEECA, 0);
+			trigger.drawRoundedRect(_settings2.default.trigger.x, _settings2.default.trigger.y, _settings2.default.trigger.w, _settings2.default.trigger.h, 10);
+			trigger.endFill();
+			trigger.interactive = true;
+	
+			this.triggerClickCounter = 0;
+	
+			_presets.touchEvents.start.forEach(function (event) {
+				return trigger.on(event, _this.showDebugWindow, _this);
+			});
+	
+			var debugWindow = this.debugWindow = new PIXI.Graphics();
+			debugWindow.beginFill(0xFF3300);
+			debugWindow.lineStyle(4, 0xffd900, 1);
+			debugWindow.lineStyle(2, 0x1F0731, 1);
+			debugWindow.beginFill(0x1F0731, 0.75);
+			debugWindow.drawRoundedRect(0, 0, _settings2.default.positions.w, _settings2.default.positions.h, 10);
+			debugWindow.endFill();
+	
+			container.addChild(trigger);
+		}
+	
+		_createClass(View, [{
+			key: 'addText',
+			value: function addText(text, position) {
+				var _this2 = this;
+	
+				text = text.replace(/,"/gi, ', "');
+				text = text.replace(/":"/gi, '": "');
+	
+				if (this.textStore[position]) {
+					this.textStore[position].text = position + ': ' + text;
+	
+					this.textStore.forEach(function (someText, idx, arr) {
+						var dY = arr[idx - 1] ? arr[idx - 1].position.y + arr[idx - 1].height + 30 : 10;
+						someText.y = dY;
+					});
+				} else {
+					// Не мацать, работает
+					var newText = new _pixi.Text('', _settings2.default.textStyle);
+					position !== undefined ? this.textStore[position] = newText : this.textStore.push(newText);
+					var num = position !== undefined ? position : this.textStore.length;
+					newText.text = num + ': ' + text;
+	
+					var topMargin = this.textStore[num - 1] ? this.textStore[num - 1].position.y + this.textStore[num - 1].height + 30 : 40 * num;
+	
+					newText.position = { x: 20, y: 10 + topMargin };
+				}
+	
+				this.debugWindow.height = 10;
+				this.textStore.forEach(function (someText) {
+					_this2.debugWindow.height += someText.height;
+				});
+				this.debugWindow.height += 200;
+			}
+		}, {
+			key: 'clearText',
+			value: function clearText() {
+				var _this3 = this;
+	
+				this.textStore.forEach(function (someText) {
+					return _this3.container.removeChild(someText);
+				});
+				this.textStore.length = 0;
+			}
+		}, {
+			key: 'showDebugWindow',
+			value: function showDebugWindow() {
+				var _this4 = this;
+	
+				this.triggerClickCounter++;
+				if (this.triggerClickCounter >= 5) {
+					if (this.debugWindowActive) {
+						this.container.removeChild(this.debugWindow);
+						this.textStore.forEach(function (someText) {
+							return _this4.container.removeChild(someText);
+						});
+						//this.textStore.length = 0;
+					} else {
+						this.container.addChild(this.debugWindow);
+						this.textStore.forEach(function (someText) {
+							return _this4.container.addChild(someText);
+						});
+					}
+					this.debugWindowActive = !this.debugWindowActive;
+					this.triggerClickCounter = 0;
+				}
+	
+				if (!this.timeoutId) {
+					this.timeoutId = setTimeout(function () {
+						_this4.triggerClickCounter = 0;
+						clearTimeout(_this4.timeoutId);
+						_this4.timeoutId = null;
+					}, 3000);
+				}
+			}
+		}]);
+	
+		return View;
+	}();
+	
+	exports.default = View;
+
+/***/ },
+/* 611 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.default = {
+		trigger: { x: 700, y: 40, w: 50, h: 45 },
+		positions: { x: 0, y: 0, w: 500, h: 100 },
+		textStyle: { font: "26px Arial", fill: 'white', align: 'left', wordWrap: true, wordWrapWidth: 450 }
+	};
+
+/***/ },
+/* 612 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+	
+	var _serverMessages = __webpack_require__(613);
 	
 	var _serverMessages2 = _interopRequireDefault(_serverMessages);
 	
@@ -74820,7 +75034,7 @@
 	exports.default = Debugger;
 
 /***/ },
-/* 610 */
+/* 613 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -74970,7 +75184,7 @@
 	exports.default = serverMessages;
 
 /***/ },
-/* 611 */
+/* 614 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -74981,7 +75195,7 @@
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
-	var _serverMessages = __webpack_require__(610);
+	var _serverMessages = __webpack_require__(613);
 	
 	var _serverMessages2 = _interopRequireDefault(_serverMessages);
 	
@@ -75066,125 +75280,6 @@
 	}();
 	
 	exports.default = stateMachine;
-
-/***/ },
-/* 612 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _view = __webpack_require__(613);
-	
-	var _view2 = _interopRequireDefault(_view);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var Controller = function () {
-		function Controller() {
-			_classCallCheck(this, Controller);
-	
-			this.view = new _view2.default();
-		}
-	
-		_createClass(Controller, [{
-			key: 'viewText',
-			value: function viewText(text) {
-				this.view.viewText(text);
-			}
-		}, {
-			key: 'pixiSprite',
-			get: function get() {
-				return this.view.container;
-			}
-		}]);
-	
-		return Controller;
-	}();
-	
-	exports.default = Controller;
-
-/***/ },
-/* 613 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-			value: true
-	});
-	
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-	
-	var _settings = __webpack_require__(614);
-	
-	var _settings2 = _interopRequireDefault(_settings);
-	
-	var _pixi = __webpack_require__(1);
-	
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
-	var View = function () {
-			function View() {
-					_classCallCheck(this, View);
-	
-					var container = this.container = new _pixi.Container();
-					container.position = { x: 0, y: 0 };
-	
-					var graphics = new PIXI.Graphics();
-	
-					// set a fill and line style
-					graphics.beginFill(0xFF3300);
-					graphics.lineStyle(4, 0xffd900, 1);
-	
-					// draw a rounded rectangle
-					graphics.lineStyle(2, 0x1F0731, 1);
-					graphics.beginFill(0x1F0731, 0.75);
-					graphics.drawRoundedRect(0, 0, _settings2.default.positions.w, _settings2.default.positions.h, 10);
-					graphics.endFill();
-	
-					this.errorText = new _pixi.Text('', _settings2.default.textStyle);
-					//this.errorText.anchor.set(0.5, 0.5);
-					this.errorText.position = { x: 20, y: 20 };
-	
-					container.addChild(graphics);
-					container.addChild(this.errorText);
-			}
-	
-			_createClass(View, [{
-					key: 'viewText',
-					value: function viewText(text) {
-							this.errorText.text = text;
-					}
-			}]);
-	
-			return View;
-	}();
-	
-	exports.default = View;
-
-/***/ },
-/* 614 */
-/***/ function(module, exports) {
-
-	'use strict';
-	
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	exports.default = {
-		positions: { x: 0, y: 0, w: 400, h: 300 },
-		textStyle: { font: "26px Arial", fill: 'white', align: 'center' }
-	};
 
 /***/ }
 /******/ ]);

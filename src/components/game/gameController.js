@@ -131,6 +131,10 @@ export default class GameController {
 	 * Обработка init_msg-сообщений
 	 */
 	initMessageHandler(gameData, authData, bets){
+		this.debugW.addText('gameData: ' + JSON.stringify(gameData), 1);
+		this.debugW.addText('authData: ' + JSON.stringify(authData), 2);
+		this.debugW.addText('bets: ' + JSON.stringify(bets), 3);
+
 		this.animateTimeouts = [];
 		this.prevBets = undefined;
 		this.prevBetsActive = false;
@@ -221,6 +225,8 @@ export default class GameController {
 	 * Обработка rand_msg-сообщений
 	 */
 	randMessageHandler(gameData){
+		this.debugW.addText('gameData: ' + JSON.stringify(gameData), 1);
+
 		this.hideTableHints();
 		this.removeFloatChip();
 		this.prevBetsActive = false;
@@ -448,6 +454,7 @@ export default class GameController {
 	 * Обработчик подтверждения ставок от сервера
 	 */
 	confirmBets(betsServerStatus){
+		this.debugW.addText('gameData: ' + JSON.stringify(betsServerStatus), 3);
 
 		if(!betsServerStatus){
 			// Если ставка не прошла
@@ -632,7 +639,7 @@ export default class GameController {
 
 	onTouchStart(event){
 		this.touchCount++;
-		this.debugW.viewText('touchStart '+this.touchCount);
+		this.debugW.addText('touchCount: '+this.touchCount, 0);
 
 		// let intMan = this.game.renderer.plugins.interaction;
 		// console.log('➠', intMan.interactiveDataPool);
@@ -675,7 +682,7 @@ export default class GameController {
 	 */
 	onTouchEnd(event){
 		this.touchCount--;
-		this.debugW.viewText('touchStart '+this.touchCount);
+		this.debugW.addText('touchCount: '+this.touchCount, 0);
 
 		let {componentCotrollers: cmpCtrl, gameModel: GM} = this;
 
