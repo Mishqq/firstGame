@@ -74787,107 +74787,147 @@
 	
 			_classCallCheck(this, View);
 	
+			/**
+	   * Статус активности окна
+	   * @type {boolean}
+	   */
 			this.debugWindowActive = false;
+	
+			/**
+	   * Массив с объектами pixiText
+	   * @type {Array}
+	   */
 			this.textStore = [];
+	
+			/**
+	   * Счетчик тапов по триггеру.
+	   * @type {number}
+	   */
+			this.triggerClickCounter = 0;
 	
 			var container = this.container = new _pixi.Container();
 			container.position = { x: 0, y: 0 };
 	
-			// Область, по которой надо тапнуть 10 раз менее чем за 3 секунды
+			/**
+	   * Область, по которой надо тапнуть 10 раз менее чем за 3 секунды
+	   */
 			var trigger = new PIXI.Graphics();
-			trigger.beginFill(0x3FEECA, 0);
-			trigger.drawRoundedRect(_settings2.default.trigger.x, _settings2.default.trigger.y, _settings2.default.trigger.w, _settings2.default.trigger.h, 10);
-			trigger.endFill();
+			trigger.beginFill(0x3FEECA, 0).drawRoundedRect(_settings2.default.trigger.x, _settings2.default.trigger.y, _settings2.default.trigger.w, _settings2.default.trigger.h, 10).endFill();
 			trigger.interactive = true;
-	
-			this.triggerClickCounter = 0;
-	
 			_presets.touchEvents.start.forEach(function (event) {
 				return trigger.on(event, _this.showDebugWindow, _this);
 			});
 	
-			var debugWindow = this.debugWindow = new PIXI.Graphics();
-			debugWindow.beginFill(0xFF3300);
-			debugWindow.lineStyle(4, 0xffd900, 1);
-			debugWindow.lineStyle(2, 0x1F0731, 1);
-			debugWindow.beginFill(0x1F0731, 0.75);
-			debugWindow.drawRoundedRect(0, 0, _settings2.default.positions.w, _settings2.default.positions.h, 10);
-			debugWindow.endFill();
-	
 			container.addChild(trigger);
 		}
+	
+		/**
+	  * Функция добавления текста в debugWindow
+	  * Если позиция не задана, то текст добавится в конец
+	  * @param text - текст. Не сериализуется
+	  * @param position - позиция, на которую надо добавить текст. Позиция отображается в дебаге
+	  */
+	
 	
 		_createClass(View, [{
 			key: 'addText',
 			value: function addText(text, position) {
-				var _this2 = this;
-	
 				text = text.replace(/,"/gi, ', "');
 				text = text.replace(/":"/gi, '": "');
 	
+				// Если на этой позиции есть текст, то прост апдейтим его
 				if (this.textStore[position]) {
 					this.textStore[position].text = position + ': ' + text;
 	
+					// Смещаем существующие тексты
 					this.textStore.forEach(function (someText, idx, arr) {
-						var dY = arr[idx - 1] ? arr[idx - 1].position.y + arr[idx - 1].height + 30 : 10;
-						someText.y = dY;
+						var prevObj = arr[idx - 1];
+						someText.y = prevObj ? prevObj.position.y + prevObj.height + 30 : 10;
 					});
 				} else {
 					// Не мацать, работает
 					var newText = new _pixi.Text('', _settings2.default.textStyle);
+	
+					// Если позиции нет, то добавляем текс в конец массива.
 					position !== undefined ? this.textStore[position] = newText : this.textStore.push(newText);
+	
+					// Номер для отрисовки индекса и вычисления предыдущего текста
 					var num = position !== undefined ? position : this.textStore.length;
+	
 					newText.text = num + ': ' + text;
 	
-					var topMargin = this.textStore[num - 1] ? this.textStore[num - 1].position.y + this.textStore[num - 1].height + 30 : 40 * num;
+					// Отступ текста = координата "y" текста выше + его высота + 30 пикселей
+					// Если на месте текста выше "undefined", то 40*индекс текущего текста
+					var y = this.textStore[num - 1] ? this.textStore[num - 1].position.y + this.textStore[num - 1].height + 40 : 40 * num + 10;
 	
-					newText.position = { x: 20, y: 10 + topMargin };
+					newText.position = { x: 20, y: y };
 				}
 	
-				this.debugWindow.height = 10;
-				this.textStore.forEach(function (someText) {
-					_this2.debugWindow.height += someText.height;
-				});
-				this.debugWindow.height += 200;
+				this.drawBackground();
 			}
+	
+			/**
+	   * Подложка под дебаг-текст
+	   */
+	
+		}, {
+			key: 'drawBackground',
+			value: function drawBackground() {
+				if (this.debugWindow) this.container.removeChild(this.debugWindow);
+	
+				if (!this.debugWindowActive) return;
+	
+				var height = 210;
+				this.textStore.forEach(function (someText) {
+					return height += someText.height;
+				});
+	
+				var debugWindow = this.debugWindow = new PIXI.Graphics();
+				debugWindow.beginFill(0xFF3300).lineStyle(1, 0x6AEEE6, 1).beginFill(0x075158, 0.75).drawRect(2, 0, _settings2.default.positions.w, height).endFill();
+	
+				this.container.addChildAt(this.debugWindow, 0);
+			}
+	
+			/**
+	   * Очищаем весь текст
+	   */
+	
 		}, {
 			key: 'clearText',
 			value: function clearText() {
-				var _this3 = this;
+				var _this2 = this;
 	
 				this.textStore.forEach(function (someText) {
-					return _this3.container.removeChild(someText);
+					return _this2.container.removeChild(someText);
 				});
 				this.textStore.length = 0;
 			}
 		}, {
 			key: 'showDebugWindow',
 			value: function showDebugWindow() {
-				var _this4 = this;
+				var _this3 = this;
 	
+				// TODO: разобраться со скрытием подложки после смены состояний
 				this.triggerClickCounter++;
+				this.drawBackground();
+	
 				if (this.triggerClickCounter >= 5) {
-					if (this.debugWindowActive) {
-						this.container.removeChild(this.debugWindow);
-						this.textStore.forEach(function (someText) {
-							return _this4.container.removeChild(someText);
-						});
-						//this.textStore.length = 0;
-					} else {
-						this.container.addChild(this.debugWindow);
-						this.textStore.forEach(function (someText) {
-							return _this4.container.addChild(someText);
-						});
-					}
+					this.debugWindowActive ? this.textStore.forEach(function (someText) {
+						return _this3.container.removeChild(someText);
+					}) : this.textStore.forEach(function (someText) {
+						return _this3.container.addChild(someText);
+					});
+					this.drawBackground();
+	
 					this.debugWindowActive = !this.debugWindowActive;
 					this.triggerClickCounter = 0;
 				}
 	
 				if (!this.timeoutId) {
 					this.timeoutId = setTimeout(function () {
-						_this4.triggerClickCounter = 0;
-						clearTimeout(_this4.timeoutId);
-						_this4.timeoutId = null;
+						_this3.triggerClickCounter = 0;
+						clearTimeout(_this3.timeoutId);
+						_this3.timeoutId = null;
 					}, 3000);
 				}
 			}
