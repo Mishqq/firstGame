@@ -36,7 +36,7 @@ export default class View {
 				settings.trigger.h, 10)
 			.endFill();
 		trigger.interactive = true;
-		touchEvents.start.forEach(event=>trigger.on(event, this.showDebugWindow, this));
+		touchEvents.start.forEach(event=>trigger.on(event, this.switcher, this));
 
 		container.addChild( trigger );
 	}
@@ -85,7 +85,8 @@ export default class View {
 			newText.position = {x: 20, y: y};
 		}
 
-		this.drawBackground();
+		this.removeBackground();
+		if(this.debugWindowActive) this.drawBackground();
 	}
 
 
@@ -93,10 +94,6 @@ export default class View {
 	 * Подложка под дебаг-текст
 	 */
 	drawBackground(){
-		if(this.debugWindow) this.container.removeChild( this.debugWindow );
-
-		if(!this.debugWindowActive) return;
-
 		let height = 210;
 		this.textStore.forEach(someText => height += someText.height);
 
@@ -110,6 +107,10 @@ export default class View {
 		this.container.addChildAt( this.debugWindow, 0 );
 	}
 
+	removeBackground(){
+		if(this.debugWindow) this.container.removeChild( this.debugWindow );
+	}
+
 	/**
 	 * Очищаем весь текст
 	 */
@@ -120,17 +121,23 @@ export default class View {
 
 
 	showDebugWindow(){
-		// TODO: разобраться со скрытием подложки после смены состояний
-		this.triggerClickCounter++;
+		this.textStore.forEach(someText => this.container.addChild(someText));
 		this.drawBackground();
+	}
+
+
+	hideDebugWindow(){
+		this.textStore.forEach(someText => this.container.removeChild(someText));
+		this.removeBackground();
+	}
+
+
+	switcher(){
+		this.triggerClickCounter++;
 
 		if(this.triggerClickCounter >= 5){
-			this.debugWindowActive ?
-				this.textStore.forEach(someText => this.container.removeChild(someText)) :
-				this.textStore.forEach(someText => this.container.addChild(someText));
-			this.drawBackground();
-
 			this.debugWindowActive = !this.debugWindowActive;
+			this.debugWindowActive ? this.showDebugWindow() : this.hideDebugWindow();
 			this.triggerClickCounter = 0;
 		}
 

@@ -74815,7 +74815,7 @@
 			trigger.beginFill(0x3FEECA, 0).drawRoundedRect(_settings2.default.trigger.x, _settings2.default.trigger.y, _settings2.default.trigger.w, _settings2.default.trigger.h, 10).endFill();
 			trigger.interactive = true;
 			_presets.touchEvents.start.forEach(function (event) {
-				return trigger.on(event, _this.showDebugWindow, _this);
+				return trigger.on(event, _this.switcher, _this);
 			});
 	
 			container.addChild(trigger);
@@ -74863,7 +74863,8 @@
 					newText.position = { x: 20, y: y };
 				}
 	
-				this.drawBackground();
+				this.removeBackground();
+				if (this.debugWindowActive) this.drawBackground();
 			}
 	
 			/**
@@ -74873,10 +74874,6 @@
 		}, {
 			key: 'drawBackground',
 			value: function drawBackground() {
-				if (this.debugWindow) this.container.removeChild(this.debugWindow);
-	
-				if (!this.debugWindowActive) return;
-	
 				var height = 210;
 				this.textStore.forEach(function (someText) {
 					return height += someText.height;
@@ -74886,6 +74883,11 @@
 				debugWindow.beginFill(0xFF3300).lineStyle(1, 0x6AEEE6, 1).beginFill(0x075158, 0.75).drawRect(2, 0, _settings2.default.positions.w, height).endFill();
 	
 				this.container.addChildAt(this.debugWindow, 0);
+			}
+		}, {
+			key: 'removeBackground',
+			value: function removeBackground() {
+				if (this.debugWindow) this.container.removeChild(this.debugWindow);
 			}
 	
 			/**
@@ -74907,27 +74909,39 @@
 			value: function showDebugWindow() {
 				var _this3 = this;
 	
-				// TODO: разобраться со скрытием подложки после смены состояний
-				this.triggerClickCounter++;
+				this.textStore.forEach(function (someText) {
+					return _this3.container.addChild(someText);
+				});
 				this.drawBackground();
+			}
+		}, {
+			key: 'hideDebugWindow',
+			value: function hideDebugWindow() {
+				var _this4 = this;
+	
+				this.textStore.forEach(function (someText) {
+					return _this4.container.removeChild(someText);
+				});
+				this.removeBackground();
+			}
+		}, {
+			key: 'switcher',
+			value: function switcher() {
+				var _this5 = this;
+	
+				this.triggerClickCounter++;
 	
 				if (this.triggerClickCounter >= 5) {
-					this.debugWindowActive ? this.textStore.forEach(function (someText) {
-						return _this3.container.removeChild(someText);
-					}) : this.textStore.forEach(function (someText) {
-						return _this3.container.addChild(someText);
-					});
-					this.drawBackground();
-	
 					this.debugWindowActive = !this.debugWindowActive;
+					this.debugWindowActive ? this.showDebugWindow() : this.hideDebugWindow();
 					this.triggerClickCounter = 0;
 				}
 	
 				if (!this.timeoutId) {
 					this.timeoutId = setTimeout(function () {
-						_this3.triggerClickCounter = 0;
-						clearTimeout(_this3.timeoutId);
-						_this3.timeoutId = null;
+						_this5.triggerClickCounter = 0;
+						clearTimeout(_this5.timeoutId);
+						_this5.timeoutId = null;
 					}, 3000);
 				}
 			}
