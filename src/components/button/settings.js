@@ -1,7 +1,8 @@
 export default {
 	position: {
-		btnCancel:      {x: 180, y: 934},
-		btnClear:       {x: 350, y: 934},
+		btnCancel:      {x: 150, y: 934},
+		btnClear:       {x: 390, y: 934},
+		// btnClear:       {x: 350, y: 934},
 		btnRepeat:      {x: 1430, y: 934},
 		btnX2:          {x: 1550, y: 934}
 	},

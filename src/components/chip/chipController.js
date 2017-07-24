@@ -28,7 +28,7 @@ export default class ChipController {
 	}
 
 	onClick(event, price){
-		event.stopPropagation();
+		//event.stopPropagation();
 
 		let chipType = this.returnChipType(price),
 			thisChip = this.chips[chipType];

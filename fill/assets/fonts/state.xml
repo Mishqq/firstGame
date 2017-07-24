@@ -1,0 +1,80 @@
+<font>
+  <info face="State" size="22" bold="0" italic="0" charset="" unicode="0" stretchH="100" smooth="1" aa="1" padding="0,0,0,0" spacing="2,2" />
+  <common lineHeight="23" base="22" scaleW="256" scaleH="256" pages="1" packed="0" />
+  <pages>
+      <page id="0" file="state.png" />
+  </pages>
+  <chars count="71" >
+      <char id="1062" x="1" y="1" width="12" height="19" xoffset="1" yoffset="4" xadvance="14" page="0" chnl="0" letter="Ц" />
+      <char id="1044" x="14" y="1" width="13" height="19" xoffset="0" yoffset="4" xadvance="13" page="0" chnl="0" letter="Д" />
+      <char id="1065" x="28" y="1" width="17" height="19" xoffset="1" yoffset="4" xadvance="19" page="0" chnl="0" letter="Щ" />
+      <char id="1025" x="46" y="1" width="9" height="19" xoffset="1" yoffset="0" xadvance="10" page="0" chnl="0" letter="Ё" />
+      <char id="1049" x="56" y="1" width="12" height="18" xoffset="1" yoffset="1" xadvance="14" page="0" chnl="0" letter="Й" />
+      <char id="81" x="69" y="1" width="14" height="18" xoffset="0" yoffset="3" xadvance="15" page="0" chnl="0" letter="Q" />
+      <char id="1060" x="84" y="1" width="15" height="17" xoffset="0" yoffset="3" xadvance="15" page="0" chnl="0" letter="Ф" />
+      <char id="47" x="100" y="1" width="8" height="16" xoffset="0" yoffset="3" xadvance="7" page="0" chnl="0" letter="/" />
+      <char id="1047" x="109" y="1" width="10" height="16" xoffset="0" yoffset="3" xadvance="10" page="0" chnl="0" letter="З" />
+      <char id="1070" x="120" y="1" width="17" height="16" xoffset="1" yoffset="3" xadvance="19" page="0" chnl="0" letter="Ю" />
+      <char id="1069" x="138" y="1" width="12" height="16" xoffset="0" yoffset="3" xadvance="12" page="0" chnl="0" letter="Э" />
+      <char id="1054" x="151" y="1" width="14" height="16" xoffset="0" yoffset="3" xadvance="15" page="0" chnl="0" letter="О" />
+      <char id="79" x="166" y="1" width="14" height="16" xoffset="0" yoffset="3" xadvance="15" page="0" chnl="0" letter="O" />
+      <char id="1057" x="181" y="1" width="12" height="16" xoffset="0" yoffset="3" xadvance="12" page="0" chnl="0" letter="С" />
+      <char id="67" x="194" y="1" width="12" height="16" xoffset="0" yoffset="3" xadvance="12" page="0" chnl="0" letter="C" />
+      <char id="83" x="207" y="1" width="9" height="16" xoffset="0" yoffset="3" xadvance="10" page="0" chnl="0" letter="S" />
+      <char id="71" x="217" y="1" width="13" height="16" xoffset="0" yoffset="4" xadvance="14" page="0" chnl="0" letter="G" />
+      <char id="74" x="231" y="1" width="7" height="16" xoffset="0" yoffset="4" xadvance="8" page="0" chnl="0" letter="J" />
+      <char id="85" x="239" y="1" width="11" height="16" xoffset="1" yoffset="4" xadvance="14" page="0" chnl="0" letter="U" />
+      <char id="1059" x="1" y="21" width="12" height="16" xoffset="0" yoffset="4" xadvance="11" page="0" chnl="0" letter="У" />
+      <char id="1042" x="14" y="21" width="10" height="16" xoffset="1" yoffset="4" xadvance="11" page="0" chnl="0" letter="В" />
+      <char id="66" x="25" y="21" width="10" height="16" xoffset="1" yoffset="4" xadvance="11" page="0" chnl="0" letter="B" />
+      <char id="68" x="36" y="21" width="13" height="16" xoffset="1" yoffset="4" xadvance="14" page="0" chnl="0" letter="D" />
+      <char id="1051" x="50" y="21" width="12" height="16" xoffset="0" yoffset="4" xadvance="13" page="0" chnl="0" letter="Л" />
+      <char id="1041" x="63" y="21" width="10" height="15" xoffset="1" yoffset="4" xadvance="12" page="0" chnl="0" letter="Б" />
+      <char id="1067" x="74" y="21" width="13" height="15" xoffset="1" yoffset="4" xadvance="16" page="0" chnl="0" letter="Ы" />
+      <char id="1068" x="88" y="21" width="10" height="15" xoffset="1" yoffset="4" xadvance="11" page="0" chnl="0" letter="Ь" />
+      <char id="1066" x="99" y="21" width="14" height="15" xoffset="0" yoffset="4" xadvance="13" page="0" chnl="0" letter="Ъ" />
+      <char id="1056" x="114" y="21" width="10" height="15" xoffset="1" yoffset="4" xadvance="11" page="0" chnl="0" letter="Р" />
+      <char id="1071" x="125" y="21" width="10" height="15" xoffset="0" yoffset="4" xadvance="11" page="0" chnl="0" letter="Я" />
+      <char id="82" x="136" y="21" width="10" height="15" xoffset="1" yoffset="4" xadvance="11" page="0" chnl="0" letter="R" />
+      <char id="80" x="147" y="21" width="10" height="15" xoffset="1" yoffset="4" xadvance="11" page="0" chnl="0" letter="P" />
+      <char id="1063" x="158" y="21" width="10" height="15" xoffset="1" yoffset="4" xadvance="13" page="0" chnl="0" letter="Ч" />
+      <char id="87" x="169" y="21" width="19" height="15" xoffset="0" yoffset="4" xadvance="18" page="0" chnl="0" letter="W" />
+      <char id="1045" x="189" y="21" width="9" height="15" xoffset="1" yoffset="4" xadvance="10" page="0" chnl="0" letter="Е" />
+      <char id="76" x="199" y="21" width="9" height="15" xoffset="1" yoffset="4" xadvance="10" page="0" chnl="0" letter="L" />
+      <char id="70" x="209" y="21" width="8" height="15" xoffset="1" yoffset="4" xadvance="10" page="0" chnl="0" letter="F" />
+      <char id="1043" x="218" y="21" width="8" height="15" xoffset="1" yoffset="4" xadvance="9" page="0" chnl="0" letter="Г" />
+      <char id="69" x="227" y="21" width="9" height="15" xoffset="1" yoffset="4" xadvance="10" page="0" chnl="0" letter="E" />
+      <char id="1050" x="237" y="21" width="11" height="15" xoffset="1" yoffset="4" xadvance="11" page="0" chnl="0" letter="К" />
+      <char id="1058" x="1" y="38" width="11" height="15" xoffset="0" yoffset="4" xadvance="10" page="0" chnl="0" letter="Т" />
+      <char id="75" x="13" y="38" width="11" height="15" xoffset="1" yoffset="4" xadvance="11" page="0" chnl="0" letter="K" />
+      <char id="1046" x="25" y="38" width="18" height="15" xoffset="0" yoffset="4" xadvance="17" page="0" chnl="0" letter="Ж" />
+      <char id="1064" x="44" y="38" width="16" height="15" xoffset="1" yoffset="4" xadvance="18" page="0" chnl="0" letter="Ш" />
+      <char id="1052" x="61" y="38" width="16" height="15" xoffset="1" yoffset="4" xadvance="17" page="0" chnl="0" letter="М" />
+      <char id="77" x="78" y="38" width="16" height="15" xoffset="1" yoffset="4" xadvance="17" page="0" chnl="0" letter="M" />
+      <char id="1040" x="95" y="38" width="13" height="15" xoffset="0" yoffset="4" xadvance="13" page="0" chnl="0" letter="А" />
+      <char id="65" x="109" y="38" width="13" height="15" xoffset="0" yoffset="4" xadvance="13" page="0" chnl="0" letter="A" />
+      <char id="86" x="123" y="38" width="13" height="15" xoffset="0" yoffset="4" xadvance="12" page="0" chnl="0" letter="V" />
+      <char id="89" x="137" y="38" width="12" height="15" xoffset="0" yoffset="4" xadvance="11" page="0" chnl="0" letter="Y" />
+      <char id="88" x="150" y="38" width="12" height="15" xoffset="0" yoffset="4" xadvance="12" page="0" chnl="0" letter="X" />
+      <char id="1061" x="163" y="38" width="12" height="15" xoffset="0" yoffset="4" xadvance="12" page="0" chnl="0" letter="Х" />
+      <char id="78" x="176" y="38" width="12" height="15" xoffset="1" yoffset="4" xadvance="14" page="0" chnl="0" letter="N" />
+      <char id="73" x="189" y="38" width="2" height="15" xoffset="1" yoffset="4" xadvance="5" page="0" chnl="0" letter="I" />
+      <char id="72" x="192" y="38" width="12" height="15" xoffset="1" yoffset="4" xadvance="14" page="0" chnl="0" letter="H" />
+      <char id="1053" x="205" y="38" width="12" height="15" xoffset="1" yoffset="4" xadvance="14" page="0" chnl="0" letter="Н" />
+      <char id="84" x="218" y="38" width="11" height="15" xoffset="0" yoffset="4" xadvance="10" page="0" chnl="0" letter="T" />
+      <char id="90" x="230" y="38" width="11" height="15" xoffset="0" yoffset="4" xadvance="12" page="0" chnl="0" letter="Z" />
+      <char id="1055" x="242" y="38" width="11" height="15" xoffset="1" yoffset="4" xadvance="14" page="0" chnl="0" letter="П" />
+      <char id="1048" x="1" y="54" width="12" height="15" xoffset="1" yoffset="4" xadvance="14" page="0" chnl="0" letter="И" />
+      <char id="51" x="14" y="54" width="9" height="15" xoffset="0" yoffset="4" xadvance="11" page="0" chnl="0" letter="3" />
+      <char id="56" x="24" y="54" width="10" height="15" xoffset="0" yoffset="4" xadvance="11" page="0" chnl="0" letter="8" />
+      <char id="48" x="35" y="54" width="10" height="15" xoffset="0" yoffset="4" xadvance="11" page="0" chnl="0" letter="0" />
+      <char id="57" x="46" y="54" width="10" height="15" xoffset="0" yoffset="4" xadvance="11" page="0" chnl="0" letter="9" />
+      <char id="54" x="57" y="54" width="10" height="15" xoffset="0" yoffset="4" xadvance="11" page="0" chnl="0" letter="6" />
+      <char id="53" x="68" y="54" width="9" height="15" xoffset="0" yoffset="4" xadvance="11" page="0" chnl="0" letter="5" />
+      <char id="50" x="78" y="54" width="10" height="15" xoffset="0" yoffset="4" xadvance="11" page="0" chnl="0" letter="2" />
+      <char id="52" x="89" y="54" width="11" height="15" xoffset="0" yoffset="4" xadvance="11" page="0" chnl="0" letter="4" />
+      <char id="55" x="101" y="54" width="10" height="15" xoffset="1" yoffset="4" xadvance="11" page="0" chnl="0" letter="7" />
+      <char id="49" x="112" y="54" width="5" height="15" xoffset="2" yoffset="4" xadvance="11" page="0" chnl="0" letter="1" />
+      <char id="32" x="0" y="0" width="0" height="0" xoffset="0" yoffset="19" xadvance="4" page="0" chnl="0" letter=" " />
+  </chars>
+</font>

@@ -1,0 +1,37 @@
+{
+	"frames": {
+		"bet1": {
+			"frame": {"x":5,"y":5,"w":290,"h":290},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {"x":0,"y":0,"w":290,"h":290},
+			"sourceSize": {"w":290,"h":290},
+			"pivot": {"x":0.5,"y":0.5}
+		},
+		"bet2": {
+			"frame": {"x":295,"y":5,"w":290,"h":290},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {"x":0,"y":0,"w":290,"h":290},
+			"sourceSize": {"w":290,"h":290},
+			"pivot": {"x":0.5,"y":0.5}
+		},
+		"bet3": {
+			"frame": {"x":585,"y":5,"w":290,"h":290},
+			"rotated": false,
+			"trimmed": false,
+			"spriteSourceSize": {"x":0,"y":0,"w":290,"h":290},
+			"sourceSize": {"w":290,"h":290},
+			"pivot": {"x":0.5,"y":0.5}
+		}
+	},
+	"meta": {
+		"app": "http://www.codeandweb.com/texturepacker",
+		"version": "1.0",
+		"image": "bet.png",
+		"format": "RGBA8888",
+		"size": {"w":881,"h":295},
+		"scale": "1",
+		"smartupdate": "$TexturePacker:SmartUpdate:536285afc8a3a15b31ccc1adae04968d:c2e5d37a4dd3625eb7e580cc10dbfd94:41c4024dd36abc24ac19a2858f83c76c$"
+	}
+}

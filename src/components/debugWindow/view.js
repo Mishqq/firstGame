@@ -24,6 +24,9 @@ export default class View {
 
 		let container = this.container = new Container();
 		container.position = {x: 0, y: 0};
+		container.interactive = true;
+
+		touchEvents.start.forEach(event=>container.on(event, event=>event.stopPropagation()));
 
 		/**
 		 * Область, по которой надо тапнуть 10 раз менее чем за 3 секунды
@@ -37,6 +40,7 @@ export default class View {
 			.endFill();
 		trigger.interactive = true;
 		touchEvents.start.forEach(event=>trigger.on(event, this.switcher, this));
+		touchEvents.end.forEach(event=>container.on(event, event=>event.stopPropagation()));
 
 		container.addChild( trigger );
 	}
@@ -83,6 +87,8 @@ export default class View {
 				this.textStore[num - 1].position.y + this.textStore[num - 1].height + 40 : 40*num+10;
 
 			newText.position = {x: 20, y: y};
+
+			if(this.debugWindowActive) this.container.addChild(newText);
 		}
 
 		this.removeBackground();
@@ -114,9 +120,24 @@ export default class View {
 	/**
 	 * Очищаем весь текст
 	 */
-	clearText(){
-		this.textStore.forEach(someText=>this.container.removeChild(someText));
-		this.textStore.length = 0;
+	clearText(idx){
+		if(idx !== undefined){
+			let deleteText = this.textStore[idx];
+			this.container.removeChild(deleteText);
+			this.textStore.splice(idx, 1);
+
+			// Смещаем существующие тексты
+			this.textStore.forEach((someText, idx, arr) => {
+				let prevObj = arr[idx-1];
+				someText.y = prevObj ? prevObj.position.y + prevObj.height + 30 : 10;
+			});
+
+			this.removeBackground();
+			if(this.debugWindowActive) this.drawBackground();
+		} else {
+			this.textStore.forEach(someText=>this.container.removeChild(someText));
+			this.textStore.length = 0;
+		}
 	}
 
 
@@ -132,7 +153,9 @@ export default class View {
 	}
 
 
-	switcher(){
+	switcher(event){
+		event.stopPropagation();
+
 		this.triggerClickCounter++;
 
 		if(this.triggerClickCounter >= 5){

@@ -14,8 +14,8 @@ export default class Controller {
 		return this;
 	}
 
-	clearText(){
-		this.view.clearText();
+	clearText(idx){
+		this.view.clearText(idx);
 		return this;
 	}
 

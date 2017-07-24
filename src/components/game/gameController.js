@@ -13,7 +13,7 @@ import {_hf} from '../../services/helpFunctions';
 // Components
 import Background           from '../background/background';
 import GameFieldController  from '../gameField/gameFieldController';
-import ButtonController     from '../button/buttonPanelController';
+import ButtonController     from '../button/controller';
 import ChipController       from '../chip/chipController';
 import FloatChipController  from '../floatChip/floatChipController';
 import BetController        from '../bet/betController';
@@ -84,6 +84,7 @@ export default class GameController {
 
 			// Панель кнопок
 			cmpCtrl.buttons = new ButtonController({
+				btnCancel: this.btnCancel,
 				btnClear: this.btnClear,
 				btnRepeat: this.btnRepeat,
 				btnX2: this.btnX2,
@@ -163,6 +164,7 @@ export default class GameController {
 
 		cmpCtrl.historyCtrl.setData(gameData.balls); // Добавляем выпавшие шары из прошлых розыгрышей
 		cmpCtrl.buttons.lockClear(true); // Блокировка "Очистить"
+		cmpCtrl.buttons.lockCancel(true);
 		cmpCtrl.gameField.hideWinNum(); // Отключение подсветки выигрышного номера
 		cmpCtrl.historyCtrl.showRollAnim(false); // Анимация выпадающего числа
 
@@ -256,6 +258,7 @@ export default class GameController {
 		GM.resetModel();
 		this.interactiveSwitcher(true);
 		cmpCtrl.buttons.lockClear(true);
+		cmpCtrl.buttons.lockCancel(true);
 		//cmpCtrl.gameField.hideWinNum();
 		setTimeout(() => cmpCtrl.gameField.hideWinNum(), 3000);
 
@@ -556,6 +559,15 @@ export default class GameController {
 		} else if(flag === 'isEmpty'){ // Проверка на пустоту
 			return !!GM.betStore.length
 
+		} else if(flag === 'cancel'){
+			if(GM.betStore.length){
+				let idx = GM.betStore.length-1,
+					cancelBet = GM.betStore[idx],
+					animation = (rest[2] !== false);
+
+				GM.betStore.splice(idx, 1);
+				deleteSomeBet(cancelBet, animation);
+			}
 		}
 
 		this.userData({
@@ -581,6 +593,7 @@ export default class GameController {
 		}
 
 		buttons.lockClear( !GM.betStore.filter(bet => !bet.confirm).length );
+		buttons.lockCancel(!GM.betStore.length);
 	}
 
 
@@ -740,6 +753,10 @@ export default class GameController {
 
 		this.prevBetsActive = false;
 	};
+
+	btnCancel(){
+		this.betStoreInterface('cancel');
+	}
 
 	/**
 	 * Событие кнопки "повторить ставки" (передаётся коллбеком)

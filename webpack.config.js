@@ -1,9 +1,10 @@
 'use strict';
 
-var webpack = require('webpack');
-var path = require('path');
+const webpack = require('webpack');
+const path = require('path');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
-var plugins = [];
+const plugins = [];
 if (process.env.NODE_ENV === "production") {
 	plugins.push(
 		new webpack.optimize.UglifyJsPlugin({
@@ -20,7 +21,7 @@ module.exports = {
 	devtool: 'source-map',
 	entry: ['pixi.js', './src/index.js'],
 	output: {
-		filename: 'build/game.js'
+		filename: 'dist/game.js'
 	},
 	resolve: {
 		extensions: ["", ".js"]
@@ -51,5 +52,12 @@ module.exports = {
 				}
 			}
 		]
-	}
+	},
+	plugins: [
+		new CopyWebpackPlugin([
+			{ from: './fill', to: './dist' },
+		], {
+			copyUnmodified: true
+		})
+	]
 };
